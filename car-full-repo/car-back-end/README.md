@@ -1,6 +1,6 @@
 # Car Backend API
 
-A Flask-based REST API for managing car data.
+A Flask-based REST API backend with microservices architecture.
 
 ## Setup
 
@@ -28,15 +28,20 @@ The API will be available at `http://localhost:5000`
 ## API Endpoints
 
 - `GET /` - Health check
-- `GET /api/cars` - Get all cars
-- `POST /api/cars` - Add a new car (requires: make, model, year)
-- `GET /api/cars/<id>` - Get a specific car
-- `DELETE /api/cars/<id>` - Delete a car
+- `GET /api/health` - API health check (frontend connection test)
+- `GET /api/db/health` - Database health check
 
-## Example Request
+## Architecture
 
-```bash
-curl -X POST http://localhost:5000/api/cars \
-  -H "Content-Type: application/json" \
-  -d '{"make": "Toyota", "model": "Camry", "year": 2023, "color": "Blue"}'
-```
+The backend follows a microservices architecture with a service controller:
+- **Service Controller**: Manages and orchestrates all microservices
+- **Startup Service**: Handles application startup logic and health checks
+- **Database Connection Service**: Manages database connections and setup
+- **Database Query Service**: Service for database query management
+
+## Database
+
+The application uses SQLite for local development:
+- Database file: `data/car_database.db`
+- Database setup runs automatically on first startup
+- Connection service manages a single persistent database connection
