@@ -23,27 +23,16 @@ def create_app():
     db_query_service = DatabaseQueryService(db_connection_service)
     controller.register_service(db_query_service)
     
+    # Initialize all services
+    controller.initialize_all_services()
+    
     return controller.get_app()
 
 
 def main():
     """Main entry point"""
-    # Initialize service controller
-    controller = ServiceController()
-    
-    # Register services
-    startup_service = StartupService()
-    controller.register_service(startup_service)
-    
-    # Register database services
-    db_connection_service = DatabaseConnectionService()
-    controller.register_service(db_connection_service)
-    
-    db_query_service = DatabaseQueryService(db_connection_service)
-    controller.register_service(db_query_service)
-    
-    # Run the application
-    controller.run(debug=True, host='0.0.0.0', port=5000)
+    app = create_app()
+    app.run(debug=True, host='0.0.0.0', port=5000)
 
 
 if __name__ == '__main__':

@@ -17,7 +17,7 @@ car-full-repo/
 │   │   ├── __init__.py
 │   │   ├── startup_service.py       # Startup service (health checks)
 │   │   ├── database_connection_service.py  # Database connection management
-│   │   └── database_query_service.py       # Database query management (CRUD)
+│   │   └── database_query_service.py       # Database query management
 │   └── utils/                       # Utility scripts
 │       ├── __init__.py
 │       └── database_setup_script.py # Database setup script
@@ -104,7 +104,7 @@ cd car-front-end
 
 - Microservices architecture with service controller
 - Database connection management service
-- Database query management service (ready for CRUD)
+- Database query management service
 - Database setup script with initialization tracking
 - Frontend-backend connection testing
 - Health check endpoints
@@ -130,5 +130,5 @@ The frontend uses a container-based architecture:
 The application uses SQLite for local development:
 - Database file: `car-back-end/data/car_database.db`
 - Database setup runs automatically on first startup
-- Connection service manages database connections
-- Query service ready for CRUD operations
+- Connection service manages a single persistent database connection
+- Query service available for future database operations
