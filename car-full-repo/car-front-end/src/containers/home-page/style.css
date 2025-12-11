@@ -1,0 +1,213 @@
+/* IBM Carbon Design System v11 - Design Tokens and Patterns */
+
+/* Carbon theme variables - G10 theme */
+:root {
+    --cds-background: #f4f4f4;
+    --cds-layer: #ffffff;
+    --cds-text-primary: #161616;
+    --cds-text-secondary: #525252;
+    --cds-interactive: #0f62fe;
+    --cds-interactive-hover: #0353e9;
+    --cds-support-success: #24a148;
+    --cds-support-error: #da1e28;
+    --cds-support-warning: #f1c21b;
+}
+
+/* Reset and base styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    background-color: var(--cds-background);
+    color: var(--cds-text-primary);
+    line-height: 1.5;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+/* Container using Carbon grid */
+.container {
+    max-width: 1584px; /* Carbon max container width */
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+/* Header section */
+.cds-header {
+    padding: 3rem 1rem;
+    text-align: center;
+    background-color: var(--cds-layer);
+    border-bottom: 1px solid #e0e0e0;
+    margin-bottom: 2rem;
+}
+
+.cds-header h1 {
+    font-size: 2.625rem;
+    font-weight: 400;
+    line-height: 1.19;
+    letter-spacing: 0;
+    margin: 0 0 0.5rem 0;
+    color: var(--cds-text-primary);
+}
+
+.cds-header p {
+    font-size: 1rem;
+    color: var(--cds-text-secondary);
+    margin: 0;
+}
+
+/* Main content area */
+.cds-content {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+/* Status card using Carbon tile pattern */
+.cds-status-card {
+    grid-column: 4 / 14;
+    background-color: var(--cds-layer);
+    padding: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1056px) {
+    .cds-status-card {
+        grid-column: 2 / 16;
+    }
+}
+
+@media (max-width: 672px) {
+    .cds-status-card {
+        grid-column: 1 / -1;
+        padding: 1.5rem;
+    }
+}
+
+.cds-status-card h2 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    margin: 0 0 1.5rem 0;
+    color: var(--cds-text-primary);
+}
+
+/* Status indicator using Carbon notification pattern */
+.cds-status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 0;
+    margin-bottom: 1.5rem;
+    min-height: 3rem;
+}
+
+.cds-status-indicator.loading {
+    background-color: #fff3cd;
+    border-left: 4px solid var(--cds-support-warning);
+}
+
+.cds-status-indicator.success {
+    background-color: #defbe6;
+    border-left: 4px solid var(--cds-support-success);
+}
+
+.cds-status-indicator.error {
+    background-color: #fff1f1;
+    border-left: 4px solid var(--cds-support-error);
+}
+
+.cds-status-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.cds-status-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: 0.16px;
+}
+
+.cds-status-indicator.loading .cds-status-text {
+    color: #8c6800;
+}
+
+.cds-status-indicator.success .cds-status-text {
+    color: #0e6027;
+}
+
+.cds-status-indicator.error .cds-status-text {
+    color: #750e13;
+}
+
+/* Status details using Carbon structured list pattern */
+.cds-status-details {
+    padding: 1rem;
+    background-color: var(--cds-background);
+}
+
+.cds-status-details.success {
+    background-color: #f4f9f6;
+}
+
+.cds-status-details.error {
+    background-color: #fff9f9;
+}
+
+.cds-status-details p {
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+}
+
+.cds-status-details strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+/* Carbon-style loading spinner */
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.cds-loading-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid var(--cds-support-warning);
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 672px) {
+    .cds-header {
+        padding: 2rem 1rem;
+    }
+    
+    .cds-header h1 {
+        font-size: 2rem;
+    }
+    
+    .cds-status-card {
+        padding: 1rem;
+    }
+}

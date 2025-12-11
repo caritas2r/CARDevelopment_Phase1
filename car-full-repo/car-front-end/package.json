@@ -1,0 +1,9 @@
+{
+  "name": "car-front-end",
+  "version": "1.0.0",
+  "description": "Car Management Frontend",
+  "type": "module",
+  "dependencies": {
+    "@carbon/styles": "^1.38.0"
+  }
+}
