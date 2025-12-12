@@ -6,26 +6,42 @@ A full-stack application with a Python Flask backend and a lightweight frontend 
 
 ```
 car-full-repo/
+├── .gitignore                       # Git ignore rules
+├── README.md                        # This file
+│
 ├── car-back-end/                    # Flask API backend (microservices architecture)
 │   ├── app.py                       # Application entry point
-│   ├── requirements.txt
-│   ├── README.md
-│   ├── src/                         # Source code
+│   ├── requirements.txt             # Python dependencies
+│   ├── README.md                    # Backend documentation
+│   ├── data/                        # Data directory
+│   │   └── car_database.db          # SQLite database (gitignored)
+│   ├── schemas/                     # Vehicle Selection V1 schema
 │   │   ├── __init__.py
-│   │   └── service_controller.py    # Service controller that manages all microservices
+│   │   ├── README.md                # Schema documentation
+│   │   ├── vehicle_selection_v1_schema.json  # JSON Schema definition
+│   │   ├── vehicle_selection_v1_vocab.py    # Canonical vocabularies
+│   │   └── training_example.json   # Example training data
 │   ├── services/                    # Microservices
 │   │   ├── __init__.py
 │   │   ├── startup_service.py       # Startup service (health checks)
 │   │   ├── database_connection_service.py  # Database connection management
-│   │   └── database_query_service.py       # Database query management
+│   │   ├── database_query_service.py       # Database query management
+│   │   ├── query_service.py         # Query orchestration
+│   │   ├── inference_service.py     # NLP to JSON conversion
+│   │   └── json_input_converter_service.py  # JSON to SQL conversion
+│   ├── src/                         # Source code
+│   │   ├── __init__.py
+│   │   └── service_controller.py    # Service controller
 │   └── utils/                       # Utility scripts
 │       ├── __init__.py
-│       └── database_setup_script.py # Database setup script
+│       ├── database_setup_script.py # Database setup script
+│       └── schema_validator.py      # Schema validation utility
 │
 └── car-front-end/                   # Lightweight frontend
     ├── index.html                   # Main HTML file
     ├── app.js                       # App entry point (routing)
-    ├── README.md
+    ├── package.json                 # Node dependencies
+    ├── README.md                    # Frontend documentation
     └── src/                         # Source code
         └── containers/              # Page containers
             └── home-page/           # Home page container
@@ -89,6 +105,9 @@ cd car-front-end
 - `GET /` - Health check
 - `GET /api/health` - API health check (frontend connection test)
 - `GET /api/db/health` - Database health check
+- `POST /api/query/v1` - Process natural language vehicle queries
+  - Request body: `{ "query": "natural language text" }`
+  - Returns: Structured JSON conforming to Vehicle Selection V1 schema
 
 ## Technology Stack
 
@@ -96,39 +115,81 @@ cd car-front-end
   - Python, Flask, Flask-CORS
   - SQLite (local database)
   - Microservices architecture with service controller
+  - JSON Schema validation (jsonschema)
+  - NLP to JSON translation pipeline
 - **Frontend:** 
   - HTML5, CSS3, Vanilla JavaScript (ES6 modules)
   - Container-based architecture
+  - IBM Carbon Design System v11
 
 ## Features
 
+### Backend
 - Microservices architecture with service controller
 - Database connection management service
 - Database query management service
+- Natural language query processing pipeline
+- Vehicle Selection V1 schema for structured queries
+- Schema validation utility
 - Database setup script with initialization tracking
-- Frontend-backend connection testing
 - Health check endpoints
 - CORS enabled for cross-origin requests
+
+### Frontend
 - Container-based frontend architecture
+- IBM Carbon Design System v11 styling
+- Responsive design
 
 ## Architecture
 
 ### Backend
 The backend follows a microservices architecture:
+
+**Core Services:**
 - **Service Controller**: Manages and orchestrates all microservices
-- **Services**: Individual microservices (startup, database connection, database query)
-- **Utils**: Utility scripts for database setup and other tasks
+- **Startup Service**: Handles application startup and health checks
+- **Database Connection Service**: Manages database connections
+- **Database Query Service**: Handles database queries
+
+**Query Processing Pipeline:**
+1. **Query Service**: Receives natural language query, orchestrates processing
+2. **Inference Service**: Converts natural language to structured JSON (Vehicle Selection V1 schema)
+3. **JSON Input Converter Service**: Converts structured JSON to SQL
+4. **Database Query Service**: Executes SQL queries
+
+**Supporting Components:**
+- **Schemas**: Vehicle Selection V1 schema definitions and vocabularies
+- **Schema Validator**: Validates JSON output against schema
+- **Utils**: Utility scripts for database setup and validation
 
 ### Frontend
 The frontend uses a container-based architecture:
 - **app.js**: Entry point that handles routing
 - **Containers**: Page-level components (home-page, etc.)
 - Each container has its own logic (`index.js`) and styles (`style.css`)
+- IBM Carbon Design System v11 for consistent styling
 
 ## Database
 
 The application uses SQLite for local development:
-- Database file: `car-back-end/data/car_database.db`
+- Database file: `car-back-end/data/car_database.db` (gitignored)
 - Database setup runs automatically on first startup
 - Connection service manages a single persistent database connection
-- Query service available for future database operations
+- Query service handles all database operations
+
+## Vehicle Selection V1 Schema
+
+The system uses a structured schema for vehicle selection queries. This schema:
+- Defines a frozen V1 contract for NLP-to-JSON translation
+- Includes canonical vocabularies for consistent training
+- Supports comprehensive vehicle selection criteria:
+  - Vehicle type (body styles)
+  - Capacity and practicality
+  - Intended use cases
+  - Powertrain and drivability
+  - Features and amenities
+  - Ownership constraints (budget, year, mileage)
+  - Preference signals (reliability, safety)
+  - Location constraints
+
+See `car-back-end/schemas/README.md` for detailed schema documentation.
