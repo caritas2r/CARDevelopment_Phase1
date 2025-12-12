@@ -5,6 +5,9 @@ from src.service_controller import ServiceController
 from services.startup_service import StartupService
 from services.database_connection_service import DatabaseConnectionService
 from services.database_query_service import DatabaseQueryService
+from services.inference_service import InferenceService
+from services.json_input_converter_service import JsonInputConverterService
+from services.query_service import QueryService
 
 
 def create_app():
@@ -12,7 +15,7 @@ def create_app():
     # Initialize service controller
     controller = ServiceController()
     
-    # Register services
+    # Register core services
     startup_service = StartupService()
     controller.register_service(startup_service)
     
@@ -22,6 +25,22 @@ def create_app():
     
     db_query_service = DatabaseQueryService(db_connection_service)
     controller.register_service(db_query_service)
+    
+    # Register query processing services
+    # These services form the NLP-to-SQL pipeline
+    inference_service = InferenceService()
+    controller.register_service(inference_service)
+    
+    json_converter_service = JsonInputConverterService()
+    controller.register_service(json_converter_service)
+    
+    # QueryService depends on the other services, so create it after they're instantiated
+    query_service = QueryService(
+        inference_service=inference_service,
+        json_converter_service=json_converter_service,
+        database_query_service=db_query_service
+    )
+    controller.register_service(query_service)
     
     # Initialize all services
     controller.initialize_all_services()
