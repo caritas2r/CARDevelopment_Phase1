@@ -1,6 +1,6 @@
 # Car Backend API
 
-A Flask-based REST API backend with microservices architecture.
+A Flask-based REST API backend with microservices architecture for vehicle selection and query processing.
 
 ## Setup
 
@@ -30,18 +30,90 @@ The API will be available at `http://localhost:5000`
 - `GET /` - Health check
 - `GET /api/health` - API health check (frontend connection test)
 - `GET /api/db/health` - Database health check
+- `POST /api/query/v1` - Process natural language vehicle queries (returns structured JSON)
 
 ## Architecture
 
 The backend follows a microservices architecture with a service controller:
+
+### Core Services
 - **Service Controller**: Manages and orchestrates all microservices
 - **Startup Service**: Handles application startup logic and health checks
 - **Database Connection Service**: Manages database connections and setup
 - **Database Query Service**: Service for database query management
 
+### Query Processing Services
+- **Query Service**: Orchestrates the natural language query processing pipeline
+- **Inference Service**: Processes natural language queries through inference model (NLP to JSON)
+- **JSON Input Converter Service**: Converts structured JSON query to SQL
+
+### Utilities
+- **Schema Validator**: Validates JSON output against Vehicle Selection V1 schema
+- **Database Setup Script**: Handles database initialization
+
+## Project Structure
+
+```
+car-back-end/
+├── app.py                          # Application entry point
+├── requirements.txt                # Python dependencies
+├── README.md                       # This file
+├── data/
+│   └── car_database.db            # SQLite database (gitignored)
+├── schemas/                        # Vehicle Selection V1 schema definitions
+│   ├── __init__.py
+│   ├── README.md                   # Schema documentation
+│   ├── vehicle_selection_v1_schema.json  # JSON Schema (Draft-07)
+│   ├── vehicle_selection_v1_vocab.py     # Canonical vocabularies
+│   └── training_example.json      # Example training data
+├── services/                       # Microservices
+│   ├── __init__.py
+│   ├── startup_service.py         # Startup and health checks
+│   ├── database_connection_service.py
+│   ├── database_query_service.py
+│   ├── query_service.py           # Query orchestration
+│   ├── inference_service.py       # NLP to JSON conversion
+│   └── json_input_converter_service.py  # JSON to SQL conversion
+├── src/
+│   ├── __init__.py
+│   └── service_controller.py      # Service controller
+└── utils/                          # Utility scripts
+    ├── __init__.py
+    ├── database_setup_script.py
+    └── schema_validator.py         # Schema validation utility
+```
+
+## Vehicle Selection V1 Schema
+
+The backend uses a structured schema for vehicle selection queries. See `schemas/README.md` for detailed documentation.
+
+### Key Features
+- **Structured JSON Output**: Natural language queries are converted to structured JSON
+- **Schema Validation**: All outputs are validated against Vehicle Selection V1 schema
+- **Canonical Vocabularies**: Consistent enum values for training and inference
+
+### Example Query
+
+**Input:**
+```json
+{
+  "query": "I need an SUV for my family of 5, under $30k, with AWD and backup camera"
+}
+```
+
+**Output:** (Structured JSON conforming to Vehicle Selection V1 schema)
+See `schemas/training_example.json` for a complete example.
+
 ## Database
 
 The application uses SQLite for local development:
-- Database file: `data/car_database.db`
+- Database file: `data/car_database.db` (gitignored)
 - Database setup runs automatically on first startup
 - Connection service manages a single persistent database connection
+
+## Dependencies
+
+- Flask 3.0.0 - Web framework
+- flask-cors 4.0.0 - CORS support
+- python-dotenv 1.0.0 - Environment variable management
+- jsonschema 4.20.0 - JSON schema validation

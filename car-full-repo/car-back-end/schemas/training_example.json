@@ -1,0 +1,50 @@
+{
+  "query_text": "I need an SUV for my family of 5, under $30k, with AWD and backup camera",
+  "vehicle_type": {
+    "include_body_styles": ["suv"],
+    "exclude_body_styles": []
+  },
+  "capacity_practicality": {
+    "min_seating_capacity": 5,
+    "kid_count": null,
+    "pet_count": null,
+    "cargo_priority": null,
+    "cargo_flexibility": {}
+  },
+  "intended_use": {
+    "use_case_tags": ["family"]
+  },
+  "powertrain_drivability": {
+    "transmission": "unspecified",
+    "drivetrain": "AWD",
+    "powertrain_type": "unspecified",
+    "fuel_economy_priority": null
+  },
+  "features_amenities": {
+    "must_have": ["backup_camera"],
+    "nice_to_have": [],
+    "avoid": []
+  },
+  "ownership_constraints": {
+    "budget": {
+      "currency": "USD",
+      "min": null,
+      "max": 30000,
+      "strict_max": true
+    },
+    "year": {
+      "min": null,
+      "max": null
+    },
+    "mileage": {
+      "max": null,
+      "qualitative": null
+    }
+  },
+  "preference_signals": {
+    "reliability_maintenance_priority": "unspecified",
+    "safety_priority": "unspecified"
+  },
+  "location_constraints": null
+}
+
