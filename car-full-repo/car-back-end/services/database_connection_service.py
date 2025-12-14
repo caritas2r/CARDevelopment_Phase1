@@ -57,6 +57,171 @@ class DatabaseConnectionService:
                     'database': 'unhealthy',
                     'error': str(e)
                 }), 503
+        
+        @app.route('/api/db/schema')
+        def db_schema():
+            """Database schema introspection endpoint"""
+            try:
+                # Check if service is initialized
+                if not self.initialized:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Database connection service not initialized",
+                        "error": "Service not ready"
+                    }), 503
+                
+                # Get connection (will create if needed)
+                # Note: get_connection() may raise RuntimeError if database doesn't exist
+                try:
+                    conn = self.get_connection()
+                except RuntimeError as e:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Database not found",
+                        "error": str(e)
+                    }), 404
+                except Exception as e:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Failed to get database connection",
+                        "error": str(e)
+                    }), 503
+                
+                if conn is None:
+                    return jsonify({
+                        "status": "error",
+                        "message": "Failed to get database connection",
+                        "error": "Connection is None"
+                    }), 503
+                
+                # Get all user tables (exclude sqlite internal tables)
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT name
+                    FROM sqlite_master
+                    WHERE type='table'
+                      AND name NOT LIKE 'sqlite_%'
+                    ORDER BY name;
+                """)
+                tables = cursor.fetchall()
+                
+                schema = {
+                    "database_path": self.db_path,
+                    "tables": []
+                }
+                
+                for t in tables:
+                    # Extract table name (should be a tuple from fetchall)
+                    if not isinstance(t, (tuple, list)) or len(t) == 0:
+                        continue  # Skip invalid table entries
+                    
+                    table_name = t[0]
+                    
+                    # Safety check: table name must be a non-empty string
+                    if not table_name or not isinstance(table_name, str):
+                        continue
+                    
+                    # Safety check: validate table name contains only safe characters
+                    # SQLite table names should only contain alphanumeric, underscore, and dollar sign
+                    if not all(c.isalnum() or c in ('_', '$') for c in table_name):
+                        continue  # Skip invalid table names
+                    
+                    # Get table columns
+                    cursor.execute(f"PRAGMA table_info('{table_name}')")
+                    columns = cursor.fetchall()
+                    # Get table indexes
+                    cursor.execute(f"PRAGMA index_list('{table_name}')")
+                    indexes = cursor.fetchall()
+                    # Get foreign keys
+                    cursor.execute(f"PRAGMA foreign_key_list('{table_name}')")
+                    fks = cursor.fetchall()
+                    
+                    # Get index details
+                    index_details = []
+                    for idx in indexes:
+                        # PRAGMA index_list returns: (seq, name, unique, origin, partial)
+                        # idx[0] = seq, idx[1] = name, idx[2] = unique (0 or 1)
+                        if not isinstance(idx, (tuple, list)) or len(idx) < 2:
+                            continue  # Skip invalid index entries
+                        
+                        idx_name = idx[1]
+                        
+                        # Safety check: index name must be a non-empty string
+                        if not idx_name or not isinstance(idx_name, str):
+                            continue
+                        
+                        # Safety check: validate index name
+                        if not all(c.isalnum() or c in ('_', '$') for c in idx_name):
+                            continue  # Skip invalid index names
+                        
+                        cursor.execute(f"PRAGMA index_info('{idx_name}')")
+                        idx_info = cursor.fetchall()
+                        
+                        # Extract column names from index info
+                        # PRAGMA index_info returns: (seqno, cid, name)
+                        # Note: name can be None for expression-based indexes
+                        idx_columns = []
+                        for ii in idx_info:
+                            if isinstance(ii, (tuple, list)) and len(ii) > 2:
+                                col_name = ii[2]  # Column name is at index 2
+                                if col_name and isinstance(col_name, str):
+                                    idx_columns.append(col_name)
+                        
+                        index_details.append({
+                            "name": idx_name,
+                            "unique": bool(idx[2]) if isinstance(idx, (tuple, list)) and len(idx) > 2 else False,
+                            "columns": idx_columns
+                        })
+                    
+                    # Process columns
+                    # PRAGMA table_info returns: (cid, name, type, notnull, dflt_value, pk)
+                    column_list = []
+                    for c in columns:
+                        if isinstance(c, (tuple, list)) and len(c) >= 6:
+                            column_list.append({
+                                "cid": c[0],
+                                "name": c[1],
+                                "type": c[2],
+                                "notnull": bool(c[3]),
+                                "default": c[4],
+                                "pk": bool(c[5]),
+                            })
+                    
+                    # Process foreign keys
+                    # PRAGMA foreign_key_list returns: (id, seq, table, from, to, on_update, on_delete, match)
+                    fk_list = []
+                    for fk in fks:
+                        if isinstance(fk, (tuple, list)) and len(fk) >= 8:
+                            fk_list.append({
+                                "id": fk[0],
+                                "seq": fk[1],
+                                "table": fk[2],
+                                "from": fk[3],
+                                "to": fk[4],
+                                "on_update": fk[5],
+                                "on_delete": fk[6],
+                                "match": fk[7],
+                            })
+                    
+                    schema["tables"].append({
+                        "name": table_name,
+                        "columns": column_list,
+                        "indexes": index_details,
+                        "foreign_keys": fk_list,
+                    })
+                
+                return jsonify(schema)
+                
+            except Exception as e:
+                import traceback
+                error_trace = traceback.format_exc()
+                print(f"[db_schema] Error: {str(e)}")
+                print(f"[db_schema] Traceback: {error_trace}")
+                return jsonify({
+                    "status": "error",
+                    "message": "Failed to introspect database schema",
+                    "error": str(e),
+                }), 500
     
     def database_exists(self):
         """
@@ -128,11 +293,14 @@ class DatabaseConnectionService:
             sqlite3.Connection: Database connection object
         """
         if self.connection is None:
+            if not os.path.exists(self.db_path):
+                raise RuntimeError(f"Database file does not exist at {self.db_path}")
+            
             self.connection = sqlite3.connect(self.db_path)
             # Enable foreign keys
             self.connection.execute('PRAGMA foreign_keys = ON')
-            # Set row factory for easier access
-            self.connection.row_factory = sqlite3.Row
+            # Don't set row_factory to Row for PRAGMA commands - they work better with tuples
+            # self.connection.row_factory = sqlite3.Row
         
         return self.connection
     

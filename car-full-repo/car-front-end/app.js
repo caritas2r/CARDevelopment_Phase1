@@ -1,9 +1,61 @@
-// App entry point - launches the app and routes to the default route (home page)
+// App entry point - hash-based routing for frontend navigation
 
-// Load home page container (default route)
+// Load containers (these are ES6 modules, so they execute immediately)
 import './src/containers/home-page/index.js';
+import './src/containers/db-schema-page/index.js';
 
-// Initialize app
+// Hash-based routing
+function route() {
+    const hash = window.location.hash || '#/';
+    
+    // Normalize hash (remove trailing slash except for root)
+    const normalizedHash = hash === '#' || hash === '' ? '#/' : hash;
+    
+    console.log('[Router] Current hash:', normalizedHash);
+    console.log('[Router] renderHomePage available:', typeof window.renderHomePage);
+    console.log('[Router] renderDbSchemaPage available:', typeof window.renderDbSchemaPage);
+    
+    if (normalizedHash === '#/db-schema') {
+        console.log('[Router] Routing to DB Schema page');
+        if (window.renderDbSchemaPage) {
+            window.renderDbSchemaPage();
+        } else {
+            console.error('[Router] renderDbSchemaPage not available! Retrying...');
+            // Retry after a short delay if function not available yet
+            setTimeout(() => {
+                if (window.renderDbSchemaPage) {
+                    window.renderDbSchemaPage();
+                } else {
+                    console.error('[Router] renderDbSchemaPage still not available after retry');
+                }
+            }, 100);
+        }
+    } else {
+        console.log('[Router] Routing to Home page');
+        if (window.renderHomePage) {
+            window.renderHomePage();
+        } else {
+            console.error('[Router] renderHomePage not available! Retrying...');
+            // Retry after a short delay if function not available yet
+            setTimeout(() => {
+                if (window.renderHomePage) {
+                    window.renderHomePage();
+                } else {
+                    console.error('[Router] renderHomePage still not available after retry');
+                }
+            }, 100);
+        }
+    }
+}
+
+// Handle hash changes
+window.addEventListener('hashchange', route);
+
+// Initialize on DOM ready
+// Use a small delay to ensure modules have loaded and exposed their functions
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('App initialized - routing to home page');
+    // Small delay to ensure ES6 modules have executed
+    setTimeout(() => {
+        route();
+    }, 50);
 });
