@@ -49,11 +49,14 @@ async function loadSchema() {
     try {
         const res = await fetch(`${API_BASE_URL}/api/db/schema`);
         
-        if (!res.ok) {
-            throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-        }
-        
+        // Parse response even if not ok to get error details
         const data = await res.json();
+        
+        if (!res.ok) {
+            // Use error message from backend if available
+            const errorMsg = data.error || data.message || `HTTP ${res.status}: ${res.statusText}`;
+            throw new Error(errorMsg);
+        }
         
         statusDiv.innerHTML = `
             <div class="cds-status-indicator success">
@@ -125,14 +128,25 @@ async function loadSchema() {
             bodyDiv.innerHTML = '<p>No tables found in database.</p>';
         }
     } catch (error) {
+        console.error('[DbSchemaPage] Error loading schema:', error);
+        
+        // Extract more details from error if available
+        let errorDetails = escapeHtml(error.message);
+        if (error.message.includes('Database not found')) {
+            errorDetails += '<br><em>The database will be created automatically when the backend initializes.</em>';
+        } else if (error.message.includes('connection')) {
+            errorDetails += '<br><em>Try refreshing the page. The connection may need to be re-established.</em>';
+        }
+        
         statusDiv.innerHTML = `
             <div class="cds-status-indicator error">
                 <span class="cds-status-icon">✕</span>
                 <span class="cds-status-text">Failed to load schema</span>
             </div>
             <div class="cds-status-details error">
-                <p><strong>Error:</strong> ${escapeHtml(error.message)}</p>
+                <p><strong>Error:</strong> ${errorDetails}</p>
                 <p>Please ensure the backend is running at ${API_BASE_URL}</p>
+                <p><button onclick="window.location.reload()" class="cds-button cds-button--secondary" style="margin-top: 0.5rem;">Retry</button></p>
             </div>
         `;
         bodyDiv.innerHTML = '';

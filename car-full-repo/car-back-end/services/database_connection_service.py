@@ -70,28 +70,54 @@ class DatabaseConnectionService:
                         "error": "Service not ready"
                     }), 503
                 
-                # Get connection (will create if needed)
-                # Note: get_connection() may raise RuntimeError if database doesn't exist
-                try:
-                    conn = self.get_connection()
-                except RuntimeError as e:
-                    return jsonify({
-                        "status": "error",
-                        "message": "Database not found",
-                        "error": str(e)
-                    }), 404
-                except Exception as e:
-                    return jsonify({
-                        "status": "error",
-                        "message": "Failed to get database connection",
-                        "error": str(e)
-                    }), 503
+                # Get connection (will create if needed, and auto-create database if missing)
+                # Try to get connection, with retry on failure
+                conn = None
+                max_retries = 2
+                for attempt in range(max_retries):
+                    try:
+                        # On retry, refresh the connection
+                        refresh = (attempt > 0)
+                        conn = self.get_connection(refresh=refresh)
+                        break
+                    except RuntimeError as e:
+                        # Database doesn't exist and couldn't be created
+                        if attempt == max_retries - 1:
+                            return jsonify({
+                                "status": "error",
+                                "message": "Database not found and could not be created",
+                                "error": str(e),
+                                "database_path": self.db_path
+                            }), 404
+                        # Retry - maybe database was just created
+                        continue
+                    except (sqlite3.Error, sqlite3.OperationalError) as e:
+                        # Database connection error
+                        if attempt == max_retries - 1:
+                            return jsonify({
+                                "status": "error",
+                                "message": "Database connection error",
+                                "error": str(e),
+                                "database_path": self.db_path
+                            }), 503
+                        # Retry with fresh connection
+                        print(f"[db_schema] Connection error on attempt {attempt + 1}, retrying...")
+                        continue
+                    except Exception as e:
+                        # Other unexpected errors
+                        return jsonify({
+                            "status": "error",
+                            "message": "Failed to get database connection",
+                            "error": str(e),
+                            "database_path": self.db_path
+                        }), 503
                 
                 if conn is None:
                     return jsonify({
                         "status": "error",
-                        "message": "Failed to get database connection",
-                        "error": "Connection is None"
+                        "message": "Failed to get database connection after retries",
+                        "error": "Connection is None",
+                        "database_path": self.db_path
                     }), 503
                 
                 # Get all user tables (exclude sqlite internal tables)
@@ -285,22 +311,53 @@ class DatabaseConnectionService:
             print(f"[{self.name}] ERROR: Failed to create database: {e}")
             raise
     
-    def get_connection(self):
+    def get_connection(self, refresh=False):
         """
         Get or create a database connection
+        
+        Args:
+            refresh: If True, close existing connection and create a new one
         
         Returns:
             sqlite3.Connection: Database connection object
         """
-        if self.connection is None:
-            if not os.path.exists(self.db_path):
-                raise RuntimeError(f"Database file does not exist at {self.db_path}")
-            
-            self.connection = sqlite3.connect(self.db_path)
-            # Enable foreign keys
-            self.connection.execute('PRAGMA foreign_keys = ON')
-            # Don't set row_factory to Row for PRAGMA commands - they work better with tuples
-            # self.connection.row_factory = sqlite3.Row
+        # Refresh connection if requested
+        if refresh and self.connection:
+            try:
+                self.connection.close()
+            except:
+                pass
+            self.connection = None
+        
+        # Check if connection exists and is still valid
+        if self.connection is not None:
+            try:
+                # Test if connection is still alive
+                self.connection.execute('SELECT 1')
+                return self.connection
+            except (sqlite3.Error, sqlite3.ProgrammingError):
+                # Connection is stale, close it and create a new one
+                print(f"[{self.name}] Connection is stale, refreshing...")
+                try:
+                    self.connection.close()
+                except:
+                    pass
+                self.connection = None
+        
+        # Create new connection
+        if not os.path.exists(self.db_path):
+            # Try to create database if it doesn't exist
+            print(f"[{self.name}] Database not found at {self.db_path}, attempting to create...")
+            try:
+                self.create_database()
+            except Exception as e:
+                raise RuntimeError(f"Database file does not exist at {self.db_path} and could not be created: {e}")
+        
+        self.connection = sqlite3.connect(self.db_path)
+        # Enable foreign keys
+        self.connection.execute('PRAGMA foreign_keys = ON')
+        # Don't set row_factory to Row for PRAGMA commands - they work better with tuples
+        # self.connection.row_factory = sqlite3.Row
         
         return self.connection
     
