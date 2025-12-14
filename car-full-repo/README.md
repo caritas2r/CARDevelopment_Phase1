@@ -35,6 +35,9 @@ car-full-repo/
 │   └── utils/                       # Utility scripts
 │       ├── __init__.py
 │       ├── database_setup_script.py # Database setup script
+│       ├── db_bootstrap.py          # Database schema bootstrap (PoC pattern)
+│       ├── DB_BOOTSTRAP_README.md   # Database bootstrap documentation
+│       ├── inspect_database.py      # Database inspection utility
 │       └── schema_validator.py      # Schema validation utility
 │
 └── car-front-end/                   # Lightweight frontend
@@ -174,8 +177,14 @@ The frontend uses a container-based architecture:
 The application uses SQLite for local development:
 - Database file: `car-back-end/data/car_database.db` (gitignored)
 - Database setup runs automatically on first startup
+- Database schema is created using the bootstrap pattern (idempotent, safe to run on every startup)
+- Schema includes three tables:
+  - `vehicles`: Main vehicle inventory table with all vehicle attributes
+  - `vehicle_features`: Junction table for vehicle features (many-to-many)
+  - `query_history`: Stores processed queries for analytics
 - Connection service manages a single persistent database connection
 - Query service handles all database operations
+- See `car-back-end/utils/DB_BOOTSTRAP_README.md` for detailed database schema documentation
 
 ## Vehicle Selection V1 Schema
 

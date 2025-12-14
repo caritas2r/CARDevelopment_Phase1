@@ -50,6 +50,8 @@ The backend follows a microservices architecture with a service controller:
 ### Utilities
 - **Schema Validator**: Validates JSON output against Vehicle Selection V1 schema
 - **Database Setup Script**: Handles database initialization
+- **Database Bootstrap**: Creates database schema using PoC pattern (idempotent, safe to run on every startup)
+- **Database Inspector**: Utility script to inspect database structure and contents
 
 ## Project Structure
 
@@ -79,7 +81,10 @@ car-back-end/
 │   └── service_controller.py      # Service controller
 └── utils/                          # Utility scripts
     ├── __init__.py
-    ├── database_setup_script.py
+    ├── database_setup_script.py    # Database setup script
+    ├── db_bootstrap.py              # Database schema bootstrap (PoC pattern)
+    ├── DB_BOOTSTRAP_README.md       # Database bootstrap documentation
+    ├── inspect_database.py          # Database inspection utility
     └── schema_validator.py         # Schema validation utility
 ```
 
@@ -109,7 +114,14 @@ See `schemas/training_example.json` for a complete example.
 The application uses SQLite for local development:
 - Database file: `data/car_database.db` (gitignored)
 - Database setup runs automatically on first startup
+- Database schema is created using the bootstrap pattern (idempotent, safe to run on every startup)
+- Schema includes three tables:
+  - `vehicles`: Main vehicle inventory table with all vehicle attributes (make, model, year, body_style, price, currency, transmission, drivetrain, powertrain_type, seating_capacity, mileage, location)
+  - `vehicle_features`: Junction table for vehicle features (many-to-many relationship)
+  - `query_history`: Stores processed NLP queries and their Vehicle Selection V1 JSON representations
 - Connection service manages a single persistent database connection
+- See `utils/DB_BOOTSTRAP_README.md` for detailed database schema documentation
+- Use `python utils/inspect_database.py` to inspect the database structure
 
 ## Dependencies
 
