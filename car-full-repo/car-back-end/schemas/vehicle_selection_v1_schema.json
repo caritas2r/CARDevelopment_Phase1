@@ -33,9 +33,24 @@
     "capacity_practicality": {
       "type": "object",
       "properties": {
-        "min_seating_capacity": { "type": ["integer", "null"], "minimum": 1 },
-        "kid_count": { "type": ["integer", "null"], "minimum": 0 },
-        "pet_count": { "type": ["integer", "null"], "minimum": 0 },
+        "min_seating_capacity": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
+        "kid_count": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
+        "pet_count": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
         "cargo_priority": { "$ref": "#/definitions/priority_level" },
         "cargo_flexibility": {
           "type": "object",
@@ -102,8 +117,18 @@
                 { "type": "string", "enum": ["unspecified"] }
               ]
             },
-            "min": { "type": ["number", "null"] },
-            "max": { "type": ["number", "null"] },
+            "min": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "max": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
             "strict_max": { "$ref": "#/definitions/boolean_with_unspecified" }
           },
           "additionalProperties": false
@@ -111,8 +136,18 @@
         "year": {
           "type": "object",
           "properties": {
-            "min": { "type": ["integer", "null"] },
-            "max": { "type": ["integer", "null"] }
+            "min": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "max": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            }
           },
           "additionalProperties": false
         },
@@ -147,9 +182,14 @@
     "location_constraints": {
       "type": ["object", "null"],
       "properties": {
-        "city": { "type": ["string", "null"] },
-        "state_region": { "type": ["string", "null"] },
-        "radius_miles": { "type": ["number", "null"] }
+        "city": { "type": "string" },
+        "state_region": { "type": "string" },
+        "radius_miles": {
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        }
       },
       "additionalProperties": false
     }

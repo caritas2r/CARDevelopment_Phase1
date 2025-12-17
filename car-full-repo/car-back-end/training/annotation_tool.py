@@ -104,6 +104,28 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
             enum_values = field.get('enum_values', [])
             value = FieldPrompter.prompt_array_enum(field_name, enum_values, nullable, required)
             set_nested_value(annotated, field_path, value)
+            
+            # Validate vehicle_type immediately after both arrays are set
+            if field_name in ('vehicle_type.include_body_styles', 'vehicle_type.exclude_body_styles'):
+                vehicle_type = annotated.get('vehicle_type', {})
+                include = vehicle_type.get('include_body_styles')
+                exclude = vehicle_type.get('exclude_body_styles')
+                
+                # Only validate if both arrays have been set (keys exist in dict)
+                if 'include_body_styles' in vehicle_type and 'exclude_body_styles' in vehicle_type:
+                    # Filter out 'unspecified' from arrays for validation
+                    include_filtered = [x for x in include if x != 'unspecified'] if include else []
+                    exclude_filtered = [x for x in exclude if x != 'unspecified'] if exclude else []
+                    
+                    if len(include_filtered) == 0 and len(exclude_filtered) == 0:
+                        print("\n" + "="*60)
+                        print("VALIDATION ERROR: vehicle_type")
+                        print("="*60)
+                        print("At least one of 'include_body_styles' or 'exclude_body_styles' must have values.")
+                        print("You cannot leave both arrays empty or only have 'unspecified'.")
+                        print("Please select at least one actual body style (not 'unspecified') in one of the arrays.")
+                        print("="*60)
+                        raise ValueError("vehicle_type must have at least one non-empty array with actual body styles")
         
         elif field_type in ('integer', 'number'):
             value = FieldPrompter.prompt_number(field_name, nullable, required)
