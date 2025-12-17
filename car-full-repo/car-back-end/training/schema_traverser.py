@@ -49,6 +49,18 @@ class SchemaTraverser:
             ref_schema = self.resolve_ref(field_schema['$ref'])
             return self.get_field_type(ref_schema)
         
+        # Handle oneOf (for integer or "unspecified" patterns like currency, mileage.max)
+        if 'oneOf' in field_schema:
+            one_of = field_schema['oneOf']
+            # Check if it's integer or "unspecified" string pattern
+            has_integer = any(item.get('type') == 'integer' for item in one_of)
+            has_unspecified_string = any(
+                item.get('type') == 'string' and item.get('enum') == ['unspecified']
+                for item in one_of
+            )
+            if has_integer and has_unspecified_string:
+                return 'integer_or_unspecified'
+        
         # Check for enum
         if 'enum' in field_schema:
             return 'enum'
@@ -174,6 +186,16 @@ class SchemaTraverser:
                         'type': 'enum',
                         'enum_values': enum_values,
                         'nullable': self.is_nullable(prop_schema),
+                        'required': prop_required
+                    })
+                
+                # Handle integer_or_unspecified (currency, mileage.max)
+                elif field_type == 'integer_or_unspecified':
+                    fields.append({
+                        'path': prop_path,
+                        'name': '.'.join(prop_path),
+                        'type': 'integer_or_unspecified',
+                        'nullable': False,  # Uses "unspecified" instead of null
                         'required': prop_required
                     })
                 

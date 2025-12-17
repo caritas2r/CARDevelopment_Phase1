@@ -84,6 +84,16 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
             print("Skipping...")
             continue
         
+        # Special message for vehicle_type arrays
+        if field_name in ('vehicle_type.include_body_styles', 'vehicle_type.exclude_body_styles'):
+            if 'vehicle_type' not in annotated or not annotated.get('vehicle_type'):
+                print("\n" + "="*60)
+                print("IMPORTANT: vehicle_type requirement")
+                print("="*60)
+                print("At least ONE of 'include_body_styles' or 'exclude_body_styles' must have values.")
+                print("You cannot leave both arrays empty.")
+                print("="*60 + "\n")
+        
         # Prompt based on field type
         if field_type == 'enum':
             enum_values = field.get('enum_values', [])
@@ -107,9 +117,33 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
             value = FieldPrompter.prompt_boolean(field_name, nullable, required)
             set_nested_value(annotated, field_path, value)
         
+        elif field_type == 'integer_or_unspecified':
+            value = FieldPrompter.prompt_integer_or_unspecified(field_name, required)
+            set_nested_value(annotated, field_path, value)
+        
         else:
             print(f"\n=== Field: {field_name} ===")
             print(f"Warning: Unsupported field type '{field_type}'. Skipping...")
+    
+    # Final validation: vehicle_type must have at least one non-empty array
+    if 'vehicle_type' in annotated:
+        vehicle_type = annotated['vehicle_type']
+        include = vehicle_type.get('include_body_styles', [])
+        exclude = vehicle_type.get('exclude_body_styles', [])
+        
+        # Filter out 'unspecified' from arrays for validation
+        include_filtered = [x for x in include if x != 'unspecified'] if include else []
+        exclude_filtered = [x for x in exclude if x != 'unspecified'] if exclude else []
+        
+        if len(include_filtered) == 0 and len(exclude_filtered) == 0:
+            print("\n" + "="*60)
+            print("VALIDATION ERROR: vehicle_type")
+            print("="*60)
+            print("At least one of 'include_body_styles' or 'exclude_body_styles' must have values.")
+            print("You cannot leave both arrays empty or only have 'unspecified'.")
+            print("Please go back and add at least one body style to one of the arrays.")
+            print("="*60)
+            raise ValueError("vehicle_type must have at least one non-empty array")
     
     return annotated
 

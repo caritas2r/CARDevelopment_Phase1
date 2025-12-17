@@ -56,15 +56,18 @@ class FieldPrompter:
         # Get user input
         while True:
             try:
-                if nullable and not required:
+                # Don't allow skip for fuel_economy_priority - must select null or unspecified
+                allow_skip = nullable and not required and 'fuel_economy_priority' not in field_name
+                
+                if allow_skip:
                     prompt = f"Enter selection (0-{len(options)-1}, or press Enter to skip): "
                 else:
                     prompt = f"Enter selection (0-{len(options)-1}): "
                 
                 user_input = input(prompt).strip()
                 
-                # Handle skip for optional nullable
-                if not user_input and nullable and not required:
+                # Handle skip for optional nullable (but not for fuel_economy_priority)
+                if not user_input and allow_skip:
                     return None
                 
                 selection = int(user_input)
@@ -80,7 +83,7 @@ class FieldPrompter:
                 print("Please enter a valid number.")
     
     @staticmethod
-    def prompt_array_enum(field_name: str, enum_values: List[Any], nullable: bool = False, required: bool = True) -> List[Any]:
+    def prompt_array_enum(field_name: str, enum_values: List[Any], nullable: bool = False, required: bool = True) -> Optional[List[Any]]:
         """
         Prompt user to select multiple enum values (for arrays)
         
@@ -91,7 +94,7 @@ class FieldPrompter:
             required: Whether field is required
         
         Returns:
-            List of selected enum values
+            List of selected enum values, or None if null
         """
         print(f"\n=== Field: {field_name} ===")
         print("Type: array of enum")
@@ -122,6 +125,7 @@ class FieldPrompter:
         while True:
             try:
                 prompt = f"Enter selection(s): "
+                
                 user_input = input(prompt).strip().lower()
                 
                 if user_input == 'done':
@@ -243,8 +247,13 @@ class FieldPrompter:
                 return value
         
         while True:
-            if nullable and not required:
+            # Don't allow skip for city and state_region - must enter value, null, or unspecified
+            allow_skip = nullable and not required and 'city' not in field_name and 'state_region' not in field_name
+            
+            if allow_skip:
                 prompt = f"Enter value (or 'null', or press Enter to skip): "
+            elif nullable:
+                prompt = f"Enter value (or 'null'): "
             else:
                 prompt = f"Enter value: "
             
@@ -258,8 +267,8 @@ class FieldPrompter:
                     print("This field does not allow null values.")
                     continue
             
-            # Handle skip for optional nullable
-            if not user_input and nullable and not required:
+            # Handle skip for optional nullable (but not for city/state_region)
+            if not user_input and allow_skip:
                 return None
             
             # Required field must have value
@@ -269,6 +278,60 @@ class FieldPrompter:
             
             print(f"Entered: {user_input}")
             return user_input
+    
+    @staticmethod
+    def prompt_integer_or_unspecified(field_name: str, required: bool = True) -> Union[int, str]:
+        """
+        Prompt user for an integer or "unspecified"
+        
+        Args:
+            field_name: Name/path of the field
+            required: Whether field is required
+        
+        Returns:
+            Integer value or "unspecified" string
+        """
+        print(f"\n=== Field: {field_name} ===")
+        
+        # Special handling for currency
+        if 'currency' in field_name:
+            print("Type: currency (integer, no commas)")
+            print("Format: Enter numerical value with no commas (e.g., 50000 for 50k, 1200, 200000)")
+            print("Options:")
+            print("  0. unspecified")
+        else:
+            print("Type: integer or unspecified")
+            print("Options:")
+            print("  0. unspecified")
+        
+        # Test mode: randomly select integer or unspecified
+        if FieldPrompter.test_mode:
+            if random.random() < 0.2:  # 20% chance of unspecified
+                print("[TEST MODE] Randomly selected: unspecified")
+                return "unspecified"
+            else:
+                value = random.randint(1000, 100000)
+                print(f"[TEST MODE] Randomly selected: {value}")
+                return value
+        
+        while True:
+            try:
+                prompt = f"Enter value (or 0 for unspecified): "
+                user_input = input(prompt).strip()
+                
+                if user_input == '0':
+                    print("Selected: unspecified")
+                    return "unspecified"
+                
+                # Parse as integer (remove any commas user might have entered)
+                value_str = user_input.replace(',', '').strip()
+                value = int(value_str)
+                
+                print(f"Entered: {value}")
+                return value
+            
+            except ValueError:
+                print("Please enter a valid integer (no commas) or 0 for unspecified.")
     
     @staticmethod
     def prompt_boolean(field_name: str, nullable: bool = False, required: bool = True) -> Optional[bool]:
