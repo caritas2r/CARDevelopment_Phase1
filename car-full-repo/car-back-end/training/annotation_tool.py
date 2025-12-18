@@ -247,6 +247,12 @@ def main():
             print("Annotation Complete!")
             print(f"{'='*60}")
             
+            # Display the completed JSON
+            print("\nCompleted JSON:")
+            print("-" * 60)
+            print(json.dumps(annotated_json, indent=2, ensure_ascii=False))
+            print("-" * 60)
+            
             # Ask to continue or save and exit (skip in test mode)
             if FieldPrompter.test_mode:
                 # In test mode, automatically continue to next prompt

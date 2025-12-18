@@ -270,17 +270,69 @@ class FieldPrompter:
         print(f"\n=== Field: {field_name} ===")
         print("Type: string")
         
+        # Special handling for make and model - plain string, no unspecified
+        is_make_or_model = field_name == 'make' or field_name == 'model'
+        is_trim = field_name == 'trim'
+        
         # Test mode: return placeholder string or null
         if FieldPrompter.test_mode:
-            if nullable and not required and random.random() < 0.2:  # 20% chance of null
+            if is_make_or_model:
+                # Generate realistic make/model names for test mode
+                makes = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz', 'Audi']
+                models = ['Camry', 'Accord', 'F-150', 'Silverado', '3 Series', 'C-Class', 'A4']
+                if field_name == 'make':
+                    value = random.choice(makes)
+                else:
+                    value = random.choice(models)
+            elif is_trim:
+                if random.random() < 0.3:  # 30% chance of unspecified
+                    value = "unspecified"
+                else:
+                    trims = ['Base', 'LE', 'XLE', 'Sport', 'Limited', 'Premium']
+                    value = random.choice(trims)
+            elif nullable and not required and random.random() < 0.2:  # 20% chance of null
                 print("[TEST MODE] Randomly selected: null")
                 return None
             else:
                 value = f"test_value_{field_name.replace('.', '_')}"
-                print(f"[TEST MODE] Randomly selected: {value}")
-                return value
+            print(f"[TEST MODE] Randomly selected: {value}")
+            return value
         
         while True:
+            # Special handling for make and model - plain string, required
+            if is_make_or_model:
+                prompt = f"Enter {field_name} (text/string, no enums): "
+                user_input = input(prompt).strip()
+                
+                if not user_input:
+                    if required:
+                        print(f"This field is required. Please enter a {field_name}.")
+                        continue
+                    else:
+                        return None
+                
+                print(f"Entered: {user_input}")
+                return user_input
+            
+            # Special handling for trim - string with unspecified option
+            if is_trim:
+                prompt = f"Enter trim (text/string, or 'unspecified'): "
+                user_input = input(prompt).strip()
+                
+                if user_input.lower() == 'unspecified':
+                    print("Entered: unspecified")
+                    return "unspecified"
+                
+                if not user_input:
+                    if required:
+                        print("This field is required. Please enter a trim or 'unspecified'.")
+                        continue
+                    else:
+                        return None
+                
+                print(f"Entered: {user_input}")
+                return user_input
+            
             # Don't allow skip for city and state_region - must enter value or unspecified
             allow_skip = nullable and not required and 'city' not in field_name and 'state_region' not in field_name
             

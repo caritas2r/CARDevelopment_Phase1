@@ -14,6 +14,9 @@
   ],
   "properties": {
     "query_text": { "type": "string" },
+    "make": { "type": "string" },
+    "model": { "type": "string" },
+    "trim": { "type": "string" },
 
     "vehicle_type": {
       "type": "object",

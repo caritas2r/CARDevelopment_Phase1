@@ -167,7 +167,7 @@ class MockNlpTripService:
             'city': random.choice(['Los Angeles', 'New York', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', None]),
             'state_region': random.choice(['CA', 'NY', 'TX', 'FL', 'IL', 'PA', None]),
             'zip_code': random.choice(['90210', '10001', '77001', '33101', '85001', '19101', None]),
-            'number_of_owners': random.choice([0, 1, 2, 3, 4, 5, None]),
+            'number_of_owners': random.randint(1, 5),  # Always at least 1 owner
             'features': random.sample(features, random.randint(1, 4)),
             'use_case_tags': random.sample(use_case_tags, random.randint(1, 3))
         }
