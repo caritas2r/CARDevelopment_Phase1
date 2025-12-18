@@ -7,7 +7,7 @@ from flask import jsonify, request
 class QueryService:
     """Service responsible for orchestrating the query processing pipeline"""
     
-    def __init__(self, inference_service, json_converter_service, database_query_service):
+    def __init__(self, inference_service, json_converter_service, database_query_service, mock_nlp_trip_service=None):
         """
         Initialize the query service
         
@@ -15,12 +15,14 @@ class QueryService:
             inference_service: InferenceService instance
             json_converter_service: JsonInputConverterService instance
             database_query_service: DatabaseQueryService instance
+            mock_nlp_trip_service: MockNlpTripService instance (optional, for PoC)
         """
         self.name = "query-service"
         self.initialized = False
         self.inference_service = inference_service
         self.json_converter_service = json_converter_service
         self.database_query_service = database_query_service
+        self.mock_nlp_trip_service = mock_nlp_trip_service
     
     def register(self, app):
         """
@@ -62,7 +64,25 @@ class QueryService:
                         'error_type': 'validation'
                     }), 400
                 
-                # TODO: Implement query processing pipeline:
+                # PoC: Use mock service to return sample vehicle
+                if self.mock_nlp_trip_service:
+                    vehicle = self.mock_nlp_trip_service.get_sample_vehicle()
+                    if vehicle:
+                        return jsonify({
+                            'success': True,
+                            'query': query_text,
+                            'results': [vehicle],
+                            'result_count': 1,
+                            'poc_mode': True
+                        }), 200
+                    else:
+                        return jsonify({
+                            'success': False,
+                            'error': 'Sample vehicle not found in database',
+                            'error_type': 'not_found'
+                        }), 404
+                
+                # TODO: Implement full query processing pipeline:
                 # 1. Process through inference service
                 # 2. Convert JSON to SQL
                 # 3. Execute query

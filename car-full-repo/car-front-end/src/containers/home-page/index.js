@@ -12,6 +12,7 @@ function renderHomePage() {
                 <p>Backend Connection Status</p>
                 <nav class="cds-nav">
                     <a href="#/" class="cds-button cds-button--primary">Home</a>
+                    <a href="#/query" class="cds-button cds-button--secondary">New Query</a>
                     <a href="#/db-schema" class="cds-button cds-button--secondary">View DB Schema</a>
                 </nav>
             </header>
@@ -23,6 +24,9 @@ function renderHomePage() {
                         <span class="cds-status-text">Checking connection...</span>
                     </div>
                     <div id="statusDetails" class="cds-status-details"></div>
+                    <div class="cds-action-buttons">
+                        <a href="#/query" class="cds-button cds-button--primary">Start New Query</a>
+                    </div>
                 </div>
             </main>
         </div>

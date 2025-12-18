@@ -3,6 +3,7 @@
 // Load containers (these are ES6 modules, so they execute immediately)
 import './src/containers/home-page/index.js';
 import './src/containers/db-schema-page/index.js';
+import './src/containers/query-page/index.js';
 
 // Hash-based routing
 function route() {
@@ -14,6 +15,7 @@ function route() {
     console.log('[Router] Current hash:', normalizedHash);
     console.log('[Router] renderHomePage available:', typeof window.renderHomePage);
     console.log('[Router] renderDbSchemaPage available:', typeof window.renderDbSchemaPage);
+    console.log('[Router] renderQueryPage available:', typeof window.renderQueryPage);
     
     if (normalizedHash === '#/db-schema') {
         console.log('[Router] Routing to DB Schema page');
@@ -27,6 +29,21 @@ function route() {
                     window.renderDbSchemaPage();
                 } else {
                     console.error('[Router] renderDbSchemaPage still not available after retry');
+                }
+            }, 100);
+        }
+    } else if (normalizedHash === '#/query') {
+        console.log('[Router] Routing to Query page');
+        if (window.renderQueryPage) {
+            window.renderQueryPage();
+        } else {
+            console.error('[Router] renderQueryPage not available! Retrying...');
+            // Retry after a short delay if function not available yet
+            setTimeout(() => {
+                if (window.renderQueryPage) {
+                    window.renderQueryPage();
+                } else {
+                    console.error('[Router] renderQueryPage still not available after retry');
                 }
             }, 100);
         }

@@ -253,6 +253,18 @@ body {
     outline-offset: 2px;
 }
 
+/* Action buttons in main content */
+.cds-action-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.cds-action-buttons .cds-button {
+    min-width: 12rem;
+}
+
 /* Responsive adjustments */
 @media (max-width: 672px) {
     .cds-header {
@@ -273,6 +285,16 @@ body {
     }
     
     .cds-button {
+        width: 100%;
+        max-width: 20rem;
+    }
+    
+    .cds-action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cds-action-buttons .cds-button {
         width: 100%;
         max-width: 20rem;
     }
