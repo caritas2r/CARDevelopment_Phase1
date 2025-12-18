@@ -90,10 +90,4 @@ MAINTENANCE_PRIORITIES = [
     "unspecified"
 ]
 
-# Safety priority values
-SAFETY_PRIORITIES = [
-    "baseline",
-    "enhanced",
-    "unspecified"
-]
 

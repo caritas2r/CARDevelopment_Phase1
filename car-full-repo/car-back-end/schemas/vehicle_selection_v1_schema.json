@@ -173,7 +173,6 @@
         "reliability_maintenance_priority": {
           "$ref": "#/definitions/maintenance_priority"
         },
-        "safety_priority": { "$ref": "#/definitions/safety_priority" },
         "color": { "$ref": "#/definitions/color" }
       },
       "additionalProperties": false
@@ -242,10 +241,6 @@
     "maintenance_priority": {
       "type": "string",
       "enum": ["low_cost", "balanced", "performance_first", "unspecified"]
-    },
-    "safety_priority": {
-      "type": "string",
-      "enum": ["baseline", "enhanced", "unspecified"]
     },
     "color": {
       "type": "string",

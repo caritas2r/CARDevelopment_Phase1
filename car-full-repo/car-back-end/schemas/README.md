@@ -23,7 +23,7 @@ The schema requires the following top-level fields:
 5. **`powertrain_drivability`** (object): Transmission, drivetrain, fuel type preferences
 6. **`features_amenities`** (object): Must-have, nice-to-have, and avoid features
 7. **`ownership_constraints`** (object): Budget, year, mileage constraints
-8. **`preference_signals`** (object): Reliability and safety priorities
+8. **`preference_signals`** (object): Reliability and color preferences
 9. **`location_constraints`** (object, optional): Geographic constraints
 
 ## Canonical Vocabularies
@@ -103,8 +103,7 @@ When creating training examples, ensure:
     }
   },
   "preference_signals": {
-    "reliability_maintenance_priority": "unspecified",
-    "safety_priority": "unspecified"
+    "reliability_maintenance_priority": "unspecified"
   },
   "location_constraints": null
 }
