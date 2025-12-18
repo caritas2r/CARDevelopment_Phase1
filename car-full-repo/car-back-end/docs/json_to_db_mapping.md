@@ -48,7 +48,7 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 |-----------------|----------------|----------------|-------|
 | `powertrain_drivability.transmission` | `vehicles` | `transmission` | Direct match. "unspecified" → NULL |
 | `powertrain_drivability.drivetrain` | `vehicles` | `drivetrain` | Direct match. "unspecified" → NULL |
-| `powertrain_drivability.powertrain_type` | `vehicles` | `powertrain_type` | Direct match. "unspecified" → NULL |
+| `powertrain_drivability.powertrain_type[]` | `vehicle_powertrain_types` (junction table) | `powertrain_type` | Array → many-to-many relationship. Array of types → multiple rows. "unspecified" → skip (don't create row). **Note: Junction table needs to be created in database schema.** |
 | `powertrain_drivability.fuel_economy_priority` | `vehicles` | `fuel_economy` | Maps priority level to economy level: "low" → "low", "medium" → "medium", "high" → "high", "unspecified" → NULL |
 
 ### Features & Amenities
@@ -125,6 +125,12 @@ All other fields are nullable to allow for incomplete data.
 - Maps many-to-many relationship between vehicles and use case tags
 - Primary key: (`vehicle_id`, `use_case_tag`)
 - Foreign key: `vehicle_id` → `vehicles(vehicle_id)`
+
+### `vehicle_powertrain_types` (to be created)
+- Maps many-to-many relationship between vehicles and powertrain types
+- Primary key: (`vehicle_id`, `powertrain_type`)
+- Foreign key: `vehicle_id` → `vehicles(vehicle_id)`
+- **Note: This junction table needs to be added to the database schema to support multiple powertrain types per vehicle.**
 
 ## Notes
 

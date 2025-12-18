@@ -191,7 +191,7 @@ function setupFormHandlers() {
                                         <p><strong>Body Style:</strong> ${escapeHtml(vehicle.body_style || 'N/A')}</p>
                                         <p><strong>Transmission:</strong> ${escapeHtml(vehicle.transmission || 'N/A')}</p>
                                         <p><strong>Drivetrain:</strong> ${escapeHtml(vehicle.drivetrain || 'N/A')}</p>
-                                        <p><strong>Powertrain:</strong> ${escapeHtml(vehicle.powertrain_type || 'N/A')}</p>
+                                        ${vehicle.powertrain_types && vehicle.powertrain_types.length > 0 ? `<p><strong>Powertrain:</strong> ${vehicle.powertrain_types.map(pt => escapeHtml(pt)).join(', ')}</p>` : '<p><strong>Powertrain:</strong> N/A</p>'}
                                         ${vehicle.seating_capacity ? `<p><strong>Seating:</strong> ${vehicle.seating_capacity}</p>` : ''}
                                         ${vehicle.color ? `<p><strong>Color:</strong> ${escapeHtml(vehicle.color)}</p>` : ''}
                                         <p><strong>Number of Owners:</strong> ${vehicle.number_of_owners !== null && vehicle.number_of_owners !== undefined ? vehicle.number_of_owners : 'N/A'}</p>

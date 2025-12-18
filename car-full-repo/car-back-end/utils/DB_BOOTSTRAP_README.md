@@ -18,19 +18,17 @@ The database schema is designed to support querying vehicles based on the Vehicl
 
 1. **`vehicles`** - Main vehicle inventory table
    - Stores actual vehicle inventory data (not query criteria)
-   - Most fields are **NOT NULL** because vehicles in inventory should have complete information
+   - Required fields (NOT NULL): make, model, year, price, currency, mileage
+   - Most other fields are nullable to allow for incomplete data
    - Fields align with Vehicle Selection V1 query criteria for matching:
-     - `body_style`: Matches schema enum (sedan, coupe, hatchback, wagon, suv, crossover, van, truck) - **NOT NULL**
-     - `transmission`: Matches schema enum (automatic, manual, other, unspecified) - **NOT NULL** (defaults to 'unspecified')
-     - `drivetrain`: Matches schema enum (AWD, 4WD, FWD, RWD, unspecified) - **NOT NULL** (defaults to 'unspecified')
-     - `powertrain_type`: Matches schema enum (gas, hybrid, plug_in_hybrid, electric, diesel, unspecified) - **NOT NULL** (defaults to 'unspecified')
-     - `seating_capacity`: Supports `capacity_practicality.min_seating_capacity` queries - **NOT NULL**
-     - `price` (REAL): Numeric price value - **NOT NULL** (required for inventory)
-     - `currency` (TEXT): Currency code (e.g., "USD", "EUR", "GBP") - **NOT NULL** (defaults to 'USD')
-     - `year`: Supports `ownership_constraints.year` queries - **NOT NULL** (core identifier)
-     - `mileage`: Supports `ownership_constraints.mileage` queries - **nullable** (new vehicles may not have mileage)
-     - `city`, `state_region`: Supports `location_constraints` queries - **nullable** (location may not always be known)
-   - **Note on currency/price**: Currency is stored as a TEXT string (ISO currency codes like "USD"), while price is stored as a REAL number. This allows for proper currency handling and potential future currency conversion features.
+     - Identity: `make`, `model`, `trim` (make/model required, trim optional)
+     - Transactional: `year`, `price`, `currency` (INTEGER, ISO 4217 numeric code, default 840 for USD), `mileage`
+     - Descriptors: `body_style`, `transmission`, `drivetrain`, `seating_capacity`, `color`, `cargo_space`
+     - Features: `has_hatch_access`, `has_fold_flat_seats`, `fuel_economy`, `reliability`
+     - Location: `city`, `state_region`, `zip_code`
+     - Ownership: `number_of_owners`
+     - **Note**: `powertrain_type` is NOT in this table - use `vehicle_powertrain_types` junction table
+   - **Note on currency/price**: Currency is stored as INTEGER (ISO 4217 numeric codes like 840 for USD), while price is stored as INTEGER (whole dollars). This allows for proper currency handling and potential future currency conversion features.
 
 2. **`vehicle_features`** - Junction table for vehicle features
    - Many-to-many relationship between vehicles and features
@@ -39,20 +37,42 @@ The database schema is designed to support querying vehicles based on the Vehicl
      - backup_camera, blind_spot_monitoring, adaptive_cruise_control
      - apple_carplay, android_auto, heated_seats, leather_seats
      - sunroof, third_row_seating
+   - Primary key: (vehicle_id, feature_tag)
+   - Foreign key: vehicle_id → vehicles(vehicle_id) ON DELETE CASCADE
 
-3. **`query_history`** - Query analytics table
+3. **`vehicle_use_case_tags`** - Junction table for use case tags
+   - Many-to-many relationship between vehicles and use case tags
+   - Supports `intended_use.use_case_tags` queries
+   - Use case tags match schema enum:
+     - family, animals, commute, cargo, travel, work_light, pleasure, performance
+   - Primary key: (vehicle_id, use_case_tag)
+   - Foreign key: vehicle_id → vehicles(vehicle_id) ON DELETE CASCADE
+
+4. **`vehicle_powertrain_types`** - Junction table for powertrain types
+   - Many-to-many relationship between vehicles and powertrain types
+   - Supports `powertrain_drivability.powertrain_type[]` queries (array field)
+   - Powertrain types match schema enum:
+     - gas, hybrid, plug_in_hybrid, electric, diesel
+   - **Note**: Vehicles can have multiple powertrain types (e.g., a plug-in hybrid has both "hybrid" and "plug_in_hybrid")
+   - Primary key: (vehicle_id, powertrain_type)
+   - Foreign key: vehicle_id → vehicles(vehicle_id) ON DELETE CASCADE
+
+5. **`search_requests`** - Query analytics table
    - Stores processed NLP queries and their Vehicle Selection V1 JSON representations
    - Useful for analytics and improving query processing
+   - Fields: request_id (AUTOINCREMENT), created_at, query_text, selection_json_raw, selection_json_normalized
 
 ### Indexes
 
 Indexes are created for common query patterns:
 - Body style, make/model/year combinations
 - Price, year, mileage (for constraint queries)
-- Drivetrain, powertrain type (for powertrain queries)
+- Drivetrain (for drivetrain queries)
 - Seating capacity (for capacity queries)
 - Location (city, state_region)
 - Feature lookups (vehicle_id, feature_tag)
+- Use case tag lookups (vehicle_id, use_case_tag)
+- Powertrain type lookups (vehicle_id, powertrain_type)
 
 ## Integration
 
@@ -109,12 +129,13 @@ This will show:
 
 The implementation extends the PoC pattern with:
 
-1. **Multiple tables**: Three tables instead of one (vehicles, vehicle_features, query_history)
-2. **Junction table**: Many-to-many relationship for features
+1. **Multiple tables**: Five tables (vehicles, vehicle_features, vehicle_use_case_tags, vehicle_powertrain_types, search_requests)
+2. **Junction tables**: Many-to-many relationships for features, use case tags, and powertrain types
 3. **Comprehensive indexes**: Multiple indexes for query performance
 4. **CHECK constraints**: Enforces enum values from Vehicle Selection V1 schema
-5. **Foreign keys**: CASCADE delete for vehicle_features
+5. **Foreign keys**: CASCADE delete for all junction tables
 6. **Connection reuse**: Optional connection parameter to avoid unnecessary connections
+7. **Powertrain types as array**: Powertrain types are stored in a junction table to support multiple types per vehicle
 
 ## Future Enhancements
 
@@ -126,14 +147,14 @@ The implementation extends the PoC pattern with:
 
 - The schema uses `TEXT` for IDs (flexible for UUIDs or other formats)
 - Timestamps use ISO 8601 format with UTC timezone
-- All enum values match the Vehicle Selection V1 schema exactly
+- All enum values match the Vehicle Selection V1 schema exactly (excluding "unspecified" which becomes NULL in DB)
 - The schema is designed to be queryable by the `DatabaseQueryService` based on Vehicle Selection V1 criteria
-- **Nullable fields**: Only fields that may legitimately be unknown are nullable:
-  - `mileage`: New vehicles may not have mileage yet
-  - `city`, `state_region`: Location may not always be known or relevant
-- **NOT NULL fields**: Vehicle inventory should have complete information (make, model, year, body_style, price, currency, transmission, drivetrain, powertrain_type, seating_capacity)
-- **Currency design**: Currency is stored as TEXT (ISO codes like "USD", "EUR") while price is REAL. This separation allows for:
+- **Nullable fields**: Most fields are nullable except required transactional fields (make, model, year, price, currency, mileage)
+- **NOT NULL fields**: Only core transactional fields are required: make, model, year, price, currency, mileage
+- **Currency design**: Currency is stored as INTEGER (ISO 4217 numeric codes like 840 for USD) while price is INTEGER (whole dollars). This separation allows for:
   - Proper currency identification
   - Future currency conversion capabilities
-  - Handling cases where price exists but currency is unspecified (defaults can be handled in application logic)
+  - Handling cases where price exists but currency is unspecified (defaults to 840 for USD)
+- **Powertrain types**: Stored in `vehicle_powertrain_types` junction table to support multiple types per vehicle (e.g., plug-in hybrid = hybrid + plug_in_hybrid)
+- **"unspecified" → NULL**: JSON schema uses "unspecified" as sentinel value, but database stores NULL for unknown values
 

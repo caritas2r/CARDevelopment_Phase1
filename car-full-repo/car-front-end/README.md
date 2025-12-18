@@ -7,6 +7,10 @@ A lightweight frontend application built with IBM Carbon Design System v11.
 - IBM Carbon Design System v11 styling
 - Vanilla JavaScript (ES6 modules)
 - Container-based architecture
+- Hash-based routing (`#/`, `#/query`, `#/schema`)
+- Query submission interface with rotating placeholder text
+- Vehicle result display
+- Database schema viewer
 - Responsive design
 
 ## Setup
@@ -76,20 +80,33 @@ Note: Currently using Carbon design tokens via CSS. For full Carbon component li
 ```
 car-front-end/
 ├── index.html           # Main HTML file
-├── app.js              # App entry point (routing)
+├── app.js              # App entry point (hash-based routing)
 ├── package.json        # Dependencies
 ├── dev-server.js       # Node.js dev server (no cache)
 ├── dev-server.py       # Python dev server (no cache)
 └── src/
     └── containers/
-        └── home-page/
-            ├── index.js    # Home page logic
-            └── style.css   # Home page styles (Carbon Design System)
+        ├── home-page/      # Home page container
+        │   ├── index.js    # Home page logic
+        │   └── style.css   # Home page styles
+        ├── query-page/    # Query submission page
+        │   ├── index.js   # Query page logic
+        │   └── style.css  # Query page styles
+        └── db-schema-page/ # Database schema viewer
+            ├── index.js   # Schema page logic
+            └── style.css  # Schema page styles
 ```
 
 ## Design System
 
 This application uses IBM Carbon Design System v11 for consistent, accessible UI components and design patterns.
+
+## Routes
+
+The application uses hash-based routing:
+- `#/` - Home page
+- `#/query` - Query submission page (submit NLP queries, view results)
+- `#/schema` - Database schema viewer
 
 ## Configuration
 
@@ -101,3 +118,13 @@ If your backend runs on a different URL/port, update the `API_BASE_URL` in each 
 ```javascript
 const API_BASE_URL = 'http://your-backend-url:port';
 ```
+
+## Query Page Features
+
+- **Rotating Placeholders**: Sample query texts rotate automatically to inspire users
+- **Result Display**: Shows vehicle details including:
+  - Basic info (make, model, year, price, mileage)
+  - Vehicle attributes (body style, transmission, drivetrain, powertrain types)
+  - Features and use case tags (displayed as comma-separated lists)
+  - Location and ownership information
+- **Navigation**: Back to home button for easy navigation

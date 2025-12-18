@@ -83,7 +83,10 @@
       "properties": {
         "transmission": { "$ref": "#/definitions/transmission" },
         "drivetrain": { "$ref": "#/definitions/drivetrain" },
-        "powertrain_type": { "$ref": "#/definitions/powertrain_type" },
+        "powertrain_type": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/powertrain_type" }
+        },
         "fuel_economy_priority": { "$ref": "#/definitions/priority_level" }
       },
       "additionalProperties": false

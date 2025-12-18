@@ -17,7 +17,7 @@
   "powertrain_drivability": {
     "transmission": "unspecified",
     "drivetrain": "AWD",
-    "powertrain_type": "unspecified",
+    "powertrain_type": ["unspecified"],
     "fuel_economy_priority": null
   },
   "features_amenities": {

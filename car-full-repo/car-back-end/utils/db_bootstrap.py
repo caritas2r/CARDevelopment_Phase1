@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS vehicles (
     body_style TEXT CHECK(body_style IN ('sedan','coupe','hatchback','wagon','suv','crossover','van','truck')),
     transmission TEXT CHECK(transmission IN ('automatic','manual','other')),
     drivetrain TEXT CHECK(drivetrain IN ('AWD','4WD','FWD','RWD')),
-    powertrain_type TEXT CHECK(powertrain_type IN ('gas','hybrid','plug_in_hybrid','electric','diesel')),
 
     seating_capacity INTEGER,
 
@@ -92,6 +91,16 @@ CREATE TABLE IF NOT EXISTS vehicle_use_case_tags (
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
 );
 
+-- Vehicle powertrain types junction table (many-to-many)
+CREATE TABLE IF NOT EXISTS vehicle_powertrain_types (
+    vehicle_id TEXT NOT NULL,
+    powertrain_type TEXT NOT NULL CHECK(powertrain_type IN (
+        'gas','hybrid','plug_in_hybrid','electric','diesel'
+    )),
+    PRIMARY KEY (vehicle_id, powertrain_type),
+    FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
+);
+
 -- Search requests table - stores processed queries for analytics
 CREATE TABLE IF NOT EXISTS search_requests (
     request_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -109,7 +118,6 @@ CREATE INDEX IF NOT EXISTS idx_vehicles_mileage ON vehicles(mileage);
 CREATE INDEX IF NOT EXISTS idx_vehicles_body_style ON vehicles(body_style);
 CREATE INDEX IF NOT EXISTS idx_vehicles_transmission ON vehicles(transmission);
 CREATE INDEX IF NOT EXISTS idx_vehicles_drivetrain ON vehicles(drivetrain);
-CREATE INDEX IF NOT EXISTS idx_vehicles_powertrain ON vehicles(powertrain_type);
 CREATE INDEX IF NOT EXISTS idx_vehicles_seating_capacity ON vehicles(seating_capacity);
 CREATE INDEX IF NOT EXISTS idx_vehicles_color ON vehicles(color);
 CREATE INDEX IF NOT EXISTS idx_vehicles_cargo_space ON vehicles(cargo_space);
@@ -118,6 +126,7 @@ CREATE INDEX IF NOT EXISTS idx_vehicles_reliability ON vehicles(reliability);
 CREATE INDEX IF NOT EXISTS idx_vehicles_location ON vehicles(state_region, city, zip_code);
 CREATE INDEX IF NOT EXISTS idx_vehicle_features_tag ON vehicle_features(feature_tag, vehicle_id);
 CREATE INDEX IF NOT EXISTS idx_vehicle_use_case_tags_tag ON vehicle_use_case_tags(use_case_tag, vehicle_id);
+CREATE INDEX IF NOT EXISTS idx_vehicle_powertrain_types_tag ON vehicle_powertrain_types(powertrain_type, vehicle_id);
 """
 
 

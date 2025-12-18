@@ -54,11 +54,11 @@ class MockNlpTripService:
             cursor.execute("""
                 INSERT INTO vehicles (
                     vehicle_id, make, model, trim, year, price, currency, mileage,
-                    body_style, transmission, drivetrain, powertrain_type,
+                    body_style, transmission, drivetrain,
                     seating_capacity, color, cargo_space, has_hatch_access,
                     has_fold_flat_seats, fuel_economy, reliability,
                     city, state_region, zip_code, number_of_owners
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 vehicle_data['vehicle_id'],
                 vehicle_data['make'],
@@ -71,7 +71,6 @@ class MockNlpTripService:
                 vehicle_data['body_style'],
                 vehicle_data['transmission'],
                 vehicle_data['drivetrain'],
-                vehicle_data['powertrain_type'],
                 vehicle_data['seating_capacity'],
                 vehicle_data['color'],
                 vehicle_data['cargo_space'],
@@ -84,6 +83,14 @@ class MockNlpTripService:
                 vehicle_data['zip_code'],
                 vehicle_data['number_of_owners']
             ))
+            
+            # Insert powertrain types (random selection)
+            if vehicle_data['powertrain_types']:
+                powertrain_values = [(self.sample_vehicle_id, pt) for pt in vehicle_data['powertrain_types']]
+                cursor.executemany(
+                    "INSERT INTO vehicle_powertrain_types (vehicle_id, powertrain_type) VALUES (?, ?)",
+                    powertrain_values
+                )
             
             # Insert features (random selection)
             if vehicle_data['features']:
@@ -156,7 +163,7 @@ class MockNlpTripService:
             'body_style': random.choice(body_styles),
             'transmission': random.choice(transmissions),
             'drivetrain': random.choice(drivetrains),
-            'powertrain_type': random.choice(powertrain_types),
+            'powertrain_types': random.sample(powertrain_types, random.randint(1, 3)),  # Array of powertrain types
             'seating_capacity': random.choice([2, 4, 5, 7, 8]),
             'color': random.choice(colors),
             'cargo_space': random.choice(cargo_spaces),
@@ -196,7 +203,7 @@ class MockNlpTripService:
                 cursor.execute("""
                     UPDATE vehicles SET
                         make = ?, model = ?, trim = ?, year = ?, price = ?, currency = ?, mileage = ?,
-                        body_style = ?, transmission = ?, drivetrain = ?, powertrain_type = ?,
+                        body_style = ?, transmission = ?, drivetrain = ?,
                         seating_capacity = ?, color = ?, cargo_space = ?, has_hatch_access = ?,
                         has_fold_flat_seats = ?, fuel_economy = ?, reliability = ?,
                         city = ?, state_region = ?, zip_code = ?, number_of_owners = ?
@@ -212,7 +219,6 @@ class MockNlpTripService:
                     vehicle_data['body_style'],
                     vehicle_data['transmission'],
                     vehicle_data['drivetrain'],
-                    vehicle_data['powertrain_type'],
                     vehicle_data['seating_capacity'],
                     vehicle_data['color'],
                     vehicle_data['cargo_space'],
@@ -231,11 +237,11 @@ class MockNlpTripService:
                 cursor.execute("""
                     INSERT INTO vehicles (
                         vehicle_id, make, model, trim, year, price, currency, mileage,
-                        body_style, transmission, drivetrain, powertrain_type,
+                        body_style, transmission, drivetrain,
                         seating_capacity, color, cargo_space, has_hatch_access,
                         has_fold_flat_seats, fuel_economy, reliability,
                         city, state_region, zip_code, number_of_owners
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     vehicle_data['vehicle_id'],
                     vehicle_data['make'],
@@ -248,7 +254,6 @@ class MockNlpTripService:
                     vehicle_data['body_style'],
                     vehicle_data['transmission'],
                     vehicle_data['drivetrain'],
-                    vehicle_data['powertrain_type'],
                     vehicle_data['seating_capacity'],
                     vehicle_data['color'],
                     vehicle_data['cargo_space'],
@@ -262,9 +267,18 @@ class MockNlpTripService:
                     vehicle_data['number_of_owners']
                 ))
             
-            # Delete existing features and tags
+            # Delete existing powertrain types, features, and tags
+            cursor.execute("DELETE FROM vehicle_powertrain_types WHERE vehicle_id = ?", (self.sample_vehicle_id,))
             cursor.execute("DELETE FROM vehicle_features WHERE vehicle_id = ?", (self.sample_vehicle_id,))
             cursor.execute("DELETE FROM vehicle_use_case_tags WHERE vehicle_id = ?", (self.sample_vehicle_id,))
+            
+            # Insert new powertrain types
+            if vehicle_data['powertrain_types']:
+                powertrain_values = [(self.sample_vehicle_id, pt) for pt in vehicle_data['powertrain_types']]
+                cursor.executemany(
+                    "INSERT INTO vehicle_powertrain_types (vehicle_id, powertrain_type) VALUES (?, ?)",
+                    powertrain_values
+                )
             
             # Insert new features
             if vehicle_data['features']:
@@ -297,7 +311,7 @@ class MockNlpTripService:
                 'body_style': vehicle_data['body_style'],
                 'transmission': vehicle_data['transmission'],
                 'drivetrain': vehicle_data['drivetrain'],
-                'powertrain_type': vehicle_data['powertrain_type'],
+                'powertrain_types': vehicle_data['powertrain_types'],  # Array of powertrain types
                 'seating_capacity': vehicle_data['seating_capacity'],
                 'color': vehicle_data['color'],
                 'cargo_space': vehicle_data['cargo_space'],

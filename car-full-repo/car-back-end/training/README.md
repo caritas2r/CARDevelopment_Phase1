@@ -59,20 +59,23 @@ python training/annotation_tool.py training/prompts.csv schemas/vehicle_selectio
 ## Field Types
 
 ### Enum Fields
-- Single enum: Select one option by number
+- Single enum: Select one option by number (1-indexed)
 - Array of enum: Select multiple options (comma-separated numbers), type 'done' when finished
+- All enum fields support "unspecified" option (use "unspecified" instead of null)
 
-### Number Fields
-- Enter a numeric value
-- Can enter 'null' if field is nullable
+### Integer/Number Fields with "unspecified"
+- Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners`
+- Enter an integer/number value, or type 'unspecified'
+- For `kid_count` and `pet_count`: 0 means "no kids/pets", type 'unspecified' for unspecified
+- For `number_of_owners`: Enter 0 or higher, or 'unspecified'
 
 ### String Fields
-- Enter text value
-- Can enter 'null' if field is nullable
+- Plain string fields (`make`, `model`): Enter text value (no "unspecified" option)
+- String with unspecified (`trim`): Enter text value or 'unspecified'
 
-### Boolean Fields
-- Select 1 for true, 2 for false
-- Can select 0 for null if nullable
+### Boolean Fields with "unspecified"
+- Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max`
+- Select 1 for "true", 2 for "false", 3 for "unspecified"
 
 ## Resuming Work
 
@@ -147,18 +150,38 @@ training/
 ## Validation
 
 The tool performs strict validation:
-- **Enum fields**: Only accepts values from the schema's enum list
+- **Enum fields**: Only accepts values from the schema's enum list (including "unspecified")
+- **Array enum fields**: Validates each selected value
 - **Invalid input**: Shows error message and re-prompts
 - **Required fields**: Must be filled (cannot skip)
-- **Nullable fields**: Can be set to null or skipped if optional
+- **Vehicle type validation**: At least one of `include_body_styles` or `exclude_body_styles` must have actual values (not just "unspecified")
+- **Integer/number fields**: Validates numeric format or "unspecified"
+- **String fields**: Validates based on field type (plain string vs. string with unspecified)
+
+## Display of Completed JSON
+
+After completing all fields for a prompt, the tool displays the completed JSON before prompting to save/quit or continue to the next prompt. This allows you to review the annotation before proceeding.
+
+## Supported Field Types
+
+The tool supports all field types from the Vehicle Selection V1 schema:
+- **Enums**: Single selection with "unspecified" option
+- **Array enums**: Multiple selections (body styles, powertrain types, features, use cases)
+- **Integers/Numbers**: With "unspecified" option for fields like budget, year, mileage, number_of_owners
+- **Strings**: Plain strings (make, model) or strings with "unspecified" (trim)
+- **Booleans**: With "unspecified" option (wants_hatch_access, wants_fold_flat_seats, strict_max)
+- **Nested objects**: Automatically traverses nested structures
 
 ## Notes
 
 - The tool saves after each complete annotation (not incrementally during annotation)
+- **Completed JSON is displayed** before prompting to save/quit or continue
 - Progress is saved to the CSV file immediately when you choose "Continue" or "Save and exit"
 - If interrupted, partial progress is saved for the current prompt
 - The tool automatically finds the next incomplete prompt in the CSV
 - All columns (including `id`) are preserved when saving updates
 - Completion status uses `complete`/`incomplete` values (also accepts `true`/`false` for compatibility)
+- Enum options are 1-indexed (first option is 1, not 0)
+- For array fields, you can select multiple values by entering comma-separated numbers
 
 
