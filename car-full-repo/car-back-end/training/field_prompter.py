@@ -365,6 +365,12 @@ class FieldPrompter:
             print("Options:")
             print("  Enter an integer (0 or higher) for the count")
             print("  Enter 'unspecified' if the count was not mentioned")
+        elif 'number_of_owners' in field_name:
+            print("Type: integer or unspecified")
+            print("Enter number of owners (integer, 0 or higher)")
+            print("Options:")
+            print("  Enter an integer (0 or higher) for the number of owners")
+            print("  Enter 'unspecified' for unspecified")
         else:
             print("Type: integer or unspecified")
             if 'seating_capacity' in field_name:
@@ -383,6 +389,8 @@ class FieldPrompter:
                     value = random.randint(1000, 100000)
                 elif 'kid_count' in field_name or 'pet_count' in field_name:
                     value = random.randint(0, 5)  # 0-5 for kids/pets
+                elif 'number_of_owners' in field_name:
+                    value = random.randint(0, 5)  # 0-5 owners
                 else:
                     value = random.randint(1, 10)
                 print(f"[TEST MODE] Randomly selected: {value}")
@@ -394,6 +402,8 @@ class FieldPrompter:
                     prompt = f"Enter value (or 'unspecified'): "
                 elif 'kid_count' in field_name or 'pet_count' in field_name:
                     prompt = f"Enter count (0 or higher, or 'unspecified'): "
+                elif 'number_of_owners' in field_name:
+                    prompt = f"Enter number of owners (0 or higher, or 'unspecified'): "
                 else:
                     prompt = f"Enter value (or 'unspecified'): "
                 
@@ -419,12 +429,15 @@ class FieldPrompter:
                 if ('kid_count' in field_name or 'pet_count' in field_name) and value < 0:
                     print("Error: Count cannot be negative.")
                     continue
+                if 'number_of_owners' in field_name and value < 0:
+                    print("Error: Number of owners cannot be negative.")
+                    continue
                 
                 print(f"Entered: {value}")
                 return value
             
             except ValueError:
-                if 'kid_count' in field_name or 'pet_count' in field_name:
+                if 'kid_count' in field_name or 'pet_count' in field_name or 'number_of_owners' in field_name:
                     print("Please enter a valid integer (0 or higher) or 'unspecified'.")
                 else:
                     print("Please enter a valid integer (no commas) or 'unspecified'.")

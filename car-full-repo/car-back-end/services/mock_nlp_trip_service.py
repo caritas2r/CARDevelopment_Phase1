@@ -57,8 +57,8 @@ class MockNlpTripService:
                     body_style, transmission, drivetrain, powertrain_type,
                     seating_capacity, color, cargo_space, has_hatch_access,
                     has_fold_flat_seats, fuel_economy, reliability,
-                    city, state_region, zip_code
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    city, state_region, zip_code, number_of_owners
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 vehicle_data['vehicle_id'],
                 vehicle_data['make'],
@@ -81,7 +81,8 @@ class MockNlpTripService:
                 vehicle_data['reliability'],
                 vehicle_data['city'],
                 vehicle_data['state_region'],
-                vehicle_data['zip_code']
+                vehicle_data['zip_code'],
+                vehicle_data['number_of_owners']
             ))
             
             # Insert features (random selection)
@@ -166,6 +167,7 @@ class MockNlpTripService:
             'city': random.choice(['Los Angeles', 'New York', 'Chicago', 'Houston', 'Phoenix', 'Philadelphia', None]),
             'state_region': random.choice(['CA', 'NY', 'TX', 'FL', 'IL', 'PA', None]),
             'zip_code': random.choice(['90210', '10001', '77001', '33101', '85001', '19101', None]),
+            'number_of_owners': random.choice([0, 1, 2, 3, 4, 5, None]),
             'features': random.sample(features, random.randint(1, 4)),
             'use_case_tags': random.sample(use_case_tags, random.randint(1, 3))
         }
@@ -197,7 +199,7 @@ class MockNlpTripService:
                         body_style = ?, transmission = ?, drivetrain = ?, powertrain_type = ?,
                         seating_capacity = ?, color = ?, cargo_space = ?, has_hatch_access = ?,
                         has_fold_flat_seats = ?, fuel_economy = ?, reliability = ?,
-                        city = ?, state_region = ?, zip_code = ?
+                        city = ?, state_region = ?, zip_code = ?, number_of_owners = ?
                     WHERE vehicle_id = ?
                 """, (
                     vehicle_data['make'],
@@ -221,6 +223,7 @@ class MockNlpTripService:
                     vehicle_data['city'],
                     vehicle_data['state_region'],
                     vehicle_data['zip_code'],
+                    vehicle_data['number_of_owners'],
                     self.sample_vehicle_id
                 ))
             else:
@@ -231,8 +234,8 @@ class MockNlpTripService:
                         body_style, transmission, drivetrain, powertrain_type,
                         seating_capacity, color, cargo_space, has_hatch_access,
                         has_fold_flat_seats, fuel_economy, reliability,
-                        city, state_region, zip_code
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                        city, state_region, zip_code, number_of_owners
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     vehicle_data['vehicle_id'],
                     vehicle_data['make'],
@@ -255,7 +258,8 @@ class MockNlpTripService:
                     vehicle_data['reliability'],
                     vehicle_data['city'],
                     vehicle_data['state_region'],
-                    vehicle_data['zip_code']
+                    vehicle_data['zip_code'],
+                    vehicle_data['number_of_owners']
                 ))
             
             # Delete existing features and tags
@@ -304,6 +308,7 @@ class MockNlpTripService:
                 'city': vehicle_data['city'],
                 'state_region': vehicle_data['state_region'],
                 'zip_code': vehicle_data['zip_code'],
+                'number_of_owners': vehicle_data['number_of_owners'],
                 'features': vehicle_data['features'],
                 'use_case_tags': vehicle_data['use_case_tags']
             }

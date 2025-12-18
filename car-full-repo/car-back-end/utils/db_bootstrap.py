@@ -63,7 +63,10 @@ CREATE TABLE IF NOT EXISTS vehicles (
     -- Location (zip_code as TEXT to preserve leading zeros)
     city TEXT,
     state_region TEXT,
-    zip_code TEXT
+    zip_code TEXT,
+
+    -- Ownership history
+    number_of_owners INTEGER
 );
 
 -- Vehicle features junction table (many-to-many)

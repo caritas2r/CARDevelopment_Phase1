@@ -77,6 +77,7 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 | `ownership_constraints.year.min` | `vehicles` | `year` | Used in queries as `year >= year.min`. "unspecified" → not applied |
 | `ownership_constraints.year.max` | `vehicles` | `year` | Used in queries as `year <= year.max`. "unspecified" → not applied |
 | `ownership_constraints.mileage.max` | `vehicles` | `mileage` | Used in queries as `mileage <= mileage.max`. "unspecified" → not applied |
+| `ownership_constraints.number_of_owners` | `vehicles` | `number_of_owners` | Direct match. Integer (0 or higher) or "unspecified". "unspecified" → NULL |
 
 ### Location Constraints
 

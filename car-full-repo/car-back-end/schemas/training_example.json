@@ -39,7 +39,8 @@
     "mileage": {
       "max": null,
       "qualitative": null
-    }
+    },
+    "number_of_owners": "unspecified"
   },
   "preference_signals": {
     "reliability_maintenance_priority": "unspecified"

@@ -162,6 +162,12 @@
             }
           },
           "additionalProperties": false
+        },
+        "number_of_owners": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
         }
       },
       "additionalProperties": false
