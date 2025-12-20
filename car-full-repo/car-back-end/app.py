@@ -8,6 +8,7 @@ from services.database_query_service import DatabaseQueryService
 from services.inference_service import InferenceService
 from services.json_input_converter_service import JsonInputConverterService
 from services.query_service import QueryService
+from services.mock_nlp_trip_service import MockNlpTripService
 
 
 def create_app():
@@ -34,11 +35,16 @@ def create_app():
     json_converter_service = JsonInputConverterService()
     controller.register_service(json_converter_service)
     
+    # Register mock NLP trip service for PoC
+    mock_nlp_trip_service = MockNlpTripService(db_query_service)
+    controller.register_service(mock_nlp_trip_service)
+    
     # QueryService depends on the other services, so create it after they're instantiated
     query_service = QueryService(
         inference_service=inference_service,
         json_converter_service=json_converter_service,
-        database_query_service=db_query_service
+        database_query_service=db_query_service,
+        mock_nlp_trip_service=mock_nlp_trip_service
     )
     controller.register_service(query_service)
     

@@ -17,7 +17,7 @@
   "powertrain_drivability": {
     "transmission": "unspecified",
     "drivetrain": "AWD",
-    "powertrain_type": "unspecified",
+    "powertrain_type": ["unspecified"],
     "fuel_economy_priority": null
   },
   "features_amenities": {
@@ -39,11 +39,11 @@
     "mileage": {
       "max": null,
       "qualitative": null
-    }
+    },
+    "number_of_owners": "unspecified"
   },
   "preference_signals": {
-    "reliability_maintenance_priority": "unspecified",
-    "safety_priority": "unspecified"
+    "reliability_maintenance_priority": "unspecified"
   },
   "location_constraints": null
 }

@@ -84,8 +84,7 @@ class InferenceService:
                         }
                     },
                     "preference_signals": {
-                        "reliability_maintenance_priority": "unspecified",
-                        "safety_priority": "unspecified"
+                        "reliability_maintenance_priority": "unspecified"
                     },
                     "location_constraints": null
                 }

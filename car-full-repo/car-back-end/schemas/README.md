@@ -23,7 +23,7 @@ The schema requires the following top-level fields:
 5. **`powertrain_drivability`** (object): Transmission, drivetrain, fuel type preferences
 6. **`features_amenities`** (object): Must-have, nice-to-have, and avoid features
 7. **`ownership_constraints`** (object): Budget, year, mileage constraints
-8. **`preference_signals`** (object): Reliability and safety priorities
+8. **`preference_signals`** (object): Reliability and color preferences
 9. **`location_constraints`** (object, optional): Geographic constraints
 
 ## Canonical Vocabularies
@@ -35,20 +35,39 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
 
 ### Key Vocabularies
 
-- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck
-- **Use Cases**: family, animals, commute, cargo, travel, work_light
-- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating
+- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck, unspecified
+- **Use Cases**: family, animals, commute, cargo, travel, work_light, pleasure, performance, unspecified
+- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating, unspecified
 - **Powertrain Types**: gas, hybrid, plug_in_hybrid, electric, diesel, unspecified
+  - **Note**: `powertrain_type` is an **array** - users can select multiple types (e.g., gas, hybrid, electric)
 - **Drivetrains**: AWD, 4WD, FWD, RWD, unspecified
+- **Colors**: black, white, silver, gray, grey, red, blue, green, brown, beige, tan, gold, orange, yellow, purple, burgundy, maroon, navy, teal, pink, unspecified
+
+## Key Schema Features
+
+- **"unspecified" sentinel**: All enum fields use "unspecified" instead of null to represent "not mentioned"
+- **Array fields**: Several fields support multiple selections:
+  - `vehicle_type.include_body_styles[]` - Array of body styles
+  - `vehicle_type.exclude_body_styles[]` - Array of excluded body styles
+  - `intended_use.use_case_tags[]` - Array of use case tags
+  - `powertrain_drivability.powertrain_type[]` - **Array of powertrain types** (can select multiple: gas, hybrid, electric, etc.)
+  - `features_amenities.must_have[]` - Array of required features
+  - `features_amenities.nice_to_have[]` - Array of preferred features
+  - `features_amenities.avoid[]` - Array of features to avoid
+- **Integer/Number with unspecified**: Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners` can be integers/numbers or "unspecified"
+- **Boolean with unspecified**: Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max` support "true", "false", or "unspecified"
+- **String fields**: `make` and `model` are plain strings (no enums), `trim` is a string with "unspecified" option
 
 ## Usage for Training
 
 When creating training examples, ensure:
 
-1. **All required fields are present** (even if null/empty)
+1. **All required fields are present** (even if "unspecified" or empty arrays)
 2. **Enum values match canonical vocabulary** exactly
-3. **Structure matches schema** (use validator to check)
-4. **Query text is preserved** in `query_text` field
+3. **Array fields are arrays** - use `[]` for empty arrays, `["value1", "value2"]` for multiple values
+4. **Structure matches schema** (use validator to check)
+5. **Query text is preserved** in `query_text` field
+6. **Use "unspecified" not null** for enum fields where value is not mentioned
 
 ### Example Training Pair
 
@@ -78,8 +97,8 @@ When creating training examples, ensure:
   "powertrain_drivability": {
     "transmission": "unspecified",
     "drivetrain": "AWD",
-    "powertrain_type": "unspecified",
-    "fuel_economy_priority": null
+    "powertrain_type": ["unspecified"],
+    "fuel_economy_priority": "unspecified"
   },
   "features_amenities": {
     "must_have": ["backup_camera"],
@@ -103,8 +122,7 @@ When creating training examples, ensure:
     }
   },
   "preference_signals": {
-    "reliability_maintenance_priority": "unspecified",
-    "safety_priority": "unspecified"
+    "reliability_maintenance_priority": "unspecified"
   },
   "location_constraints": null
 }

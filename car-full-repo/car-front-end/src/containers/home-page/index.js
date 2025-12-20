@@ -10,15 +10,23 @@ function renderHomePage() {
             <header class="cds-header">
                 <h1>Car Management System</h1>
                 <p>Backend Connection Status</p>
+                <nav class="cds-nav">
+                    <a href="#/" class="cds-button cds-button--primary">Home</a>
+                    <a href="#/query" class="cds-button cds-button--secondary">New Query</a>
+                    <a href="#/db-schema" class="cds-button cds-button--secondary">View DB Schema</a>
+                </nav>
             </header>
             <main class="cds-content">
-                <div class="cds-status-card">
+                <div class="cds-status-card" data-page="home">
                     <h2>System Status</h2>
                     <div id="connectionStatus" class="cds-status-indicator loading">
                         <span class="cds-status-icon">⏳</span>
                         <span class="cds-status-text">Checking connection...</span>
                     </div>
                     <div id="statusDetails" class="cds-status-details"></div>
+                    <div class="cds-action-buttons">
+                        <a href="#/query" class="cds-button cds-button--primary">Start New Query</a>
+                    </div>
                 </div>
             </main>
         </div>
@@ -68,9 +76,6 @@ async function checkBackendConnection() {
     }
 }
 
-// Initialize when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', renderHomePage);
-} else {
-    renderHomePage();
-}
+// Expose renderHomePage for routing
+window.renderHomePage = renderHomePage;
+console.log('[HomePage] renderHomePage function exposed to window');

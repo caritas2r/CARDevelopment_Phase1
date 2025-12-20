@@ -14,6 +14,9 @@
   ],
   "properties": {
     "query_text": { "type": "string" },
+    "make": { "type": "string" },
+    "model": { "type": "string" },
+    "trim": { "type": "string" },
 
     "vehicle_type": {
       "type": "object",
@@ -33,15 +36,30 @@
     "capacity_practicality": {
       "type": "object",
       "properties": {
-        "min_seating_capacity": { "type": ["integer", "null"], "minimum": 1 },
-        "kid_count": { "type": ["integer", "null"], "minimum": 0 },
-        "pet_count": { "type": ["integer", "null"], "minimum": 0 },
+        "min_seating_capacity": {
+          "oneOf": [
+            { "type": "integer", "minimum": 1 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
+        "kid_count": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
+        "pet_count": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        },
         "cargo_priority": { "$ref": "#/definitions/priority_level" },
         "cargo_flexibility": {
           "type": "object",
           "properties": {
-            "wants_hatch_access": { "type": "boolean" },
-            "wants_fold_flat_seats": { "type": "boolean" }
+            "wants_hatch_access": { "$ref": "#/definitions/boolean_with_unspecified" },
+            "wants_fold_flat_seats": { "$ref": "#/definitions/boolean_with_unspecified" }
           },
           "additionalProperties": false
         }
@@ -65,7 +83,10 @@
       "properties": {
         "transmission": { "$ref": "#/definitions/transmission" },
         "drivetrain": { "$ref": "#/definitions/drivetrain" },
-        "powertrain_type": { "$ref": "#/definitions/powertrain_type" },
+        "powertrain_type": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/powertrain_type" }
+        },
         "fuel_economy_priority": { "$ref": "#/definitions/priority_level" }
       },
       "additionalProperties": false
@@ -96,28 +117,63 @@
         "budget": {
           "type": "object",
           "properties": {
-            "currency": { "type": "string" },
-            "min": { "type": ["number", "null"] },
-            "max": { "type": ["number", "null"] },
-            "strict_max": { "type": "boolean" }
+            "currency": { 
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "min": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "max": {
+              "oneOf": [
+                { "type": "number" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "strict_max": { "$ref": "#/definitions/boolean_with_unspecified" }
           },
           "additionalProperties": false
         },
         "year": {
           "type": "object",
           "properties": {
-            "min": { "type": ["integer", "null"] },
-            "max": { "type": ["integer", "null"] }
+            "min": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            },
+            "max": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            }
           },
           "additionalProperties": false
         },
         "mileage": {
           "type": "object",
           "properties": {
-            "max": { "type": ["integer", "null"] },
-            "qualitative": { "$ref": "#/definitions/mileage_qualitative" }
+            "max": {
+              "oneOf": [
+                { "type": "integer" },
+                { "type": "string", "enum": ["unspecified"] }
+              ]
+            }
           },
           "additionalProperties": false
+        },
+        "number_of_owners": {
+          "oneOf": [
+            { "type": "integer", "minimum": 0 },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
         }
       },
       "additionalProperties": false
@@ -129,7 +185,7 @@
         "reliability_maintenance_priority": {
           "$ref": "#/definitions/maintenance_priority"
         },
-        "safety_priority": { "$ref": "#/definitions/safety_priority" }
+        "color": { "$ref": "#/definitions/color" }
       },
       "additionalProperties": false
     },
@@ -137,10 +193,14 @@
     "location_constraints": {
       "type": ["object", "null"],
       "properties": {
-        "city": { "type": ["string", "null"] },
-        "state_region": { "type": ["string", "null"] },
-        "radius_miles": { "type": ["number", "null"] },
-        "max_radius_miles": { "type": ["number", "null"] }
+        "city": { "type": "string" },
+        "state_region": { "type": "string" },
+        "radius_miles": {
+          "oneOf": [
+            { "type": "number" },
+            { "type": "string", "enum": ["unspecified"] }
+          ]
+        }
       },
       "additionalProperties": false
     }
@@ -149,15 +209,15 @@
   "definitions": {
     "body_style": {
       "type": "string",
-      "enum": ["sedan", "coupe", "hatchback", "wagon", "suv", "crossover", "van", "truck"]
+      "enum": ["sedan", "coupe", "hatchback", "wagon", "suv", "crossover", "van", "truck", "unspecified"]
     },
     "priority_level": {
-      "type": ["string", "null"],
-      "enum": ["low", "medium", "high", null]
+      "type": "string",
+      "enum": ["low", "medium", "high", "unspecified"]
     },
     "use_case_tag": {
       "type": "string",
-      "enum": ["family", "animals", "commute", "cargo", "travel", "work_light"]
+      "enum": ["family", "animals", "commute", "cargo", "travel", "work_light", "pleasure", "performance", "unspecified"]
     },
     "transmission": {
       "type": "string",
@@ -182,20 +242,47 @@
         "heated_seats",
         "leather_seats",
         "sunroof",
-        "third_row_seating"
+        "third_row_seating",
+        "unspecified"
       ]
     },
     "mileage_qualitative": {
-      "type": ["string", "null"],
-      "enum": ["low", "moderate", "high", "low_or_moderate", null]
+      "type": "string",
+      "enum": ["low", "moderate", "high", "low_or_moderate", "unspecified"]
     },
     "maintenance_priority": {
       "type": "string",
       "enum": ["low_cost", "balanced", "performance_first", "unspecified"]
     },
-    "safety_priority": {
+    "color": {
       "type": "string",
-      "enum": ["baseline", "enhanced", "unspecified"]
+      "enum": [
+        "black",
+        "white",
+        "silver",
+        "gray",
+        "grey",
+        "red",
+        "blue",
+        "green",
+        "brown",
+        "beige",
+        "tan",
+        "gold",
+        "orange",
+        "yellow",
+        "purple",
+        "burgundy",
+        "maroon",
+        "navy",
+        "teal",
+        "pink",
+        "unspecified"
+      ]
+    },
+    "boolean_with_unspecified": {
+      "type": "string",
+      "enum": ["true", "false", "unspecified"]
     }
   }
 }

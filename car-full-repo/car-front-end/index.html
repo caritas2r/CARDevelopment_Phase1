@@ -4,10 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Car App</title>
-    <link rel="stylesheet" href="src/containers/home-page/style.css">
+    <!-- NOTE: The ?v=dev query parameters are for cache-busting during development -->
+    <!-- TODO: Remove ?v=dev parameters before production deployment -->
+    <link rel="stylesheet" href="src/containers/home-page/style.css?v=dev">
+    <link rel="stylesheet" href="src/containers/db-schema-page/style.css?v=dev">
+    <link rel="stylesheet" href="src/containers/query-page/style.css?v=dev">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
 </head>
 <body>
     <div id="app"></div>
-    <script type="module" src="app.js"></script>
+    <!-- NOTE: The ?v=dev query parameter is for cache-busting during development -->
+    <!-- TODO: Remove ?v=dev parameter before production deployment -->
+    <script type="module" src="app.js?v=dev"></script>
 </body>
 </html>

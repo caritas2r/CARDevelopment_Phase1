@@ -30,7 +30,10 @@ The API will be available at `http://localhost:5000`
 - `GET /` - Health check
 - `GET /api/health` - API health check (frontend connection test)
 - `GET /api/db/health` - Database health check
-- `POST /api/query/v1` - Process natural language vehicle queries (returns structured JSON)
+- `GET /api/schema/v1` - Get Vehicle Selection V1 JSON schema
+- `POST /api/query/v1` - Process natural language vehicle queries
+  - Request body: `{ "query": "natural language text" }`
+  - Returns: Vehicle data matching the query (PoC: returns sample vehicle with random data)
 
 ## Architecture
 
@@ -44,12 +47,15 @@ The backend follows a microservices architecture with a service controller:
 
 ### Query Processing Services
 - **Query Service**: Orchestrates the natural language query processing pipeline
-- **Inference Service**: Processes natural language queries through inference model (NLP to JSON)
-- **JSON Input Converter Service**: Converts structured JSON query to SQL
+- **Mock NLP Trip Service**: Returns sample vehicle data for PoC demonstrations (generates random vehicle on each call)
+- **Inference Service**: Processes natural language queries through inference model (NLP to JSON) - for future ML integration
+- **JSON Input Converter Service**: Converts structured JSON query to SQL - for future query generation
 
 ### Utilities
 - **Schema Validator**: Validates JSON output against Vehicle Selection V1 schema
 - **Database Setup Script**: Handles database initialization
+- **Database Bootstrap**: Creates database schema using PoC pattern (idempotent, safe to run on every startup)
+- **Database Inspector**: Utility script to inspect database structure and contents
 
 ## Project Structure
 
@@ -72,14 +78,29 @@ car-back-end/
 │   ├── database_connection_service.py
 │   ├── database_query_service.py
 │   ├── query_service.py           # Query orchestration
-│   ├── inference_service.py       # NLP to JSON conversion
-│   └── json_input_converter_service.py  # JSON to SQL conversion
+│   ├── mock_nlp_trip_service.py   # Mock NLP service for PoC
+│   ├── inference_service.py       # NLP to JSON conversion (future)
+│   └── json_input_converter_service.py  # JSON to SQL conversion (future)
+├── training/                       # Training data annotation pipeline
+│   ├── __init__.py
+│   ├── annotation_tool.py         # Interactive annotation tool
+│   ├── csv_manager.py             # CSV file management
+│   ├── field_prompter.py          # Field input prompting
+│   ├── schema_traverser.py        # Schema traversal logic
+│   ├── reset_csv.py               # CSV reset utility
+│   ├── prompts.csv                # Sample prompts CSV
+│   └── README.md                  # Training pipeline documentation
+├── docs/                           # Documentation
+│   └── json_to_db_mapping.md      # JSON schema to database mapping
 ├── src/
 │   ├── __init__.py
 │   └── service_controller.py      # Service controller
 └── utils/                          # Utility scripts
     ├── __init__.py
-    ├── database_setup_script.py
+    ├── database_setup_script.py    # Database setup script
+    ├── db_bootstrap.py              # Database schema bootstrap (PoC pattern)
+    ├── DB_BOOTSTRAP_README.md       # Database bootstrap documentation
+    ├── inspect_database.py          # Database inspection utility
     └── schema_validator.py         # Schema validation utility
 ```
 
@@ -109,7 +130,23 @@ See `schemas/training_example.json` for a complete example.
 The application uses SQLite for local development:
 - Database file: `data/car_database.db` (gitignored)
 - Database setup runs automatically on first startup
+- Database schema is created using the bootstrap pattern (idempotent, safe to run on every startup)
+- Schema includes the following tables:
+  - `vehicles`: Main vehicle inventory table with all vehicle attributes
+    - Identity: make, model, trim, year, price, currency, mileage
+    - Descriptors: body_style, transmission, drivetrain, seating_capacity, color, cargo_space
+    - Features: has_hatch_access, has_fold_flat_seats, fuel_economy, reliability
+    - Location: city, state_region, zip_code
+    - Ownership: number_of_owners
+    - **Note**: `powertrain_type` is NOT in vehicles table (uses junction table)
+  - `vehicle_features`: Junction table for vehicle features (many-to-many)
+  - `vehicle_use_case_tags`: Junction table for use case tags (many-to-many)
+  - `vehicle_powertrain_types`: Junction table for powertrain types (many-to-many)
+  - `search_requests`: Stores processed NLP queries and their Vehicle Selection V1 JSON representations
 - Connection service manages a single persistent database connection
+- See `utils/DB_BOOTSTRAP_README.md` for detailed database schema documentation
+- See `docs/json_to_db_mapping.md` for JSON schema to database field mappings
+- Use `python utils/inspect_database.py` to inspect the database structure
 
 ## Dependencies
 

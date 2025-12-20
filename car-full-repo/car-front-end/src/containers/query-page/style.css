@@ -1,0 +1,214 @@
+/* Query Page Styles - Carbon Design System v11 */
+
+/* Query card using Carbon tile pattern */
+.cds-query-card {
+    grid-column: 4 / 14;
+    background-color: var(--cds-layer);
+    padding: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width: 1056px) {
+    .cds-query-card {
+        grid-column: 2 / 16;
+    }
+}
+
+@media (max-width: 672px) {
+    .cds-query-card {
+        grid-column: 1 / -1;
+        padding: 1.5rem;
+    }
+}
+
+.cds-query-card h2 {
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    margin: 0 0 2rem 0;
+    color: var(--cds-text-primary);
+    text-align: center;
+}
+
+/* Query form container */
+.cds-query-form {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+/* Textarea using Carbon text input pattern */
+.cds-textarea {
+    width: 100%;
+    padding: 1rem;
+    font-size: 1rem;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--cds-text-primary);
+    background-color: var(--cds-layer);
+    border: 1px solid #8d8d8d;
+    border-radius: 0;
+    resize: vertical;
+    min-height: 120px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.cds-textarea:focus {
+    outline: none;
+    border-color: var(--cds-interactive);
+    box-shadow: 0 0 0 2px rgba(15, 98, 254, 0.1);
+}
+
+.cds-textarea::placeholder {
+    color: transparent; /* Hide default placeholder */
+}
+
+/* Rotating placeholder text overlay */
+.cds-placeholder-text {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: #8d8d8d; /* Light grey color */
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    max-width: calc(100% - 2rem);
+}
+
+/* Submit button */
+.cds-button--submit {
+    width: 100%;
+    margin-top: 1rem;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: 0.16px;
+    cursor: pointer;
+    transition: background-color 0.2s, opacity 0.2s;
+}
+
+.cds-button--submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Query status area */
+.cds-query-status {
+    margin-top: 1.5rem;
+}
+
+.cds-query-status .cds-status-indicator {
+    margin-bottom: 0;
+}
+
+.cds-query-status .cds-status-details {
+    margin-top: 1rem;
+}
+
+/* Action buttons in main content */
+.cds-action-buttons {
+    margin-top: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.cds-action-buttons .cds-button {
+    min-width: 12rem;
+}
+
+/* Query results styling */
+.query-results {
+    margin-top: 1.5rem;
+}
+
+.query-result-item {
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    background-color: var(--cds-background);
+    border-left: 3px solid var(--cds-interactive);
+}
+
+.query-result-item h4 {
+    margin: 0 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+.result-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.result-details p {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+}
+
+.result-details strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+.query-results h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 672px) {
+    .cds-query-card {
+        padding: 1rem;
+    }
+    
+    .cds-query-card h2 {
+        font-size: 1.125rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .cds-textarea {
+        min-height: 100px;
+        font-size: 0.875rem;
+    }
+    
+    .cds-placeholder-text {
+        font-size: 0.875rem;
+    }
+    
+    .result-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .query-result-item {
+        padding: 1rem;
+    }
+    
+    .cds-action-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cds-action-buttons .cds-button {
+        width: 100%;
+        max-width: 20rem;
+    }
+}
+

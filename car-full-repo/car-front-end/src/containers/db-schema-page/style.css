@@ -1,0 +1,236 @@
+/* Database Schema Page Styles - Carbon Design System v11 */
+
+/* Schema status using Carbon notification pattern */
+#schemaStatus {
+    margin-bottom: 1.5rem;
+}
+
+#schemaStatus p {
+    margin: 0.5rem 0;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+}
+
+#schemaStatus strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+/* Schema table container using Carbon tile pattern */
+.schema-table {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--cds-layer);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.schema-table h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 400;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.schema-details {
+    margin-top: 1.5rem;
+}
+
+/* Section headers using Carbon label pattern */
+.schema-details h4 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.33;
+    letter-spacing: 0.32px;
+    text-transform: uppercase;
+    color: var(--cds-text-secondary);
+}
+
+.schema-details h4:first-child {
+    margin-top: 0;
+}
+
+/* Carbon table pattern */
+.schema-table-data {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+    background-color: var(--cds-layer);
+}
+
+.schema-table-data thead {
+    background-color: var(--cds-background);
+}
+
+.schema-table-data th {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.schema-table-data td {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.schema-table-data tbody tr:hover {
+    background-color: var(--cds-background);
+}
+
+.schema-table-data tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.schema-table-data strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+/* Carbon structured list pattern */
+.schema-details ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.schema-details ul:last-child {
+    margin-bottom: 0;
+}
+
+.schema-details ul li {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.25rem;
+    background-color: var(--cds-background);
+    border-left: 3px solid var(--cds-interactive);
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+}
+
+.schema-details ul li strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+/* Error notification using Carbon notification pattern */
+.error {
+    padding: 1rem;
+    background-color: #fff1f1;
+    border-left: 4px solid var(--cds-support-error);
+    margin-bottom: 1.5rem;
+}
+
+.error strong {
+    font-weight: 600;
+    color: var(--cds-support-error);
+}
+
+.error {
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: #750e13;
+}
+
+/* Navigation using Carbon button pattern */
+.cds-nav {
+    margin-top: 1.5rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cds-button {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.29;
+    letter-spacing: 0.16px;
+    text-decoration: none;
+    border: none;
+    border-radius: 0;
+    cursor: pointer;
+    transition: background-color 0.2s, color 0.2s;
+    text-align: center;
+    min-width: 10rem;
+}
+
+.cds-button--primary {
+    background-color: var(--cds-interactive);
+    color: #ffffff;
+}
+
+.cds-button--primary:hover {
+    background-color: var(--cds-interactive-hover);
+    color: #ffffff;
+}
+
+.cds-button--primary:focus {
+    outline: 2px solid var(--cds-interactive);
+    outline-offset: 2px;
+}
+
+.cds-button--secondary {
+    background-color: transparent;
+    color: var(--cds-interactive);
+    border: 1px solid var(--cds-interactive);
+}
+
+.cds-button--secondary:hover {
+    background-color: var(--cds-interactive);
+    color: #ffffff;
+}
+
+.cds-button--secondary:focus {
+    outline: 2px solid var(--cds-interactive);
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 672px) {
+    .schema-table {
+        padding: 1rem;
+    }
+    
+    .schema-table-data {
+        font-size: 0.75rem;
+    }
+    
+    .schema-table-data th,
+    .schema-table-data td {
+        padding: 0.5rem;
+    }
+    
+    .cds-nav {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cds-button {
+        width: 100%;
+        max-width: 20rem;
+    }
+}
+
