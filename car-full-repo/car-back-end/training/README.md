@@ -5,56 +5,114 @@ A CLI tool for annotating NLP prompts with structured JSON schema values for tra
 ## Overview
 
 This tool helps you create training data by:
-1. Loading prompts from a CSV file
+1. Loading prompts from `unannotated_nlp_prompts.csv` (default workflow)
 2. Iterating through the Vehicle Selection V1 JSON schema recursively
 3. Prompting you to select enum values or enter data for each field
-4. Saving annotated JSON back to the CSV file
+4. Saving annotated JSON to `annotated_nlp_prompts.csv` (original file is never modified)
+
+## Workflow
+
+The tool uses a **two-file workflow** by default to protect your source data:
+
+- **Input**: `unannotated_nlp_prompts.csv` - Your source prompts (never modified)
+- **Output**: `annotated_nlp_prompts.csv` - Completed annotations (accumulated results)
+- **Temporary**: A temporary file is used during processing (automatically cleaned up)
+
+This ensures:
+- Your original unannotated prompts remain untouched
+- Completed annotations are safely stored in a separate file
+- You can run the tool multiple times - it automatically skips already-processed prompts (by ID)
+- Incremental progress - you can add new prompts to the unannotated file and process them separately
 
 ## CSV Format
 
-The CSV file must have the following columns:
-- `id`: Unique identifier for the row (optional but recommended)
+Both `unannotated_nlp_prompts.csv` and `annotated_nlp_prompts.csv` must have the following columns:
+- `id`: Unique identifier for the row (required for duplicate detection)
 - `prompt`: The NLP query text
-- `annotated_json`: The annotated JSON (initially empty)
+- `annotated_json`: The annotated JSON (initially empty in unannotated file)
 - `completion_status`: `complete` or `incomplete` (initially `incomplete`)
 
-Example:
+**unannotated_nlp_prompts.csv** example:
 ```csv
 id,prompt,annotated_json,completion_status
-1,"I need an SUV for my family of 5, under $30k",,incomplete
-2,"Looking for a sedan with good gas mileage",,incomplete
+1,"I need an SUV for my family of 5, under $30k",,
+2,"Looking for a sedan with good gas mileage",,
 ```
 
-The tool preserves all columns (including `id`) when saving updates.
+**annotated_nlp_prompts.csv** (auto-generated):
+```csv
+id,prompt,annotated_json,completion_status
+1,"I need an SUV for my family of 5, under $30k","{...}",complete
+```
+
+The tool preserves all columns (including `id`) when saving updates. The `id` field is critical for tracking which prompts have already been processed.
 
 ## Usage
 
-### Basic Usage
+### Default Workflow (Recommended)
+
+Run without arguments to use the default workflow:
 
 ```bash
 cd car-back-end
-python training/annotation_tool.py training/prompts.csv
+python training/annotation_tool.py
 ```
+
+This will:
+- Load prompts from `training/unannotated_nlp_prompts.csv`
+- Save completed annotations to `training/annotated_nlp_prompts.csv`
+- Automatically skip prompts that have already been processed (by ID)
+- Never modify the original unannotated file
 
 ### With Custom Schema
 
 ```bash
+python training/annotation_tool.py schemas/vehicle_selection_v1_schema.json
+```
+
+### Direct CSV Editing (Backward Compatibility)
+
+If you want to edit a CSV file directly (old workflow):
+
+```bash
+python training/annotation_tool.py training/prompts.csv
 python training/annotation_tool.py training/prompts.csv schemas/vehicle_selection_v1_schema.json
+```
+
+### Test Mode
+
+Automatically select random enum values for testing:
+
+```bash
+python training/annotation_tool.py --test
 ```
 
 ## How It Works
 
-1. **Load CSV**: The tool loads your CSV file and finds the first row with `completion_status != true`
-2. **Display Prompt**: Shows the NLP prompt text
-3. **Traverse Schema**: Recursively walks through the JSON schema from top to bottom
-4. **Field Annotation**: For each field:
+### Default Workflow (Unannotated → Annotated)
+
+1. **Check Processed IDs**: Reads `annotated_nlp_prompts.csv` to find already-processed prompt IDs
+2. **Load Unannotated CSV**: Loads `unannotated_nlp_prompts.csv` into a temporary file (original never modified)
+3. **Filter Unprocessed**: Removes prompts that have already been processed (by ID)
+4. **Display Prompt**: Shows the NLP prompt text
+5. **Traverse Schema**: Recursively walks through the JSON schema from top to bottom
+6. **Field Annotation**: For each field:
    - Shows field name and type
    - For enums: Displays numbered list of options
    - For arrays: Allows multiple selections
    - Validates input strictly (only accepts valid enum values)
-5. **Save Progress**: After completing all fields, asks:
-   - Continue to next prompt (saves and moves on)
-   - Save and exit (saves and quits)
+7. **Save Progress**: After completing all fields:
+   - Appends completed annotation to `annotated_nlp_prompts.csv`
+   - Updates temporary file (for resume capability)
+   - Asks: Continue to next prompt or Save and exit
+8. **Cleanup**: Automatically deletes temporary file when done
+
+### Direct CSV Workflow (Backward Compatibility)
+
+When a CSV path is provided, the tool works directly on that file (old behavior):
+1. Loads the specified CSV file
+2. Processes prompts and saves directly to that file
+3. No temporary file or duplicate checking
 
 ## Field Types
 
@@ -79,7 +137,16 @@ python training/annotation_tool.py training/prompts.csv schemas/vehicle_selectio
 
 ## Resuming Work
 
-If you interrupt the tool (Ctrl+C), it will save your current progress. When you run it again, it will:
+### Default Workflow
+
+If you interrupt the tool (Ctrl+C), it will save your current progress to the temporary file. When you run it again:
+- **Already completed prompts**: Automatically skipped (checked by ID in `annotated_nlp_prompts.csv`)
+- **Partially completed prompts**: Resume from the first incomplete field (progress saved in temp file)
+- **New prompts**: Processed from the beginning
+
+### Direct CSV Workflow
+
+If you interrupt the tool, it saves progress to the CSV file. When you run it again:
 - Skip fields that are already annotated
 - Resume from the first incomplete field
 
@@ -139,12 +206,14 @@ Enter selection (1 or 2): 1
 ```
 training/
 ├── __init__.py
-├── annotation_tool.py      # Main script
-├── csv_manager.py          # CSV loading/updating
-├── schema_traverser.py     # Recursive schema traversal
-├── field_prompter.py       # User input prompting
-├── prompts.csv             # Sample CSV file
-└── README.md               # This file
+├── annotation_tool.py          # Main script
+├── csv_manager.py              # CSV loading/updating
+├── schema_traverser.py         # Recursive schema traversal
+├── field_prompter.py           # User input prompting
+├── unannotated_nlp_prompts.csv # Source prompts (input, never modified)
+├── annotated_nlp_prompts.csv   # Completed annotations (output, auto-generated)
+├── prompts.csv                  # Sample CSV file (for direct mode)
+└── README.md                    # This file
 ```
 
 ## Validation

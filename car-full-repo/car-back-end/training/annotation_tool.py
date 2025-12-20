@@ -5,8 +5,10 @@ Annotates NLP prompts with structured JSON schema values
 """
 import sys
 import json
+import shutil
+import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, Set, Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -170,49 +172,156 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
     return annotated
 
 
-def main():
-    """Main entry point"""
-    if len(sys.argv) < 2:
-        print("Usage: python annotation_tool.py <csv_file> [schema_file] [--test]")
-        print("\nExample:")
-        print("  python annotation_tool.py prompts.csv")
-        print("  python annotation_tool.py prompts.csv schemas/vehicle_selection_v1_schema.json")
-        print("  python annotation_tool.py prompts.csv --test  # Test mode with random enum selections")
-        sys.exit(1)
+def get_processed_ids(annotated_csv_path: Path) -> Set[str]:
+    """
+    Get set of IDs that have already been processed in the annotated CSV
     
-    # Check for test mode flag
-    test_mode = '--test' in sys.argv or '--auto' in sys.argv
-    if test_mode:
-        sys.argv = [arg for arg in sys.argv if arg not in ('--test', '--auto')]
-        FieldPrompter.test_mode = True
-        print("TEST MODE ENABLED: Random enum selections will be made automatically")
+    Args:
+        annotated_csv_path: Path to annotated_nlp_prompts.csv
     
-    csv_path = Path(sys.argv[1])
-    schema_path = Path(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else Path(__file__).parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
+    Returns:
+        Set of ID strings that are already in the annotated file
+    """
+    processed_ids = set()
     
-    # Validate paths
-    if not csv_path.exists():
-        print(f"Error: CSV file not found: {csv_path}")
-        sys.exit(1)
+    if not annotated_csv_path.exists():
+        return processed_ids
     
-    if not schema_path.exists():
-        print(f"Error: Schema file not found: {schema_path}")
-        sys.exit(1)
+    try:
+        manager = CSVManager(annotated_csv_path)
+        rows = manager.load()
+        for row in rows:
+            row_id = row.get('id', '').strip()
+            if row_id:
+                processed_ids.add(row_id)
+    except Exception as e:
+        print(f"Warning: Could not read annotated CSV to check processed IDs: {e}")
     
-    # Initialize components
-    csv_manager = CSVManager(csv_path)
-    schema_traverser = SchemaTraverser(schema_path)
+    return processed_ids
+
+
+def filter_unprocessed_rows(csv_manager: CSVManager, processed_ids: Set[str]) -> None:
+    """
+    Filter out rows that have already been processed from the CSV manager
     
-    # Load CSV and find next incomplete row
-    print("Loading CSV file...")
-    csv_manager.load()
+    Args:
+        csv_manager: CSVManager instance with loaded rows
+        processed_ids: Set of IDs that have already been processed
+    """
+    if not processed_ids:
+        return
     
-    # Get schema fields
-    print("Loading schema...")
-    fields = schema_traverser.get_fields()
-    print(f"Found {len(fields)} fields to annotate")
+    # Filter out rows with IDs that are already processed
+    original_count = len(csv_manager.rows)
+    csv_manager.rows = [
+        row for row in csv_manager.rows
+        if row.get('id', '').strip() not in processed_ids
+    ]
     
-    # Process prompts
+    removed_count = original_count - len(csv_manager.rows)
+    if removed_count > 0:
+        print(f"Note: Skipping {removed_count} row(s) that have already been processed.")
+
+
+def append_to_annotated_csv(annotated_csv_path: Path, row_data: dict) -> None:
+    """
+    Append a completed row to the annotated CSV file
+    
+    Args:
+        annotated_csv_path: Path to annotated_nlp_prompts.csv
+        row_data: Dictionary with id, prompt, annotated_json, completion_status
+    """
+    # Ensure the file exists with headers if it's new
+    if not annotated_csv_path.exists():
+        with open(annotated_csv_path, 'w', encoding='utf-8', newline='') as f:
+            import csv
+            writer = csv.DictWriter(f, fieldnames=['id', 'prompt', 'annotated_json', 'completion_status'])
+            writer.writeheader()
+    
+    # Append the row
+    with open(annotated_csv_path, 'a', encoding='utf-8', newline='') as f:
+        import csv
+        writer = csv.DictWriter(f, fieldnames=['id', 'prompt', 'annotated_json', 'completion_status'])
+        writer.writerow(row_data)
+
+
+def process_with_temp_file(unannotated_path: Path, annotated_path: Path, schema_path: Path, test_mode: bool = False):
+    """
+    Process annotations using temporary file workflow (unannotated → temp → annotated)
+    
+    Args:
+        unannotated_path: Path to unannotated_nlp_prompts.csv
+        annotated_path: Path to annotated_nlp_prompts.csv
+        schema_path: Path to schema JSON file
+        test_mode: Whether to run in test mode
+    """
+    # Get IDs that have already been processed
+    print("Checking for already processed prompts...")
+    processed_ids = get_processed_ids(annotated_path)
+    if processed_ids:
+        print(f"Found {len(processed_ids)} already processed prompt(s).")
+    
+    # Create temporary file from unannotated CSV
+    print(f"\nLoading unannotated prompts from: {unannotated_path}")
+    temp_file = tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='utf-8')
+    temp_path = Path(temp_file.name)
+    temp_file.close()
+    
+    try:
+        # Copy unannotated CSV to temp file
+        shutil.copy2(unannotated_path, temp_path)
+        print(f"Created temporary working file: {temp_path}")
+        
+        # Initialize components
+        csv_manager = CSVManager(temp_path)
+        schema_traverser = SchemaTraverser(schema_path)
+        
+        # Load CSV and filter out already processed rows
+        csv_manager.load()
+        filter_unprocessed_rows(csv_manager, processed_ids)
+        
+        if not csv_manager.rows:
+            print("\nNo unprocessed prompts found. All prompts have been annotated!")
+            return
+        
+        # Get schema fields
+        print("Loading schema...")
+        fields = schema_traverser.get_fields()
+        print(f"Found {len(fields)} fields to annotate")
+        print(f"\nFound {len(csv_manager.rows)} unprocessed prompt(s) to annotate.")
+        
+        # Process prompts (reuse the main processing loop)
+        process_prompts(csv_manager, fields, test_mode, annotated_path, use_temp_workflow=True)
+        
+        print(f"\n{'='*60}")
+        print("Session Complete!")
+        print(f"{'='*60}")
+        print(f"All completed annotations have been saved to: {annotated_path}")
+        print(f"The original unannotated file was not modified: {unannotated_path}")
+        print(f"Temporary file will be cleaned up: {temp_path}")
+    
+    finally:
+        # Clean up temporary file
+        try:
+            if temp_path.exists():
+                temp_path.unlink()
+                print(f"\nCleaned up temporary file.")
+        except Exception as e:
+            print(f"\nWarning: Could not delete temporary file {temp_path}: {e}")
+
+
+def process_prompts(csv_manager: CSVManager, fields: list, test_mode: bool, 
+                    annotated_path: Optional[Path] = None, use_temp_workflow: bool = False):
+    """
+    Main processing loop for annotating prompts
+    
+    Args:
+        csv_manager: CSVManager instance with loaded rows
+        fields: List of field definitions from schema
+        test_mode: Whether to run in test mode
+        annotated_path: Path to annotated CSV (only used in temp workflow)
+        use_temp_workflow: If True, append to annotated_path instead of saving to csv_manager's file
+    """
     while True:
         result = csv_manager.find_next_incomplete()
         
@@ -222,12 +331,10 @@ def main():
         
         row_index, row = result
         prompt_text = row.get('prompt', '').strip()
-        row_id = row.get('id', str(row_index + 1))
+        row_id = row.get('id', '').strip() or str(row_index + 1)
         
         if not prompt_text:
-            print(f"\nWarning: Row {row_index + 1} (ID: {row_id}) has empty prompt. Marking as completed.")
-            csv_manager.update_row(row_index, {}, completed=True)
-            csv_manager.save()
+            print(f"\nWarning: Row {row_index + 1} (ID: {row_id}) has empty prompt. Skipping.")
             continue
         
         # Get existing JSON if any (for resume)
@@ -253,49 +360,85 @@ def main():
             print(json.dumps(annotated_json, indent=2, ensure_ascii=False))
             print("-" * 60)
             
-            # Ask to continue or save and exit (skip in test mode)
-            if FieldPrompter.test_mode:
-                # In test mode, automatically continue to next prompt
-                csv_manager.update_row(row_index, annotated_json, completed=True)
-                csv_manager.save()
-                print("\n[TEST MODE] Saved. Moving to next prompt...\n")
+            # Handle saving based on workflow type
+            if use_temp_workflow:
+                # Prepare row data for annotated CSV
+                row_data = {
+                    'id': row_id,
+                    'prompt': prompt_text,
+                    'annotated_json': json.dumps(annotated_json, indent=2),
+                    'completion_status': 'complete'
+                }
+                
+                if test_mode:
+                    append_to_annotated_csv(annotated_path, row_data)
+                    csv_manager.update_row(row_index, annotated_json, completed=True)
+                    csv_manager.save()
+                    print("\n[TEST MODE] Saved to annotated CSV. Moving to next prompt...\n")
+                else:
+                    while True:
+                        choice = input("\nOptions:\n  1. Continue to next prompt\n  2. Save and exit\n\nEnter selection (1 or 2): ").strip()
+                        
+                        if choice == '1':
+                            append_to_annotated_csv(annotated_path, row_data)
+                            csv_manager.update_row(row_index, annotated_json, completed=True)
+                            csv_manager.save()
+                            print("\nSaved to annotated CSV. Moving to next prompt...\n")
+                            break
+                        
+                        elif choice == '2':
+                            append_to_annotated_csv(annotated_path, row_data)
+                            csv_manager.update_row(row_index, annotated_json, completed=True)
+                            csv_manager.save()
+                            print("\nSaved to annotated CSV. Exiting...")
+                            return
+                        
+                        else:
+                            print("Invalid selection. Please enter 1 or 2.")
             else:
-                while True:
-                    choice = input("\nOptions:\n  1. Continue to next prompt\n  2. Save and exit\n\nEnter selection (1 or 2): ").strip()
-                    
-                    if choice == '1':
-                        # Update CSV and continue
-                        csv_manager.update_row(row_index, annotated_json, completed=True)
-                        csv_manager.save()
-                        print("\nSaved. Moving to next prompt...\n")
-                        break
-                    
-                    elif choice == '2':
-                        # Update CSV and exit
-                        csv_manager.update_row(row_index, annotated_json, completed=True)
-                        csv_manager.save()
-                        print("\nSaved. Exiting...")
-                        return
-                    
-                    else:
-                        print("Invalid selection. Please enter 1 or 2.")
+                # Direct workflow: save to the CSV file directly
+                if test_mode:
+                    csv_manager.update_row(row_index, annotated_json, completed=True)
+                    csv_manager.save()
+                    print("\n[TEST MODE] Saved. Moving to next prompt...\n")
+                else:
+                    while True:
+                        choice = input("\nOptions:\n  1. Continue to next prompt\n  2. Save and exit\n\nEnter selection (1 or 2): ").strip()
+                        
+                        if choice == '1':
+                            csv_manager.update_row(row_index, annotated_json, completed=True)
+                            csv_manager.save()
+                            print("\nSaved. Moving to next prompt...\n")
+                            break
+                        
+                        elif choice == '2':
+                            csv_manager.update_row(row_index, annotated_json, completed=True)
+                            csv_manager.save()
+                            print("\nSaved. Exiting...")
+                            return
+                        
+                        else:
+                            print("Invalid selection. Please enter 1 or 2.")
         
         except KeyboardInterrupt:
             print("\n\nInterrupted by user.")
             # Save current progress
             if 'annotated_json' in locals():
-                csv_manager.update_row(row_index, annotated_json, completed=False)
-                csv_manager.save()
-                print("Progress saved.")
+                if use_temp_workflow:
+                    # In temp workflow, save to temp file only (not to annotated CSV)
+                    csv_manager.update_row(row_index, annotated_json, completed=False)
+                    csv_manager.save()
+                    print("Progress saved to temporary file.")
+                else:
+                    csv_manager.update_row(row_index, annotated_json, completed=False)
+                    csv_manager.save()
+                    print("Progress saved.")
             sys.exit(0)
         
         except EOFError:
             print("\n\nError: No input available (non-interactive mode).")
             print("This tool requires interactive input. Please run it in a terminal.")
             print(f"\nSkipping row {row_index + 1} (ID: {row_id})...")
-            # Mark as incomplete and move on to prevent infinite loop
-            csv_manager.update_row(row_index, {}, completed=False)
-            csv_manager.save()
             continue
         
         except Exception as e:
@@ -303,14 +446,76 @@ def main():
             import traceback
             traceback.print_exc()
             print(f"\nSkipping row {row_index + 1} (ID: {row_id})...")
-            # Mark as incomplete to prevent infinite loop on same error
-            try:
-                partial_json = annotated_json if 'annotated_json' in locals() else {}
-                csv_manager.update_row(row_index, partial_json, completed=False)
-                csv_manager.save()
-            except:
-                pass  # If we can't save, at least continue
             continue
+
+
+def main():
+    """Main entry point"""
+    # Check for test mode flag
+    test_mode = '--test' in sys.argv or '--auto' in sys.argv
+    if test_mode:
+        sys.argv = [arg for arg in sys.argv if arg not in ('--test', '--auto')]
+        FieldPrompter.test_mode = True
+        print("TEST MODE ENABLED: Random enum selections will be made automatically")
+    
+    # Check for direct mode flag (backward compatibility)
+    direct_mode = '--direct' in sys.argv
+    if direct_mode:
+        sys.argv = [arg for arg in sys.argv if arg != '--direct']
+    
+    # Determine workflow:
+    # - If no CSV provided: use new workflow (unannotated → annotated) [DEFAULT]
+    # - If CSV provided: use old workflow (direct CSV editing) [BACKWARD COMPATIBLE]
+    if len(sys.argv) < 2:
+        # New workflow: use unannotated_nlp_prompts.csv → annotated_nlp_prompts.csv
+        training_dir = Path(__file__).parent
+        unannotated_path = training_dir / 'unannotated_nlp_prompts.csv'
+        annotated_path = training_dir / 'annotated_nlp_prompts.csv'
+        schema_path = Path(__file__).parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
+        
+        # Validate paths
+        if not unannotated_path.exists():
+            print(f"Error: Unannotated CSV file not found: {unannotated_path}")
+            print("\nPlease create unannotated_nlp_prompts.csv in the training directory, or")
+            print("use the direct mode: python annotation_tool.py <csv_file>")
+            sys.exit(1)
+        
+        if not schema_path.exists():
+            print(f"Error: Schema file not found: {schema_path}")
+            sys.exit(1)
+        
+        # Use new workflow
+        process_with_temp_file(unannotated_path, annotated_path, schema_path, test_mode)
+        return
+    
+    # Old workflow: direct CSV editing (backward compatibility)
+    csv_path = Path(sys.argv[1])
+    schema_path = Path(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else Path(__file__).parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
+    
+    # Validate paths
+    if not csv_path.exists():
+        print(f"Error: CSV file not found: {csv_path}")
+        sys.exit(1)
+    
+    if not schema_path.exists():
+        print(f"Error: Schema file not found: {schema_path}")
+        sys.exit(1)
+    
+    # Initialize components
+    csv_manager = CSVManager(csv_path)
+    schema_traverser = SchemaTraverser(schema_path)
+    
+    # Load CSV and find next incomplete row
+    print("Loading CSV file...")
+    csv_manager.load()
+    
+    # Get schema fields
+    print("Loading schema...")
+    fields = schema_traverser.get_fields()
+    print(f"Found {len(fields)} fields to annotate")
+    
+    # Process prompts using direct workflow
+    process_prompts(csv_manager, fields, test_mode, use_temp_workflow=False)
 
 
 if __name__ == '__main__':

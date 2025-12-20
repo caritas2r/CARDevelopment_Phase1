@@ -35,12 +35,15 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
 
 ### Key Vocabularies
 
-- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck, unspecified
-- **Use Cases**: family, animals, commute, cargo, travel, work_light, pleasure, performance, unspecified
-- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating, unspecified
-- **Powertrain Types**: gas, hybrid, plug_in_hybrid, electric, diesel, unspecified
+- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck, convertible, minivan, unspecified
+- **Use Cases**: family, animals, commute, cargo, travel, work_light, pleasure, performance, rideshare, towing, off_road, luxury, budget_value, unspecified
+- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating, lane_keep_assist, lane_departure_warning, front_parking_sensors, rear_parking_sensors, remote_start, heated_steering_wheel, ventilated_seats, wireless_charging, premium_audio, built_in_navigation, roof_rack, tow_package, panoramic_roof, memory_seats, keyless_entry, unspecified
+- **Powertrain Types**: gas, hybrid, plug_in_hybrid, electric, diesel, mild_hybrid, unspecified
   - **Note**: `powertrain_type` is an **array** - users can select multiple types (e.g., gas, hybrid, electric)
+- **Transmission**: automatic, manual, other, cvt, dual_clutch, unspecified
 - **Drivetrains**: AWD, 4WD, FWD, RWD, unspecified
+- **Maintenance Priority**: low_cost, balanced, performance_first, luxury_ok, unspecified
+- **Mileage Qualitative**: low, moderate, high, low_or_moderate, very_low, very_high, does_not_matter, unspecified
 - **Colors**: black, white, silver, gray, grey, red, blue, green, brown, beige, tan, gold, orange, yellow, purple, burgundy, maroon, navy, teal, pink, unspecified
 
 ## Key Schema Features
@@ -55,6 +58,7 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
   - `features_amenities.nice_to_have[]` - Array of preferred features
   - `features_amenities.avoid[]` - Array of features to avoid
 - **Integer/Number with unspecified**: Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners` can be integers/numbers or "unspecified"
+- **Mileage qualitative**: The `mileage.qualitative` field supports qualitative mileage descriptions (low, moderate, high, very_low, very_high, does_not_matter, or unspecified)
 - **Boolean with unspecified**: Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max` support "true", "false", or "unspecified"
 - **String fields**: `make` and `model` are plain strings (no enums), `trim` is a string with "unspecified" option
 
@@ -117,8 +121,8 @@ When creating training examples, ensure:
       "max": null
     },
     "mileage": {
-      "max": null,
-      "qualitative": null
+      "max": "unspecified",
+      "qualitative": "unspecified"
     }
   },
   "preference_signals": {

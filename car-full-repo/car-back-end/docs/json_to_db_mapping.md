@@ -77,6 +77,7 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 | `ownership_constraints.year.min` | `vehicles` | `year` | Used in queries as `year >= year.min`. "unspecified" → not applied |
 | `ownership_constraints.year.max` | `vehicles` | `year` | Used in queries as `year <= year.max`. "unspecified" → not applied |
 | `ownership_constraints.mileage.max` | `vehicles` | `mileage` | Used in queries as `mileage <= mileage.max`. "unspecified" → not applied |
+| `ownership_constraints.mileage.qualitative` | N/A | N/A | Used for query logic (qualitative mileage filtering). "unspecified" → not applied |
 | `ownership_constraints.number_of_owners` | `vehicles` | `number_of_owners` | Direct match. Integer (0 or higher) or "unspecified". "unspecified" → NULL |
 
 ### Location Constraints
@@ -98,6 +99,7 @@ The following JSON schema fields are used for querying/filtering but are not sto
 - `ownership_constraints.budget.strict_max` - Affects query comparison operator
 - `ownership_constraints.year.min` / `year.max` - Used in WHERE clause comparisons
 - `ownership_constraints.mileage.max` - Used in WHERE clause comparisons
+- `ownership_constraints.mileage.qualitative` - Used for qualitative mileage filtering (low, moderate, high, very_low, very_high, does_not_matter)
 - `location_constraints.radius_miles` - Used for distance-based filtering
 - `features_amenities.avoid[]` - Used to exclude features in queries
 

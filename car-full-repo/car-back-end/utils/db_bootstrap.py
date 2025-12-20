@@ -35,8 +35,8 @@ CREATE TABLE IF NOT EXISTS vehicles (
     mileage INTEGER NOT NULL,
 
     -- Core vehicle descriptors (nullable if unknown)
-    body_style TEXT CHECK(body_style IN ('sedan','coupe','hatchback','wagon','suv','crossover','van','truck')),
-    transmission TEXT CHECK(transmission IN ('automatic','manual','other')),
+    body_style TEXT CHECK(body_style IN ('sedan','coupe','hatchback','wagon','suv','crossover','van','truck','convertible','minivan')),
+    transmission TEXT CHECK(transmission IN ('automatic','manual','other','cvt','dual_clutch')),
     drivetrain TEXT CHECK(drivetrain IN ('AWD','4WD','FWD','RWD')),
 
     seating_capacity INTEGER,
@@ -74,7 +74,11 @@ CREATE TABLE IF NOT EXISTS vehicle_features (
     feature_tag TEXT NOT NULL CHECK(feature_tag IN (
         'backup_camera','blind_spot_monitoring','adaptive_cruise_control',
         'apple_carplay','android_auto','heated_seats','leather_seats',
-        'sunroof','third_row_seating'
+        'sunroof','third_row_seating','lane_keep_assist','lane_departure_warning',
+        'front_parking_sensors','rear_parking_sensors','remote_start',
+        'heated_steering_wheel','ventilated_seats','wireless_charging',
+        'premium_audio','built_in_navigation','roof_rack','tow_package',
+        'panoramic_roof','memory_seats','keyless_entry'
     )),
     PRIMARY KEY (vehicle_id, feature_tag),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
@@ -85,7 +89,7 @@ CREATE TABLE IF NOT EXISTS vehicle_use_case_tags (
     vehicle_id TEXT NOT NULL,
     use_case_tag TEXT NOT NULL CHECK(use_case_tag IN (
         'family','animals','commute','cargo','travel','work_light',
-        'pleasure','performance'
+        'pleasure','performance','rideshare','towing','off_road','luxury','budget_value'
     )),
     PRIMARY KEY (vehicle_id, use_case_tag),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
@@ -95,7 +99,7 @@ CREATE TABLE IF NOT EXISTS vehicle_use_case_tags (
 CREATE TABLE IF NOT EXISTS vehicle_powertrain_types (
     vehicle_id TEXT NOT NULL,
     powertrain_type TEXT NOT NULL CHECK(powertrain_type IN (
-        'gas','hybrid','plug_in_hybrid','electric','diesel'
+        'gas','hybrid','plug_in_hybrid','electric','diesel','mild_hybrid'
     )),
     PRIMARY KEY (vehicle_id, powertrain_type),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE
@@ -130,7 +134,7 @@ CREATE INDEX IF NOT EXISTS idx_vehicle_powertrain_types_tag ON vehicle_powertrai
 """
 
 
-def ensure_db_and_schema(db_path: Path | str, connection: Optional[sqlite3.Connection] = None) -> None:
+def ensure_db_and_schema(db_path: Path | str, connection: Optional[sqlite3.Connection] = None, drop_existing: bool = False) -> None:
     """
     Safe to run on every app start.
     
@@ -142,6 +146,7 @@ def ensure_db_and_schema(db_path: Path | str, connection: Optional[sqlite3.Conne
     Args:
         db_path: Path to the database file
         connection: Optional existing database connection. If provided, uses it instead of creating a new one.
+        drop_existing: If True, drop existing tables before recreating (useful for schema updates)
     
     Returns:
         None
@@ -163,6 +168,19 @@ def ensure_db_and_schema(db_path: Path | str, connection: Optional[sqlite3.Conne
     try:
         # Enable foreign keys
         conn.execute("PRAGMA foreign_keys = ON;")
+        
+        # Drop existing tables if requested
+        if drop_existing:
+            drop_sql = """
+            DROP TABLE IF EXISTS search_requests;
+            DROP TABLE IF EXISTS vehicle_powertrain_types;
+            DROP TABLE IF EXISTS vehicle_use_case_tags;
+            DROP TABLE IF EXISTS vehicle_features;
+            DROP TABLE IF EXISTS vehicles;
+            """
+            conn.executescript(drop_sql)
+            conn.commit()
+            print(f"[db_bootstrap] Dropped existing tables")
         
         # Execute schema creation (idempotent with IF NOT EXISTS)
         conn.executescript(SCHEMA_SQL)
@@ -191,6 +209,6 @@ def seed_data(connection: sqlite3.Connection) -> None:
 if __name__ == "__main__":
     # Test the bootstrap
     test_db_path = Path("data/car_database.db")
-    ensure_db_and_schema(test_db_path)
+    ensure_db_and_schema(test_db_path, drop_existing=True)
     print(f"DB initialized at: {test_db_path.resolve()}")
 

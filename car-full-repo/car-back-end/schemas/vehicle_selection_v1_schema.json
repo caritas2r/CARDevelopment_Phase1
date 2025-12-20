@@ -165,7 +165,8 @@
                 { "type": "integer" },
                 { "type": "string", "enum": ["unspecified"] }
               ]
-            }
+            },
+            "qualitative": { "$ref": "#/definitions/mileage_qualitative" }
           },
           "additionalProperties": false
         },
@@ -209,7 +210,7 @@
   "definitions": {
     "body_style": {
       "type": "string",
-      "enum": ["sedan", "coupe", "hatchback", "wagon", "suv", "crossover", "van", "truck", "unspecified"]
+      "enum": ["sedan", "coupe", "hatchback", "wagon", "suv", "crossover", "van", "truck", "convertible", "minivan", "unspecified"]
     },
     "priority_level": {
       "type": "string",
@@ -217,11 +218,11 @@
     },
     "use_case_tag": {
       "type": "string",
-      "enum": ["family", "animals", "commute", "cargo", "travel", "work_light", "pleasure", "performance", "unspecified"]
+      "enum": ["family", "animals", "commute", "cargo", "travel", "work_light", "pleasure", "performance", "rideshare", "towing", "off_road", "luxury", "budget_value", "unspecified"]
     },
     "transmission": {
       "type": "string",
-      "enum": ["automatic", "manual", "other", "unspecified"]
+      "enum": ["automatic", "manual", "other", "cvt", "dual_clutch", "unspecified"]
     },
     "drivetrain": {
       "type": "string",
@@ -229,7 +230,7 @@
     },
     "powertrain_type": {
       "type": "string",
-      "enum": ["gas", "hybrid", "plug_in_hybrid", "electric", "diesel", "unspecified"]
+      "enum": ["gas", "hybrid", "plug_in_hybrid", "electric", "diesel", "mild_hybrid", "unspecified"]
     },
     "feature_tag": {
       "type": "string",
@@ -243,16 +244,31 @@
         "leather_seats",
         "sunroof",
         "third_row_seating",
+        "lane_keep_assist",
+        "lane_departure_warning",
+        "front_parking_sensors",
+        "rear_parking_sensors",
+        "remote_start",
+        "heated_steering_wheel",
+        "ventilated_seats",
+        "wireless_charging",
+        "premium_audio",
+        "built_in_navigation",
+        "roof_rack",
+        "tow_package",
+        "panoramic_roof",
+        "memory_seats",
+        "keyless_entry",
         "unspecified"
       ]
     },
     "mileage_qualitative": {
       "type": "string",
-      "enum": ["low", "moderate", "high", "low_or_moderate", "unspecified"]
+      "enum": ["low", "moderate", "high", "low_or_moderate", "very_low", "very_high", "does_not_matter", "unspecified"]
     },
     "maintenance_priority": {
       "type": "string",
-      "enum": ["low_cost", "balanced", "performance_first", "unspecified"]
+      "enum": ["low_cost", "balanced", "performance_first", "luxury_ok", "unspecified"]
     },
     "color": {
       "type": "string",

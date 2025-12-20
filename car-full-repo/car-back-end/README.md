@@ -88,7 +88,9 @@ car-back-end/
 │   ├── field_prompter.py          # Field input prompting
 │   ├── schema_traverser.py        # Schema traversal logic
 │   ├── reset_csv.py               # CSV reset utility
-│   ├── prompts.csv                # Sample prompts CSV
+│   ├── unannotated_nlp_prompts.csv  # Source prompts (input, never modified)
+│   ├── annotated_nlp_prompts.csv    # Completed annotations (output)
+│   ├── prompts.csv                # Sample prompts CSV (for direct mode)
 │   └── README.md                  # Training pipeline documentation
 ├── docs/                           # Documentation
 │   └── json_to_db_mapping.md      # JSON schema to database mapping

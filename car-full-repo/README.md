@@ -40,7 +40,9 @@ car-full-repo/
 │   │   ├── field_prompter.py        # Field input prompting
 │   │   ├── schema_traverser.py      # Schema traversal logic
 │   │   ├── reset_csv.py             # CSV reset utility
-│   │   ├── prompts.csv              # Sample prompts CSV
+│   │   ├── unannotated_nlp_prompts.csv  # Source prompts (input, never modified)
+│   │   ├── annotated_nlp_prompts.csv    # Completed annotations (output)
+│   │   ├── prompts.csv              # Sample prompts CSV (for direct mode)
 │   │   └── README.md                # Training pipeline documentation
 │   ├── utils/                       # Utility scripts
 │   │   ├── __init__.py
@@ -206,10 +208,13 @@ cd car-front-end
 
 ### Training Pipeline
 - Interactive annotation tool for labeling NLP prompts
+- Two-file workflow: `unannotated_nlp_prompts.csv` → `annotated_nlp_prompts.csv` (original file never modified)
+- Automatic duplicate detection (by ID) - skips already processed prompts
 - CSV-based data management
 - Schema-aware field prompting
 - Support for arrays, enums, and complex nested structures
 - Progress tracking and resume capability
+- Temporary file workflow for safe processing
 
 ## Architecture
 
