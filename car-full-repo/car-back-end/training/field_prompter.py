@@ -29,6 +29,10 @@ class FieldPrompter:
         print("Type: enum")
         print("Options:")
         
+        # Check if "unspecified" is available
+        has_unspecified = "unspecified" in enum_values
+        default_value = "unspecified" if has_unspecified else None
+        
         options = []
         option_num = 1
         
@@ -38,8 +42,14 @@ class FieldPrompter:
             options.append(None)
             option_num = 1
         
-        # Add enum options
-        for enum_val in enum_values:
+        # Add enum options (put unspecified first if it exists)
+        other_values = [v for v in enum_values if v != "unspecified"]
+        if has_unspecified:
+            print(f"  {option_num}. unspecified [DEFAULT - press Enter]")
+            options.append("unspecified")
+            option_num += 1
+        
+        for enum_val in other_values:
             print(f"  {option_num}. {enum_val}")
             options.append(enum_val)
             option_num += 1
@@ -63,22 +73,32 @@ class FieldPrompter:
                 if nullable:
                     # Has null option (0), so use 0-based
                     if allow_skip:
-                        prompt = f"Enter selection (0-{len(options)-1}, or press Enter to skip): "
+                        prompt = f"Enter selection (0-{len(options)-1}, or press Enter for default): "
                     else:
-                        prompt = f"Enter selection (0-{len(options)-1}): "
+                        prompt = f"Enter selection (0-{len(options)-1}, or press Enter for default): "
                     min_selection = 0
                     max_selection = len(options) - 1
                 else:
                     # No null option, use 1-based indexing
-                    prompt = f"Enter selection (1-{len(options)}): "
+                    if default_value:
+                        prompt = f"Enter selection (1-{len(options)}, or press Enter for 'unspecified'): "
+                    else:
+                        prompt = f"Enter selection (1-{len(options)}): "
                     min_selection = 1
                     max_selection = len(options)
                 
                 user_input = input(prompt).strip()
                 
-                # Handle skip for optional nullable (but not for fuel_economy_priority)
-                if not user_input and allow_skip:
-                    return None
+                # Handle Enter key - use default
+                if not user_input:
+                    if default_value:
+                        print(f"Selected: {default_value} (default)")
+                        return default_value
+                    elif allow_skip:
+                        return None
+                    else:
+                        print("Please enter a selection.")
+                        continue
                 
                 selection = int(user_input)
                 
@@ -119,13 +139,24 @@ class FieldPrompter:
         """
         print(f"\n=== Field: {field_name} ===")
         print("Type: array of enum")
-        print("Select one or more options (comma-separated numbers, or 'done' when finished):")
+        
+        # Check if "unspecified" is available
+        has_unspecified = "unspecified" in enum_values
+        default_value = ["unspecified"] if has_unspecified else []
+        
+        print("Select one or more options (comma-separated numbers, 'done' when finished, or press Enter for default):")
         
         options = []
         option_num = 1
         
-        # Add enum options
-        for enum_val in enum_values:
+        # Add enum options (put unspecified first if it exists)
+        other_values = [v for v in enum_values if v != "unspecified"]
+        if has_unspecified:
+            print(f"  {option_num}. unspecified [DEFAULT - press Enter]")
+            options.append("unspecified")
+            option_num += 1
+        
+        for enum_val in other_values:
             print(f"  {option_num}. {enum_val}")
             options.append(enum_val)
             option_num += 1
@@ -145,9 +176,24 @@ class FieldPrompter:
         # Get user input
         while True:
             try:
-                prompt = f"Enter selection(s): "
+                if default_value:
+                    prompt = f"Enter selection(s) (or press Enter for ['unspecified']): "
+                else:
+                    prompt = f"Enter selection(s): "
                 
                 user_input = input(prompt).strip().lower()
+                
+                # Handle Enter key - use default
+                if not user_input:
+                    if default_value:
+                        print(f"Selected: {default_value} (default)")
+                        return default_value
+                    elif not required:
+                        print("Selected: [] (empty array)")
+                        return []
+                    else:
+                        print("This field is required. Please select at least one option.")
+                        continue
                 
                 if user_input == 'done':
                     if required and len(selections) == 0:
@@ -177,7 +223,7 @@ class FieldPrompter:
                         print(f"Added: {value}")
             
             except ValueError:
-                print("Please enter valid numbers separated by commas, or 'done'.")
+                print("Please enter valid numbers separated by commas, 'done', or press Enter for default.")
         
         print(f"Selected: {selections}")
         return selections
@@ -214,13 +260,24 @@ class FieldPrompter:
                 is_budget_year_radius = any(x in field_name for x in ['budget.min', 'budget.max', 'year.min', 'year.max', 'radius_miles'])
                 
                 if is_budget_year_radius:
-                    prompt = f"Enter value (or 'unspecified'): "
+                    prompt = f"Enter value (or press Enter for 'unspecified'): "
                 elif nullable and not required:
-                    prompt = f"Enter value (or 'null'): "
+                    prompt = f"Enter value (or 'null', or press Enter to skip): "
                 else:
                     prompt = f"Enter value: "
                 
                 user_input = input(prompt).strip()
+                
+                # Handle Enter key - default to unspecified for budget/year/radius fields
+                if not user_input:
+                    if is_budget_year_radius:
+                        print("Entered: unspecified (default)")
+                        return "unspecified"
+                    elif nullable and not required:
+                        return None
+                    else:
+                        print("Please enter a value.")
+                        continue
                 
                 # Handle unspecified for budget/year/radius fields
                 if user_input.lower() == 'unspecified' and is_budget_year_radius:
@@ -235,10 +292,6 @@ class FieldPrompter:
                         print("This field does not allow null values. Use 'unspecified' instead.")
                         continue
                 
-                # Handle skip for optional nullable
-                if not user_input and nullable and not required:
-                    return None
-                
                 # Try integer first, then float
                 try:
                     value = int(user_input)
@@ -250,7 +303,7 @@ class FieldPrompter:
             
             except ValueError:
                 if is_budget_year_radius:
-                    print("Please enter a valid number or 'unspecified'.")
+                    print("Please enter a valid number, 'unspecified', or press Enter for default.")
                 else:
                     print("Please enter a valid number.")
     
@@ -316,19 +369,17 @@ class FieldPrompter:
             
             # Special handling for trim - string with unspecified option
             if is_trim:
-                prompt = f"Enter trim (text/string, or 'unspecified'): "
+                prompt = f"Enter trim (text/string, or press Enter for 'unspecified'): "
                 user_input = input(prompt).strip()
+                
+                # Handle Enter key - default to unspecified
+                if not user_input:
+                    print("Entered: unspecified (default)")
+                    return "unspecified"
                 
                 if user_input.lower() == 'unspecified':
                     print("Entered: unspecified")
                     return "unspecified"
-                
-                if not user_input:
-                    if required:
-                        print("This field is required. Please enter a trim or 'unspecified'.")
-                        continue
-                    else:
-                        return None
                 
                 print(f"Entered: {user_input}")
                 return user_input
@@ -337,16 +388,32 @@ class FieldPrompter:
             allow_skip = nullable and not required and 'city' not in field_name and 'state_region' not in field_name
             
             # Special handling for city, state_region, and radius_miles - show unspecified option
-            if 'city' in field_name or 'state_region' in field_name or 'radius_miles' in field_name:
-                prompt = f"Enter value (or 'unspecified'): "
+            # Most string fields support unspecified as default
+            supports_unspecified = 'city' in field_name or 'state_region' in field_name or 'radius_miles' in field_name or not is_make_or_model
+            
+            if supports_unspecified:
+                prompt = f"Enter value (or press Enter for 'unspecified'): "
             elif allow_skip:
                 prompt = f"Enter value (or 'null', or press Enter to skip): "
             elif nullable:
                 prompt = f"Enter value (or 'null'): "
             else:
-                prompt = f"Enter value (or 'unspecified'): "
+                prompt = f"Enter value: "
             
             user_input = input(prompt).strip()
+            
+            # Handle Enter key - default to unspecified for fields that support it
+            if not user_input:
+                if supports_unspecified:
+                    print("Entered: unspecified (default)")
+                    return "unspecified"
+                elif allow_skip:
+                    return None
+                elif required:
+                    print("This field is required. Please enter a value or 'unspecified'.")
+                    continue
+                else:
+                    return None
             
             # Handle unspecified (preferred over null)
             if user_input.lower() == 'unspecified':
@@ -360,10 +427,6 @@ class FieldPrompter:
                 else:
                     print("This field does not allow null values. Use 'unspecified' instead.")
                     continue
-            
-            # Handle skip for optional nullable (but not for city/state_region)
-            if not user_input and allow_skip:
-                return None
             
             # Required field must have value
             if required and not user_input:
@@ -451,15 +514,20 @@ class FieldPrompter:
         while True:
             try:
                 if 'currency' in field_name:
-                    prompt = f"Enter value (or 'unspecified'): "
+                    prompt = f"Enter value (or press Enter for 'unspecified'): "
                 elif 'kid_count' in field_name or 'pet_count' in field_name:
-                    prompt = f"Enter count (0 or higher, or 'unspecified'): "
+                    prompt = f"Enter count (0 or higher, or press Enter for 'unspecified'): "
                 elif 'number_of_owners' in field_name:
-                    prompt = f"Enter number of owners (0 or higher, or 'unspecified'): "
+                    prompt = f"Enter number of owners (0 or higher, or press Enter for 'unspecified'): "
                 else:
-                    prompt = f"Enter value (or 'unspecified'): "
+                    prompt = f"Enter value (or press Enter for 'unspecified'): "
                 
                 user_input = input(prompt).strip().lower()
+                
+                # Handle Enter key - default to unspecified
+                if not user_input:
+                    print("Selected: unspecified (default)")
+                    return "unspecified"
                 
                 if user_input == 'unspecified':
                     print("Selected: unspecified")
@@ -495,9 +563,9 @@ class FieldPrompter:
                     print("Please enter a valid integer (no commas) or 'unspecified'.")
     
     @staticmethod
-    def prompt_boolean(field_name: str, nullable: bool = False, required: bool = True) -> Optional[bool]:
+    def prompt_boolean(field_name: str, nullable: bool = False, required: bool = True) -> Optional[Union[bool, str]]:
         """
-        Prompt user for a boolean
+        Prompt user for a boolean or "unspecified"
         
         Args:
             field_name: Name/path of the field
@@ -505,20 +573,40 @@ class FieldPrompter:
             required: Whether field is required
         
         Returns:
-            Boolean value or None
+            Boolean value, "unspecified" string, or None
         """
+        # Check if this field supports "unspecified" (boolean_with_unspecified type)
+        supports_unspecified = any(x in field_name for x in ['wants_hatch_access', 'wants_fold_flat_seats', 'strict_max'])
+        
         print(f"\n=== Field: {field_name} ===")
         print("Type: boolean")
         print("Options:")
-        print("  1. true")
-        print("  2. false")
+        
+        options = []
+        option_num = 1
+        
+        if supports_unspecified:
+            print(f"  {option_num}. unspecified [DEFAULT - press Enter]")
+            options.append("unspecified")
+            option_num += 1
+        
+        print(f"  {option_num}. true")
+        options.append(True)
+        option_num += 1
+        
+        print(f"  {option_num}. false")
+        options.append(False)
+        option_num += 1
         
         if nullable:
-            print("  0. (null)")
+            print(f"  0. (null)")
         
         # Test mode: randomly select
         if FieldPrompter.test_mode:
-            if nullable and not required and random.random() < 0.2:  # 20% chance of null
+            if supports_unspecified and random.random() < 0.3:  # 30% chance of unspecified
+                print("[TEST MODE] Randomly selected: unspecified")
+                return "unspecified"
+            elif nullable and not required and random.random() < 0.2:  # 20% chance of null
                 print("[TEST MODE] Randomly selected: null")
                 return None
             else:
@@ -528,29 +616,42 @@ class FieldPrompter:
         
         while True:
             try:
-                if nullable and not required:
+                if supports_unspecified:
+                    prompt = f"Enter selection (1-{len(options)}, or press Enter for 'unspecified'): "
+                elif nullable and not required:
                     prompt = f"Enter selection (0-2, or press Enter to skip): "
                 else:
                     prompt = f"Enter selection (1-2): "
                 
                 user_input = input(prompt).strip()
                 
-                # Handle skip for optional nullable
-                if not user_input and nullable and not required:
-                    return None
+                # Handle Enter key - default to unspecified if supported
+                if not user_input:
+                    if supports_unspecified:
+                        print("Selected: unspecified (default)")
+                        return "unspecified"
+                    elif nullable and not required:
+                        return None
+                    else:
+                        print("Please enter a selection.")
+                        continue
                 
                 selection = int(user_input)
                 
+                # Handle null option
                 if nullable and selection == 0:
                     return None
-                elif selection == 1:
-                    print("Selected: true")
-                    return True
-                elif selection == 2:
-                    print("Selected: false")
-                    return False
+                
+                # Adjust for 1-based indexing
+                if 1 <= selection <= len(options):
+                    selected_value = options[selection - 1]
+                    print(f"Selected: {selected_value}")
+                    return selected_value
                 else:
-                    print("Invalid selection. Please choose 1-2 (or 0 for null).")
+                    if supports_unspecified:
+                        print(f"Invalid selection. Please choose 1-{len(options)}, or press Enter for default.")
+                    else:
+                        print("Invalid selection. Please choose 1-2 (or 0 for null).")
             
             except ValueError:
                 print("Please enter a valid number.")

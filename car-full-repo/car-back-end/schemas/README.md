@@ -50,6 +50,8 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
 
 - **"unspecified" sentinel**: All enum fields use "unspecified" instead of null to represent "not mentioned"
 - **Array fields**: Several fields support multiple selections:
+  - `make[]` - **Array of make names** (e.g., ["Toyota", "Honda"] for multiple makes)
+  - `model[]` - **Array of model names** (e.g., ["Camry", "Accord"] for multiple models)
   - `vehicle_type.include_body_styles[]` - Array of body styles
   - `vehicle_type.exclude_body_styles[]` - Array of excluded body styles
   - `intended_use.use_case_tags[]` - Array of use case tags
@@ -57,10 +59,12 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
   - `features_amenities.must_have[]` - Array of required features
   - `features_amenities.nice_to_have[]` - Array of preferred features
   - `features_amenities.avoid[]` - Array of features to avoid
+  - `preference_signals.color[]` - **Array of color preferences** (e.g., ["black", "silver"] for multiple colors)
+  - `ownership_constraints.mileage.qualitative[]` - **Array of qualitative mileage descriptions** (e.g., ["low", "moderate"] for multiple preferences)
 - **Integer/Number with unspecified**: Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners` can be integers/numbers or "unspecified"
-- **Mileage qualitative**: The `mileage.qualitative` field supports qualitative mileage descriptions (low, moderate, high, very_low, very_high, does_not_matter, or unspecified)
+- **Mileage qualitative**: The `mileage.qualitative[]` field is an **array** that supports qualitative mileage descriptions (low, moderate, high, very_low, very_high, does_not_matter, or unspecified)
 - **Boolean with unspecified**: Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max` support "true", "false", or "unspecified"
-- **String fields**: `make` and `model` are plain strings (no enums), `trim` is a string with "unspecified" option
+- **String fields**: `trim` is a string with "unspecified" option. `make` and `model` are now **arrays of strings** to support multiple makes/models
 
 ## Usage for Training
 
@@ -84,16 +88,22 @@ When creating training examples, ensure:
 ```json
 {
   "query_text": "I need an SUV for my family of 5, under $30k, with AWD and backup camera",
+  "make": ["unspecified"],
+  "model": ["unspecified"],
+  "trim": "unspecified",
   "vehicle_type": {
     "include_body_styles": ["suv"],
-    "exclude_body_styles": []
+    "exclude_body_styles": ["unspecified"]
   },
   "capacity_practicality": {
     "min_seating_capacity": 5,
-    "kid_count": null,
-    "pet_count": null,
-    "cargo_priority": null,
-    "cargo_flexibility": {}
+    "kid_count": "unspecified",
+    "pet_count": "unspecified",
+    "cargo_priority": "unspecified",
+    "cargo_flexibility": {
+      "wants_hatch_access": "unspecified",
+      "wants_fold_flat_seats": "unspecified"
+    }
   },
   "intended_use": {
     "use_case_tags": ["family"]
@@ -106,29 +116,35 @@ When creating training examples, ensure:
   },
   "features_amenities": {
     "must_have": ["backup_camera"],
-    "nice_to_have": [],
-    "avoid": []
+    "nice_to_have": ["unspecified"],
+    "avoid": ["unspecified"]
   },
   "ownership_constraints": {
     "budget": {
-      "currency": "USD",
-      "min": null,
+      "currency": 840,
+      "min": "unspecified",
       "max": 30000,
-      "strict_max": true
+      "strict_max": "unspecified"
     },
     "year": {
-      "min": null,
-      "max": null
+      "min": "unspecified",
+      "max": "unspecified"
     },
     "mileage": {
       "max": "unspecified",
-      "qualitative": "unspecified"
-    }
+      "qualitative": ["unspecified"]
+    },
+    "number_of_owners": "unspecified"
   },
   "preference_signals": {
-    "reliability_maintenance_priority": "unspecified"
+    "reliability_maintenance_priority": "unspecified",
+    "color": ["unspecified"]
   },
-  "location_constraints": null
+  "location_constraints": {
+    "city": "unspecified",
+    "state_region": "unspecified",
+    "radius_miles": "unspecified"
+  }
 }
 ```
 

@@ -91,21 +91,26 @@ python training/annotation_tool.py --test
 
 ### Default Workflow (Unannotated → Annotated)
 
-1. **Check Processed IDs**: Reads `annotated_nlp_prompts.csv` to find already-processed prompt IDs
+1. **Check Processed IDs**: Reads `annotated_nlp_prompts.csv` to find already-processed prompt IDs (only counts rows marked as "complete")
 2. **Load Unannotated CSV**: Loads `unannotated_nlp_prompts.csv` into a temporary file (original never modified)
 3. **Filter Unprocessed**: Removes prompts that have already been processed (by ID)
-4. **Display Prompt**: Shows the NLP prompt text
-5. **Traverse Schema**: Recursively walks through the JSON schema from top to bottom
-6. **Field Annotation**: For each field:
+4. **Open Windows**: 
+   - Opens a **schema reference window** showing all enum values and types (stays open for entire session)
+   - Opens a **prompt window** showing the current NLP prompt (closes after each annotation)
+5. **Display Prompt**: Shows the NLP prompt text in both the prompt window and terminal
+6. **Traverse Schema**: Recursively walks through the JSON schema from top to bottom
+7. **Field Annotation**: For each field:
    - Shows field name and type
    - For enums: Displays numbered list of options
    - For arrays: Allows multiple selections
+   - For make/model arrays: Enter comma-separated values
+   - Press Enter to accept default "unspecified" values (speeds up annotation)
    - Validates input strictly (only accepts valid enum values)
-7. **Save Progress**: After completing all fields:
+8. **Save Progress**: After completing all fields:
    - Appends completed annotation to `annotated_nlp_prompts.csv`
    - Updates temporary file (for resume capability)
-   - Asks: Continue to next prompt or Save and exit
-8. **Cleanup**: Automatically deletes temporary file when done
+   - Closes prompt window and advances to next prompt
+9. **Cleanup**: Automatically deletes temporary file when done. Schema reference window stays open until program termination (Ctrl+C)
 
 ### Direct CSV Workflow (Backward Compatibility)
 
@@ -128,7 +133,7 @@ When a CSV path is provided, the tool works directly on that file (old behavior)
 - For `number_of_owners`: Enter 0 or higher, or 'unspecified'
 
 ### String Fields
-- Plain string fields (`make`, `model`): Enter text value (no "unspecified" option)
+- Array of strings (`make`, `model`): Enter comma-separated values (e.g., "Toyota, Honda" for multiple makes). Press Enter for default `["unspecified"]`
 - String with unspecified (`trim`): Enter text value or 'unspecified'
 
 ### Boolean Fields with "unspecified"
@@ -221,11 +226,28 @@ training/
 The tool performs strict validation:
 - **Enum fields**: Only accepts values from the schema's enum list (including "unspecified")
 - **Array enum fields**: Validates each selected value
+- **Array string fields**: Accepts comma-separated values for make/model
 - **Invalid input**: Shows error message and re-prompts
 - **Required fields**: Must be filled (cannot skip)
-- **Vehicle type validation**: At least one of `include_body_styles` or `exclude_body_styles` must have actual values (not just "unspecified")
 - **Integer/number fields**: Validates numeric format or "unspecified"
-- **String fields**: Validates based on field type (plain string vs. string with unspecified)
+- **String fields**: Validates based on field type
+
+## Windows
+
+The tool uses two separate windows to improve the annotation experience:
+
+1. **Schema Reference Window**: 
+   - Opens once at the start of the session
+   - Displays all schema categories with their enum values and types
+   - Shows whether values are strings or integers, and whether they're single values or arrays
+   - Category headers are displayed in red, bold font for easy identification
+   - **Stays open throughout the entire session** - only closes when the program is terminated (Ctrl+C)
+
+2. **Prompt Window**:
+   - Opens for each prompt
+   - Displays the current NLP prompt text
+   - Automatically closes when annotation is complete
+   - Opens again with the next prompt
 
 ## Display of Completed JSON
 
@@ -234,10 +256,11 @@ After completing all fields for a prompt, the tool displays the completed JSON b
 ## Supported Field Types
 
 The tool supports all field types from the Vehicle Selection V1 schema:
-- **Enums**: Single selection with "unspecified" option
-- **Array enums**: Multiple selections (body styles, powertrain types, features, use cases)
-- **Integers/Numbers**: With "unspecified" option for fields like budget, year, mileage, number_of_owners
-- **Strings**: Plain strings (make, model) or strings with "unspecified" (trim)
+- **Enums**: Single selection with "unspecified" option (press Enter for default)
+- **Array enums**: Multiple selections (body styles, powertrain types, features, use cases, colors, mileage qualitative)
+- **Array strings**: Comma-separated values for make and model (e.g., "Toyota, Honda")
+- **Integers/Numbers**: With "unspecified" option for fields like budget, year, mileage, number_of_owners (press Enter for default)
+- **Strings**: Strings with "unspecified" (trim)
 - **Booleans**: With "unspecified" option (wants_hatch_access, wants_fold_flat_seats, strict_max)
 - **Nested objects**: Automatically traverses nested structures
 

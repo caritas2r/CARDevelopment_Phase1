@@ -78,7 +78,8 @@ CREATE TABLE IF NOT EXISTS vehicle_features (
         'front_parking_sensors','rear_parking_sensors','remote_start',
         'heated_steering_wheel','ventilated_seats','wireless_charging',
         'premium_audio','built_in_navigation','roof_rack','tow_package',
-        'panoramic_roof','memory_seats','keyless_entry'
+        'panoramic_roof','panoramic_sunroof','memory_seats','keyless_entry',
+        'bluetooth','rear_entertainment_system','sliding_doors'
     )),
     PRIMARY KEY (vehicle_id, feature_tag),
     FOREIGN KEY (vehicle_id) REFERENCES vehicles(vehicle_id) ON DELETE CASCADE

@@ -14,8 +14,14 @@
   ],
   "properties": {
     "query_text": { "type": "string" },
-    "make": { "type": "string" },
-    "model": { "type": "string" },
+    "make": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "model": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
     "trim": { "type": "string" },
 
     "vehicle_type": {
@@ -166,7 +172,10 @@
                 { "type": "string", "enum": ["unspecified"] }
               ]
             },
-            "qualitative": { "$ref": "#/definitions/mileage_qualitative" }
+            "qualitative": {
+              "type": "array",
+              "items": { "$ref": "#/definitions/mileage_qualitative" }
+            }
           },
           "additionalProperties": false
         },
@@ -186,7 +195,10 @@
         "reliability_maintenance_priority": {
           "$ref": "#/definitions/maintenance_priority"
         },
-        "color": { "$ref": "#/definitions/color" }
+        "color": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/color" }
+        }
       },
       "additionalProperties": false
     },
@@ -257,8 +269,12 @@
         "roof_rack",
         "tow_package",
         "panoramic_roof",
+        "panoramic_sunroof",
         "memory_seats",
         "keyless_entry",
+        "bluetooth",
+        "rear_entertainment_system",
+        "sliding_doors",
         "unspecified"
       ]
     },

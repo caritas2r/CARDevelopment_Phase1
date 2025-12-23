@@ -209,9 +209,11 @@ cd car-front-end
 ### Training Pipeline
 - Interactive annotation tool for labeling NLP prompts
 - Two-file workflow: `unannotated_nlp_prompts.csv` → `annotated_nlp_prompts.csv` (original file never modified)
-- Automatic duplicate detection (by ID) - skips already processed prompts
+- Automatic duplicate detection (by ID) - skips already processed prompts (only counts rows marked as "complete")
 - CSV-based data management
-- Schema-aware field prompting
+- Schema-aware field prompting with default "unspecified" values (press Enter to accept)
+- **Schema reference window** - displays all enum values and types (stays open throughout session)
+- **Prompt window** - displays current NLP prompt (closes after each annotation)
 - Support for arrays, enums, and complex nested structures
 - Progress tracking and resume capability
 - Temporary file workflow for safe processing
@@ -276,19 +278,20 @@ The system uses a structured schema for vehicle selection queries. This schema:
 - Defines a frozen V1 contract for NLP-to-JSON translation
 - Includes canonical vocabularies for consistent training
 - Supports comprehensive vehicle selection criteria:
+  - **Make and model** - **arrays of strings** (supports multiple makes/models)
   - Vehicle type (body styles) - arrays for include/exclude
   - Capacity and practicality (seating, cargo, kids, pets)
   - Intended use cases - array of tags
   - Powertrain and drivability - **powertrain_type is an array** (supports multiple selections like gas, hybrid, electric)
   - Features and amenities - arrays for must-have, nice-to-have, avoid
   - Ownership constraints (budget, year, mileage, number_of_owners)
-  - Preference signals (reliability, color)
+  - Preference signals (reliability, **color as array**)
   - Location constraints
-  - Make, model, trim (string fields)
+  - Trim (string field)
 
 **Key Features:**
 - Uses "unspecified" as sentinel value instead of null for enum fields
-- Supports arrays for multi-select fields (body styles, powertrain types, features, use cases)
+- Supports arrays for multi-select fields: **make, model, body styles, powertrain types, features, use cases, colors, mileage qualitative**
 - Integer/number fields can be values or "unspecified"
 - Boolean fields support "true", "false", or "unspecified"
 

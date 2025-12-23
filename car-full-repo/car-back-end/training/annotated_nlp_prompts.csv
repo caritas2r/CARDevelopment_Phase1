@@ -1,2 +1,1794 @@
 id,prompt,annotated_json,completion_status
 
+
+prompt_001,"I’m looking for a Lexus RX, AWD preferred, under $39k, with leather seats and heated steering wheel.","{
+  ""query_text"": ""I\u2019m looking for a Lexus RX, AWD preferred, under $39k, with leather seats and heated steering wheel."",
+  ""make"": [""Lexus""],
+  ""model"": [""RX""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""AWD"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""leather_seats"",
+      ""heated_steering_wheel""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 39000,
+      ""min"": ""unspecified"",
+      ""max"": 39000,
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_002,"Must have apple carplay, android auto, and backup camera, under $28k.","{
+  ""query_text"": ""Must have apple carplay, android auto, and backup camera, under $28k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""backup_camera"",
+      ""apple_carplay"",
+      ""android_auto""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 28000,
+      ""min"": ""unspecified"",
+      ""max"": 28000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_003,"I want a comfortable interior with useful features, but I don’t want screens or menus taking over the dashboard, under $31k.","{
+  ""query_text"": ""I want a comfortable interior with useful features, but I don\u2019t want screens or menus taking over the dashboard, under $31k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""luxury""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_004,I want an everyday vehicle that fits my life without friction.,"{
+  ""query_text"": ""I want an everyday vehicle that fits my life without friction."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_005,"I’m looking for a Honda Pilot, under $40k, automatic, with third row seating and heated seats.","{
+  ""query_text"": ""I\u2019m looking for a Honda Pilot, under $40k, automatic, with third row seating and heated seats."",
+  ""make"": [""Honda""],
+  ""model"": [""Pilot""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""heated_seats"",
+      ""third_row_seating""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 40000,
+      ""min"": ""unspecified"",
+      ""max"": 40000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_006,"I want a relaxed daily driver that doesn’t encourage spirited driving, and I’m keeping my budget below $29k.","{
+  ""query_text"": ""I want a relaxed daily driver that doesn\u2019t encourage spirited driving, and I\u2019m keeping my budget below $29k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""commute""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 29000,
+      ""min"": ""unspecified"",
+      ""max"": 29000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_007,"I want a straightforward powertrain that doesn’t complicate daily life, and I’m keeping it under $26k.","{
+  ""query_text"": ""I want a straightforward powertrain that doesn\u2019t complicate daily life, and I\u2019m keeping it under $26k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""commute""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 26000,
+      ""min"": ""unspecified"",
+      ""max"": 26000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [""unspecified""]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_008,"I’m looking for a 2021+ Hyundai Sonata in the sedan category, located within 10 miles of Monterey, CA. Budget is under $22,000, with under 80,000 miles. It should be gas-powered, have a automatic transmission and RWD drivetrain. Primary use will be family use, cargo hauling, commuting, and ownership costs should stay low-cost. Must-have features include leather seats, panoramic roof; nice to have backup camera, remote start, and I want to avoid third-row seating. Preferred exterior colors are brown, silver.","{
+  ""query_text"": ""I\u2019m looking for a 2021+ Hyundai Sonata in the sedan category, located within 10 miles of Monterey, CA. Budget is under $22,000, with under 80,000 miles. It should be gas-powered, have a automatic transmission and RWD drivetrain. Primary use will be family use, cargo hauling, commuting, and ownership costs should stay low-cost. Must-have features include leather seats, panoramic roof; nice to have backup camera, remote start, and I want to avoid third-row seating. Preferred exterior colors are brown, silver."",
+  ""make"": [""Hyundai""],
+  ""model"": [""Sonata""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""sedan""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""high"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""family"",
+      ""commute"",
+      ""cargo""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""RWD"",
+    ""powertrain_type"": [
+      ""gas""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""leather_seats"",
+      ""panoramic_roof""
+    ],
+    ""nice_to_have"": [
+      ""backup_camera"",
+      ""remote_start""
+    ],
+    ""avoid"": [
+      ""third_row_seating""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 22000,
+      ""min"": ""unspecified"",
+      ""max"": 22000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2021,
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": 80000,
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""low_cost"",
+    ""color"": [
+      ""silver"",
+      ""brown""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""Monterey"",
+    ""state_region"": ""CA"",
+    ""radius_miles"": 10
+  }
+}",complete
+prompt_009,"I want a car that feels current and comfortable, but I’m not chasing the latest trends or gimmicks, under $32k.","{
+  ""query_text"": ""I want a car that feels current and comfortable, but I\u2019m not chasing the latest trends or gimmicks, under $32k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 32000,
+      ""min"": ""unspecified"",
+      ""max"": 32000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_010,"I want something slightly taller than a sedan, so a crossover with AWD would be nice, as long as mileage stays under 85,000.","{
+  ""query_text"": ""I want something slightly taller than a sedan, so a crossover with AWD would be nice, as long as mileage stays under 85,000."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""crossover""
+    ],
+    ""exclude_body_styles"": [
+      ""sedan""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""AWD"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": 85000,
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_011,"I’m looking for a Toyota Corolla Hatchback, automatic, under $23k, with Apple CarPlay.","{e
+  ""query_text"": ""I\u2019m looking for a Toyota Corolla Hatchback, automatic, under $23k, with Apple CarPlay."",
+  ""make"": [""Toyota""],
+  ""model"": [""Corolla""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""hatchback""
+    ],
+    ""exclude_body_styles"": [
+      ""sedan"",
+      ""coupe""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""true"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""apple_carplay""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 23000,
+      ""min"": ""unspecified"",
+      ""max"": 23000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_012,"Compact SUV, fuel economy medium priority, avoid third row seating, under $28k.","{
+  ""query_text"": ""Compact SUV, fuel economy medium priority, avoid third row seating, under $28k."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""suv""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""medium""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""third_row_seating""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 28000,
+      ""min"": ""unspecified"",
+      ""max"": 28000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_013,"I want a 2021-generation Mustang 5.0 with a manual transmission, E85 tuned, and an aftermarket exhaust. The Carfax has to come back clean and well taken care of on the service portion, no accidents.","{
+  ""query_text"": ""I want a 2021-generation Mustang 5.0 with a manual transmission, E85 tuned, and an aftermarket exhaust. The Carfax has to come back clean and well taken care of on the service portion, no accidents."",
+  ""make"": [""Ford""],
+  ""model"": [""Mustang""],
+  ""trim"": ""GT"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""manual"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""gas""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": 2021,
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""unspecified""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_014,"I’m looking for a 2013+ Mazda CX-30 in the truck category, located within 50 miles of Fort Lauderdale, FL. Budget is under $30,000, with moderate mileage. It should be hybrid-powered, have a manual transmission and 4WD drivetrain. Primary use will be commuting, family use, and ownership costs should stay luxury-acceptable. Must-have features include premium audio, third-row seating, backup camera; nice to have Apple CarPlay. Preferred exterior colors are silver.","{
+  ""query_text"": ""I\u2019m looking for a 2013+ Mazda CX-30 in the truck category, located within 50 miles of Fort Lauderdale, FL. Budget is under $30,000, with moderate mileage. It should be hybrid-powered, have a manual transmission and 4WD drivetrain. Primary use will be commuting, family use, and ownership costs should stay luxury-acceptable. Must-have features include premium audio, third-row seating, backup camera; nice to have Apple CarPlay. Preferred exterior colors are silver."",
+  ""make"": [""Mazda""],
+  ""model"": [""CX-30""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""truck""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""family"",
+      ""commute""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""manual"",
+    ""drivetrain"": ""4WD"",
+    ""powertrain_type"": [
+      ""hybrid"",
+      ""plug_in_hybrid"",
+      ""mild_hybrid""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""premium_audio"",
+      ""third_row_seating"",
+      ""backup_camera""
+    ],
+    ""nice_to_have"": [
+      ""apple_carplay""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 30000,
+      ""min"": ""unspecified"",
+      ""max"": 30000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2013,
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [""moderate""]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""luxury_ok"",
+    ""color"": [
+      ""silver""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""Ft. Lauderdale"",
+    ""state_region"": ""FL"",
+    ""radius_miles"": 50
+  }
+}",complete
+prompt_015,"I’m looking for a 2013+ Honda Civic in the wagon category, located within 15 miles of Santa Barbara, CA. Budget is under $30,000, with under 80,000 miles. It should be electric-powered, have a automatic transmission and 4WD drivetrain. Primary use will be family use, and ownership costs should stay balanced. Must-have features include adaptive cruise control, premium audio; nice to have roof rack, wireless charging, third-row seating, and I want to avoid panoramic roof. Preferred exterior colors are green.","{
+  ""query_text"": ""I\u2019m looking for a 2013+ Honda Civic in the wagon category, located within 15 miles of Santa Barbara, CA. Budget is under $30,000, with under 80,000 miles. It should be electric-powered, have a automatic transmission and 4WD drivetrain. Primary use will be family use, and ownership costs should stay balanced. Must-have features include adaptive cruise control, premium audio; nice to have roof rack, wireless charging, third-row seating, and I want to avoid panoramic roof. Preferred exterior colors are green."",
+  ""make"": [""Honda""],
+  ""model"": [""Civic""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""wagon""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""family""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""4WD"",
+    ""powertrain_type"": [
+      ""electric""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""adaptive_cruise_control"",
+      ""panoramic_roof"",
+      ""premium_audio""
+    ],
+    ""nice_to_have"": [
+      ""roof_rack"",
+      ""wireless_charging"",
+      ""third_row_seating""
+    ],
+    ""avoid"": [
+      ""panoramic_roof""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 30000,
+      ""min"": ""unspecified"",
+      ""max"": 30000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2013,
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": 80000,
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""balanced"",
+    ""color"": [
+      ""green""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""Santa Barbara"",
+    ""state_region"": ""CA"",
+    ""radius_miles"": 15
+  }
+}",complete
+prompt_016,"I’m being pretty picky on specs because I plan to keep it for years. I’m looking for a 2013–2022 Lexus ES as my next hatchback within 15 miles of Henderson, NV, and I want it between $37,000 and $45,000 with under 80,000 miles; one-owner. It should be mild_hybrid with a automatic transmission and rwd drivetrain, and it needs to fit seating for 6, 3 kids, 2 pets. Primary use cases are towing, luxury, so cargo is moderate and my maintenance priority is luxury ok. Must-haves: blind spot monitoring, lane departure warning, front parking sensors, lane keep assist, adaptive cruise control. Nice-to-haves: leather seats, keyless entry, backup camera. Please avoid: apple carplay, wireless charging, premium audio. I prefer brown exterior, and I’m explicitly not shopping for suv, truck, crossover body styles.","{
+  ""query_text"": ""I\u2019m being pretty picky on specs because I plan to keep it for years. I\u2019m looking for a 2013\u20132022 Lexus ES as my next hatchback within 15 miles of Henderson, NV, and I want it between $37,000 and $45,000 with under 80,000 miles; one-owner. It should be mild_hybrid with a automatic transmission and rwd drivetrain, and it needs to fit seating for 6, 3 kids, 2 pets. Primary use cases are towing, luxury, so cargo is moderate and my maintenance priority is luxury ok. Must-haves: blind spot monitoring, lane departure warning, front parking sensors, lane keep assist, adaptive cruise control. Nice-to-haves: leather seats, keyless entry, backup camera. Please avoid: apple carplay, wireless charging, premium audio. I prefer brown exterior, and I\u2019m explicitly not shopping for suv, truck, crossover body styles."",
+  ""make"": [""Lexus""],
+  ""model"": [""ES""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""hatchback""
+    ],
+    ""exclude_body_styles"": [
+      ""suv"",
+      ""crossover"",
+      ""truck""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": 6,
+    ""kid_count"": 3,
+    ""pet_count"": 2,
+    ""cargo_priority"": ""medium"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""true"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""towing"",
+      ""luxury""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""RWD"",
+    ""powertrain_type"": [
+      ""mild_hybrid""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""blind_spot_monitoring"",
+      ""lane_departure_warning"",
+      ""front_parking_sensors"",
+      ""lane_keep_assist"",
+      ""adaptive_cruise_control""
+    ],
+    ""nice_to_have"": [
+      ""leather_seats"",
+      ""keyless_entry"",
+      ""backup_camera""
+    ],
+    ""avoid"": [
+      ""apple_carplay"",
+      ""wireless_charging"",
+      ""premium_audio""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 45000,
+      ""min"": 37000,
+      ""max"": 45000,
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": 2013,
+      ""max"": 2022
+    },
+    ""mileage"": {
+      ""max"": 80000,
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": 1
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""luxury_ok"",
+    ""color"": [
+      ""brown""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""Henderson"",
+    ""state_region"": ""NV"",
+    ""radius_miles"": 15
+  }
+}",complete
+prompt_017,"I want a manual car, but not a manual truck, and I want the manual to be fun but still practical.","{
+  ""query_text"": ""I want a manual car, but not a manual truck, and I want the manual to be fun but still practical."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""sedan"",
+      ""coupe""
+    ],
+    ""exclude_body_styles"": [
+      ""truck""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""pleasure""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""manual"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""medium""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""false""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""balanced"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_018,"I want something with personality, but I want it to blend in everywhere.","{
+  ""query_text"": ""I want something with personality, but I want it to blend in everywhere."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_019,"I’m being pretty picky on specs because I plan to keep it for years. I’m looking for a 2012–2023 Hyundai Tucson as my next truck within 15 miles of Spring Valley, NV, and I want it under $38,000 with under 120,000 miles; 2 owners max. It should be hybrid with a automatic transmission and fwd drivetrain, and it needs to fit seating for 4, 2 kids, 1 pet. Primary use cases are off_road, commute, cargo, so cargo is low priority and my maintenance priority is balanced. Must-haves: premium audio, leather seats, android auto. Nice-to-haves: roof rack, front parking sensors. Please avoid: keyless entry. I prefer red or gray exterior, and I’m explicitly not shopping for wagon body styles.","{
+  ""query_text"": ""I\u2019m being pretty picky on specs because I plan to keep it for years. I\u2019m looking for a 2012\u20132023 Hyundai Tucson as my next truck within 15 miles of Spring Valley, NV, and I want it under $38,000 with under 120,000 miles; 2 owners max. It should be hybrid with a automatic transmission and fwd drivetrain, and it needs to fit seating for 4, 2 kids, 1 pet. Primary use cases are off_road, commute, cargo, so cargo is low priority and my maintenance priority is balanced. Must-haves: premium audio, leather seats, android auto. Nice-to-haves: roof rack, front parking sensors. Please avoid: keyless entry. I prefer red or gray exterior, and I\u2019m explicitly not shopping for wagon body styles."",
+  ""make"": [""Hyundai""],
+  ""model"": [""Tuscon""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""truck""
+    ],
+    ""exclude_body_styles"": [
+      ""wagon""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": 4,
+    ""kid_count"": 2,
+    ""pet_count"": 1,
+    ""cargo_priority"": ""low"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""off_road"",
+      ""commute"",
+      ""cargo""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""automatic"",
+    ""drivetrain"": ""FWD"",
+    ""powertrain_type"": [
+      ""hybrid"",
+      ""plug_in_hybrid"",
+      ""mild_hybrid""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""premium_audio"",
+      ""leather_seats"",
+      ""android_auto""
+    ],
+    ""nice_to_have"": [
+      ""roof_rack"",
+      ""front_parking_sensors""
+    ],
+    ""avoid"": [
+      ""keyless_entry""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 38000,
+      ""min"": ""unspecified"",
+      ""max"": 38000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2012,
+      ""max"": 2023
+    },
+    ""mileage"": {
+      ""max"": 120000,
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": 2
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""balanced"",
+    ""color"": [
+      ""gray"",
+      ""red""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""Spring Valley"",
+    ""state_region"": ""NV"",
+    ""radius_miles"": 15
+  }
+}",complete
+prompt_020,"I want a balanced car that’s comfortable and confident on the road, without exceeding a $30,000 budget.","{
+  ""query_text"": ""I want a balanced car that\u2019s comfortable and confident on the road, without exceeding a $30,000 budget."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 30000,
+      ""min"": ""unspecified"",
+      ""max"": 30000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_021,"I’m shopping under $25k, but not the cheapest option available, and I want something reliable with decent features.","{
+  ""query_text"": ""I\u2019m shopping under $25k, but not the cheapest option available, and I want something reliable with decent features."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 25000,
+      ""min"": ""unspecified"",
+      ""max"": 25000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""low_cost"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_022,"I’m looking for something affordable, but not something I’ll regret buying later.","{
+  ""query_text"": ""I\u2019m looking for something affordable, but not something I\u2019ll regret buying later."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""high""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": ""unspecified"",
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""false""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""low_cost"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_023,"I’m looking for a commuter car that won’t give me headaches, under about twenty-five grand, with modern tech like Apple CarPlay.","{
+  ""query_text"": ""I\u2019m looking for a commuter car that won\u2019t give me headaches, under about twenty-five grand, with modern tech like Apple CarPlay."",
+  ""make"": [""unspecified""],
+  ""model"": [""unspecified""],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""commute""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""apple_carplay""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 25000,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""false""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""low_cost"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
