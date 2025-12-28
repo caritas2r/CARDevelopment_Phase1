@@ -229,6 +229,84 @@ class FieldPrompter:
         return selections
     
     @staticmethod
+    def prompt_array_string(field_name: str, nullable: bool = False, required: bool = True) -> Optional[List[str]]:
+        """
+        Prompt user for multiple string values (comma-separated)
+        
+        Args:
+            field_name: Name/path of the field
+            nullable: Whether null is allowed
+            required: Whether field is required
+        
+        Returns:
+            List of string values, or None if null
+        """
+        print(f"\n=== Field: {field_name} ===")
+        print("Type: array of strings")
+        print("Enter comma-separated values (e.g., 'Toyota, Honda' or 'Camry, Accord')")
+        
+        default_value = ["unspecified"]
+        
+        # Test mode: return random string array
+        if FieldPrompter.test_mode:
+            if field_name == 'make':
+                makes = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz']
+                num_selections = random.randint(1, 2)
+                selected_values = random.sample(makes, min(num_selections, len(makes)))
+            elif field_name == 'model':
+                models = ['Camry', 'Accord', 'F-150', 'Silverado', '3 Series', 'C-Class']
+                num_selections = random.randint(1, 2)
+                selected_values = random.sample(models, min(num_selections, len(models)))
+            else:
+                num_selections = random.randint(1, 2)
+                selected_values = [f"value_{i}" for i in range(1, num_selections + 1)]
+            print(f"[TEST MODE] Randomly selected: {selected_values}")
+            return selected_values
+        
+        while True:
+            try:
+                if default_value:
+                    prompt = f"Enter comma-separated {field_name} values (or press Enter for ['unspecified']): "
+                else:
+                    prompt = f"Enter comma-separated {field_name} values: "
+                
+                user_input = input(prompt).strip()
+                
+                # Handle Enter key - use default
+                if not user_input:
+                    if default_value:
+                        print(f"Selected: {default_value} (default)")
+                        return default_value
+                    elif not required:
+                        print("Selected: [] (empty array)")
+                        return []
+                    else:
+                        print("This field is required. Please enter at least one value.")
+                        continue
+                
+                # Handle "unspecified" as single value
+                if user_input.lower() == 'unspecified':
+                    print("Selected: ['unspecified']")
+                    return ["unspecified"]
+                
+                # Split by comma and strip whitespace, filter out empty strings
+                values = [v.strip() for v in user_input.split(',') if v.strip()]
+                
+                if not values:
+                    print("No valid values entered. Please enter at least one value, or press Enter for default.")
+                    continue
+                
+                if required and len(values) == 0:
+                    print("This field is required. Please enter at least one value.")
+                    continue
+                
+                print(f"Selected: {values}")
+                return values
+            
+            except Exception as e:
+                print(f"Error: {e}. Please enter comma-separated values.")
+    
+    @staticmethod
     def prompt_number(field_name: str, nullable: bool = False, required: bool = True) -> Optional[Union[int, float]]:
         """
         Prompt user for a number
@@ -323,21 +401,12 @@ class FieldPrompter:
         print(f"\n=== Field: {field_name} ===")
         print("Type: string")
         
-        # Special handling for make and model - plain string, no unspecified
-        is_make_or_model = field_name == 'make' or field_name == 'model'
+        # Special handling for trim
         is_trim = field_name == 'trim'
         
         # Test mode: return placeholder string or null
         if FieldPrompter.test_mode:
-            if is_make_or_model:
-                # Generate realistic make/model names for test mode
-                makes = ['Toyota', 'Honda', 'Ford', 'Chevrolet', 'BMW', 'Mercedes-Benz', 'Audi']
-                models = ['Camry', 'Accord', 'F-150', 'Silverado', '3 Series', 'C-Class', 'A4']
-                if field_name == 'make':
-                    value = random.choice(makes)
-                else:
-                    value = random.choice(models)
-            elif is_trim:
+            if is_trim:
                 if random.random() < 0.3:  # 30% chance of unspecified
                     value = "unspecified"
                 else:
@@ -352,21 +421,6 @@ class FieldPrompter:
             return value
         
         while True:
-            # Special handling for make and model - plain string, required
-            if is_make_or_model:
-                prompt = f"Enter {field_name} (text/string, no enums): "
-                user_input = input(prompt).strip()
-                
-                if not user_input:
-                    if required:
-                        print(f"This field is required. Please enter a {field_name}.")
-                        continue
-                    else:
-                        return None
-                
-                print(f"Entered: {user_input}")
-                return user_input
-            
             # Special handling for trim - string with unspecified option
             if is_trim:
                 prompt = f"Enter trim (text/string, or press Enter for 'unspecified'): "
@@ -387,9 +441,8 @@ class FieldPrompter:
             # Don't allow skip for city and state_region - must enter value or unspecified
             allow_skip = nullable and not required and 'city' not in field_name and 'state_region' not in field_name
             
-            # Special handling for city, state_region, and radius_miles - show unspecified option
-            # Most string fields support unspecified as default
-            supports_unspecified = 'city' in field_name or 'state_region' in field_name or 'radius_miles' in field_name or not is_make_or_model
+            # String fields support unspecified as default (city, state_region, radius_miles, query_text, trim, etc.)
+            supports_unspecified = True
             
             if supports_unspecified:
                 prompt = f"Enter value (or press Enter for 'unspecified'): "

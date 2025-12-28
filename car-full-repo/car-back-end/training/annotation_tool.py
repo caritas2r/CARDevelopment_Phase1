@@ -659,11 +659,8 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
         
         elif field_type == 'array_string' or (field_type == 'array' and (field_name == 'make' or field_name == 'model')):
             # For make and model arrays, prompt for comma-separated values
-            value = FieldPrompter.prompt_string(field_name, nullable, required)
-            if value and value != "unspecified":
-                # Split by comma and strip whitespace, filter out empty strings
-                value = [v.strip() for v in value.split(',') if v.strip()]
-            else:
+            value = FieldPrompter.prompt_array_string(field_name, nullable, required)
+            if value is None:
                 value = ["unspecified"]
             set_nested_value(annotated, field_path, value, field_type='array_string')
         
