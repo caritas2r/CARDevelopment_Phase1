@@ -1,0 +1,88 @@
+# =========================
+# Model
+# =========================
+base_model: Qwen/Qwen2.5-3B
+model_type: AutoModelForCausalLM
+tokenizer_type: AutoTokenizer
+
+# =========================
+# Template-free masking
+# =========================
+train_on_inputs: false
+
+# =========================
+# Quantization (QLoRA)
+# =========================
+load_in_4bit: true
+bnb_4bit_quant_type: nf4
+bnb_4bit_compute_dtype: float16
+bnb_4bit_use_double_quant: true
+
+# =========================
+# Data (Template-Free input_output)
+# =========================
+dataset_processes: 1
+dataset_prepared_path: prepared/qwen25_3b_template_free_v1
+
+datasets:
+  - path: ./data/train_template_free_updated.jsonl
+    type: input_output
+    split: train
+
+val_set_size: 0
+test_datasets:
+  - path: ./data/validation_template_free_updated.jsonl
+    type: input_output
+    split: train
+
+# =========================
+# Output
+# =========================
+output_dir: outputs/qwen25_3b_base_template_free_json_qlora_v2_ENDJSON_REMOVEDESCAPES
+save_total_limit: 3
+
+# =========================
+# Sequence / packing
+# =========================
+sequence_len: 2048
+sample_packing: false
+eval_sample_packing: false
+
+# =========================
+# Adapter
+# =========================
+adapter: qlora
+lora_r: 16
+lora_alpha: 32
+lora_dropout: 0.05
+lora_target_linear: true
+
+# =========================
+# Training
+# =========================
+micro_batch_size: 1
+gradient_accumulation_steps: 16
+num_epochs: 6
+learning_rate: 2e-4
+warmup_ratio: 0.03
+lr_scheduler: cosine
+weight_decay: 0.0
+optimizer: paged_adamw_8bit
+gradient_checkpointing: true
+
+fp16: true
+bf16: false
+tf32: true
+
+# =========================
+# Eval / logging
+# =========================
+eval_steps: 50
+logging_steps: 10
+save_steps: 50
+
+# =========================
+# Stability first
+# =========================
+flash_attention: false
+xformers_attention: false
