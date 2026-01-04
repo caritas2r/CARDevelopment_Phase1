@@ -1,0 +1,57 @@
+{
+  "query_text": "I'm looking for a 2025 Honda Civic, under $25k, with AWD",
+  "make": ["Honda"],
+  "model": ["Civic"],
+  "trim": "unspecified",
+  "vehicle_type": {
+    "include_body_styles": ["unspecified"],
+    "exclude_body_styles": ["unspecified"]
+  },
+  "capacity_practicality": {
+    "min_seating_capacity": "unspecified",
+    "kid_count": "unspecified",
+    "pet_count": "unspecified",
+    "cargo_priority": "unspecified",
+    "cargo_flexibility": {
+      "wants_hatch_access": "unspecified",
+      "wants_fold_flat_seats": "unspecified"
+    }
+  },
+  "intended_use": {
+    "use_case_tags": ["unspecified"]
+  },
+  "powertrain_drivability": {
+    "transmission": "unspecified",
+    "drivetrain": "AWD",
+    "powertrain_type": ["unspecified"],
+    "fuel_economy_priority": "unspecified"
+  },
+  "features_amenities": {
+    "must_have": ["unspecified"],
+    "nice_to_have": ["unspecified"],
+    "avoid": ["unspecified"]
+  },
+  "ownership_constraints": {
+    "budget": {
+      "currency": 840,
+      "min": "unspecified",
+      "max": 25000,
+      "strict_max": true
+    },
+    "year": {
+      "min": "2025",
+      "max": "2025"
+    },
+    "mileage": {
+      "max": "unspecified",
+      "qualitative": ["unspecified"]
+    },
+    "number_of_owners": "unspecified"
+  },
+  "preference_signals": {
+    "reliability_maintenance_priority": "unspecified",
+    "color": ["unspecified"]
+  },
+  "location_constraints": null
+}
+
