@@ -276,4 +276,171 @@ The tool supports all field types from the Vehicle Selection V1 schema:
 - Enum options are 1-indexed (first option is 1, not 0)
 - For array fields, you can select multiple values by entering comma-separated numbers
 
+---
+
+# Training Data Preparation
+
+Once you have annotated your prompts, you need to prepare the data for model training. This section covers converting the CSV to JSONL format and splitting it into train/validation/test sets.
+
+## Overview
+
+The training data preparation pipeline consists of two steps:
+
+1. **Convert CSV to JSONL**: Convert `annotated_nlp_prompts.csv` to `jsonl_ready_prompts.jsonl` format
+2. **Split Dataset**: Split the JSONL file into training, validation, and test sets
+
+## Step 1: Convert CSV to JSONL
+
+The `csv_to_jsonl.py` script converts the annotated CSV file into JSONL format suitable for training frameworks like axolotl.
+
+### Usage
+
+```bash
+cd car-back-end/training
+python csv_to_jsonl.py
+```
+
+This will:
+- Read `annotated_nlp_prompts.csv`
+- Convert each completed row to JSONL format: `{"prompt": "...", "completion": "{...full schema json...}"}`
+- Output `jsonl_ready_prompts.jsonl`
+
+### Output Format
+
+Each line in the JSONL file follows this structure:
+```json
+{"prompt": "I'm looking for an SUV under $30k", "completion": "{\"make\": [...], \"vehicle_type\": {...}, ...}"}
+```
+
+Only rows marked as `complete` are included in the output.
+
+## Step 2: Split Dataset
+
+The `split_jsonl.py` script randomly splits the JSONL file into training, validation, and test sets.
+
+### Default Split
+
+The default configuration splits the dataset as follows:
+- **Training set**: 180 rows → `train.jsonl`
+- **Validation set**: 20 rows → `validation.jsonl`
+- **Test set**: 20 rows → `test.jsonl`
+- **Total**: 220 rows
+
+### Usage
+
+```bash
+cd car-back-end/training
+python split_jsonl.py
+```
+
+This will:
+- Read `jsonl_ready_prompts.jsonl`
+- Randomly shuffle the data
+- Split into train/validation/test sets
+- Output three JSONL files
+
+### Custom Split Sizes
+
+You can customize the split sizes:
+
+```bash
+python split_jsonl.py --train-size 150 --val-size 35 --test-size 35
+```
+
+## Reproducibility with Random Seeds
+
+### Seed 42 for Reproducibility
+
+The `split_jsonl.py` script uses **random seed 42** by default to ensure reproducible results. This means:
+
+- **Same seed = Same split**: Running the script multiple times with the same seed will always produce the same train/validation/test split
+- **Reproducible experiments**: You can share your exact dataset splits with others, enabling reproducible research and consistent model comparisons
+- **Version control friendly**: The same seed ensures your dataset splits remain consistent across different runs and environments
+
+### Why Seed 42?
+
+Seed 42 is a common default in machine learning (popularized by "The Hitchhiker's Guide to the Galaxy"). It provides a good balance between randomness and reproducibility. Using a fixed seed ensures:
+
+- Consistent dataset splits across team members
+- Reproducible model training results
+- Easier debugging and comparison of different model configurations
+
+### Adjusting the Seed for Flexibility
+
+If you need different dataset splits (for example, to test model robustness or explore different data distributions), you can change the random seed:
+
+```bash
+# Use a different seed
+python split_jsonl.py --seed 123
+
+# Use another seed for a different split
+python split_jsonl.py --seed 999
+
+# Use current timestamp for a truly random split each time
+python split_jsonl.py --seed $(date +%s)  # Linux/Mac
+python split_jsonl.py --seed $((Get-Date).Ticks)  # PowerShell (Windows)
+```
+
+### When to Change the Seed
+
+Consider changing the seed when:
+
+1. **Testing model robustness**: Train on multiple different splits to ensure your model performs consistently
+2. **Cross-validation**: Create multiple folds for k-fold cross-validation
+3. **Data exploration**: Explore how different data distributions affect model performance
+4. **A/B testing**: Compare training strategies with different data splits
+
+### Maintaining Reproducibility
+
+**Important**: For production training and experiments, always use seed 42 (or document your seed choice) to ensure:
+
+- Results can be reproduced by others
+- Model performance comparisons are valid
+- Your training pipeline is deterministic
+
+## Complete Training Data Pipeline
+
+Here's the complete workflow:
+
+```bash
+cd car-back-end/training
+
+# Step 1: Convert CSV to JSONL
+python csv_to_jsonl.py
+
+# Step 2: Split into train/validation/test (using seed 42)
+python split_jsonl.py
+
+# Result: Three files ready for training
+# - train.jsonl (180 rows)
+# - validation.jsonl (20 rows)
+# - test.jsonl (20 rows)
+```
+
+## File Structure
+
+After running the preparation scripts, your training directory will contain:
+
+```
+training/
+├── annotated_nlp_prompts.csv      # Original annotated CSV (never modified)
+├── jsonl_ready_prompts.jsonl      # Converted JSONL format (220 rows)
+├── train.jsonl                    # Training set (180 rows)
+├── validation.jsonl               # Validation set (20 rows)
+└── test.jsonl                     # Test set (20 rows)
+```
+
+## Scripts Reference
+
+- `csv_to_jsonl.py`: Converts CSV to JSONL format
+  - Options: `--csv`, `--output`
+- `split_jsonl.py`: Splits JSONL into train/val/test sets
+  - Options: `--input`, `--train-size`, `--val-size`, `--test-size`, `--seed`, `--output-dir`
+
+For detailed usage information, run any script with `--help`:
+```bash
+python csv_to_jsonl.py --help
+python split_jsonl.py --help
+```
+
 
