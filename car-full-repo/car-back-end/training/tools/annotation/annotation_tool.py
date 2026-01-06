@@ -12,12 +12,10 @@ import subprocess
 from pathlib import Path
 from typing import Any, Set, Optional
 
-# Add parent directory to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from training.csv_manager import CSVManager
-from training.schema_traverser import SchemaTraverser
-from training.field_prompter import FieldPrompter
+# Import from same directory (files are now in tools/annotation/)
+from csv_manager import CSVManager
+from schema_traverser import SchemaTraverser
+from field_prompter import FieldPrompter
 
 # Try to import tkinter for prompt window (optional - will work without it)
 try:
@@ -156,8 +154,9 @@ root.mainloop()
         
         # Signal window to close by creating a marker file
         try:
-            script_dir = Path(__file__).parent
-            close_file = script_dir / ".prompt_window_close"
+            # Create close signal in training root directory
+            training_dir = Path(__file__).parent.parent.parent  # Go up to training/ root
+            close_file = training_dir / ".prompt_window_close"
             close_file.touch()
             
             # Wait a moment for window to close
@@ -212,7 +211,7 @@ class SchemaReferenceWindow:
         fields_info_encoded = base64.b64encode(fields_info_json.encode('utf-8')).decode('ascii')
         
         # Get the training directory path
-        training_dir = Path(__file__).parent
+        training_dir = Path(__file__).parent.parent.parent  # Go up to training/ root
         training_dir_str = str(training_dir)
         
         script_content = f'''#!/usr/bin/env python3
@@ -442,8 +441,9 @@ root.mainloop()
         
         # Signal window to close by creating a marker file
         try:
-            script_dir = Path(__file__).parent
-            close_file = script_dir / ".schema_reference_close"
+            # Create close signal in training root directory
+            training_dir = Path(__file__).parent.parent.parent  # Go up to training/ root
+            close_file = training_dir / ".schema_reference_close"
             close_file.touch()
             
             # Wait a moment for window to close
@@ -916,8 +916,8 @@ def process_prompts(csv_manager: CSVManager, fields: list, test_mode: bool,
             if use_temp_workflow:
                 # Find the original unannotated file path
                 # The temp workflow uses a temp file, so we need to remove from the original
-                training_dir = Path(__file__).parent
-                unannotated_path = training_dir / 'unannotated_nlp_prompts.csv'
+                training_dir = Path(__file__).parent.parent.parent  # Go up to training/ root
+                unannotated_path = training_dir / 'data' / 'active' / 'unannotated_nlp_prompts.csv'
                 
                 if unannotated_path.exists():
                     # Load original file, find and remove the row by ID
@@ -1084,15 +1084,16 @@ def main():
     # - If CSV provided: use old workflow (direct CSV editing) [BACKWARD COMPATIBLE]
     if len(sys.argv) < 2:
         # New workflow: use unannotated_nlp_prompts.csv → annotated_nlp_prompts.csv
-        training_dir = Path(__file__).parent
-        unannotated_path = training_dir / 'unannotated_nlp_prompts.csv'
-        annotated_path = training_dir / 'annotated_nlp_prompts.csv'
-        schema_path = Path(__file__).parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
+        # Files are now in data/active/ directory
+        training_dir = Path(__file__).parent.parent.parent  # Go up to training/ root
+        unannotated_path = training_dir / 'data' / 'active' / 'unannotated_nlp_prompts.csv'
+        annotated_path = training_dir / 'data' / 'active' / 'annotated_nlp_prompts.csv'
+        schema_path = training_dir.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
         
         # Validate paths
         if not unannotated_path.exists():
             print(f"Error: Unannotated CSV file not found: {unannotated_path}")
-            print("\nPlease create unannotated_nlp_prompts.csv in the training directory, or")
+            print("\nPlease ensure unannotated_nlp_prompts.csv exists in data/active/ directory, or")
             print("use the direct mode: python annotation_tool.py <csv_file>")
             sys.exit(1)
         
@@ -1106,7 +1107,7 @@ def main():
     
     # Old workflow: direct CSV editing (backward compatibility)
     csv_path = Path(sys.argv[1])
-    schema_path = Path(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else Path(__file__).parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
+    schema_path = Path(sys.argv[2]) if len(sys.argv) > 2 and not sys.argv[2].startswith('--') else Path(__file__).parent.parent.parent.parent / 'schemas' / 'vehicle_selection_v1_schema.json'
     
     # Validate paths
     if not csv_path.exists():
