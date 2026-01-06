@@ -5,6 +5,7 @@ Annotates NLP prompts with structured JSON schema values
 """
 import sys
 import json
+import csv
 import shutil
 import tempfile
 import subprocess
@@ -532,8 +533,11 @@ def get_default_value_for_field(field: dict) -> Any:
     elif field_type == 'array_enum':
         return ["unspecified"] if has_unspecified else []
     elif field_type in ('integer', 'number'):
+        # Special case: currency defaults to 840 (USD)
+        if 'currency' in field_name:
+            return 840
         # Check if field supports unspecified
-        is_budget_year_radius = any(x in field_name for x in ['budget.min', 'budget.max', 'year.min', 'year.max', 'radius_miles', 'mileage.max', 'number_of_owners', 'currency', 'seating_capacity', 'kid_count', 'pet_count'])
+        is_budget_year_radius = any(x in field_name for x in ['budget.min', 'budget.max', 'year.min', 'year.max', 'radius_miles', 'mileage.max', 'number_of_owners', 'seating_capacity', 'kid_count', 'pet_count'])
         return "unspecified" if is_budget_year_radius else None
     elif field_type == 'string':
         return "unspecified"
@@ -606,15 +610,14 @@ def annotate_prompt(prompt_text: str, fields: list, existing_json: dict = None) 
         # Initialize with "unspecified" defaults for all fields
         annotated = initialize_json_with_defaults(fields, prompt_text)
     
-    # Show prompt in separate window
-    if _prompt_window is not None:
+    # Note: Prompt window is shown earlier in process_prompts(), before drop prompt
+    # Only show here if somehow we got here without the window (shouldn't happen normally)
+    if _prompt_window is not None and _prompt_window.process is None:
         _prompt_window.show(prompt_text)
     
-    print(f"\n{'='*60}")
-    print("NLP Prompt:")
-    print(f"{'='*60}")
-    print(prompt_text)
-    print(f"{'='*60}\n")
+    # Don't reprint the prompt here since it was already shown in process_prompts()
+    # Just show a separator for clarity
+    print()
     
     # Iterate through each field (step-by-step mode)
     for idx, field in enumerate(fields, 1):
@@ -883,6 +886,64 @@ def process_prompts(csv_manager: CSVManager, fields: list, test_mode: bool,
         print(f"\n{'='*60}")
         print(f"Processing Row {row_index + 1} (ID: {row_id})")
         print(f"{'='*60}")
+        
+        # Show prompt in separate window FIRST (before asking about drop)
+        if _prompt_window is not None:
+            _prompt_window.show(prompt_text)
+        
+        # Show full prompt in terminal too
+        print(f"\n{'='*60}")
+        print("NLP Prompt:")
+        print(f"{'='*60}")
+        print(prompt_text)
+        print(f"{'='*60}")
+        
+        # Offer drop option at the start
+        drop_choice = input("\nType 'drop' to remove this prompt (or press Enter to annotate): ").strip().lower()
+        
+        if drop_choice == 'drop':
+            # Close prompt window if open
+            if _prompt_window is not None:
+                _prompt_window.close()
+            
+            print(f"\nRemoving prompt {row_id} from dataset...")
+            
+            # Remove from current CSV manager (temp file or direct file)
+            csv_manager.remove_row(row_index)
+            csv_manager.save()
+            
+            # If using temp workflow, also remove from original unannotated file
+            if use_temp_workflow:
+                # Find the original unannotated file path
+                # The temp workflow uses a temp file, so we need to remove from the original
+                training_dir = Path(__file__).parent
+                unannotated_path = training_dir / 'unannotated_nlp_prompts.csv'
+                
+                if unannotated_path.exists():
+                    # Load original file, find and remove the row by ID
+                    original_rows = []
+                    with open(unannotated_path, 'r', encoding='utf-8') as f:
+                        reader = csv.DictReader(f)
+                        fieldnames = reader.fieldnames
+                        for row in reader:
+                            if row.get('id', '').strip() != row_id:
+                                original_rows.append(row)
+                    
+                    # Write back without the dropped row
+                    with open(unannotated_path, 'w', encoding='utf-8', newline='') as f:
+                        writer = csv.DictWriter(f, fieldnames=fieldnames)
+                        writer.writeheader()
+                        writer.writerows(original_rows)
+                    
+                    print(f"Removed from original file: {unannotated_path}")
+                else:
+                    print("Warning: Could not find original unannotated file to update.")
+            else:
+                # Direct workflow - row already removed from file
+                pass
+            
+            print(f"Prompt {row_id} has been removed. Moving to next prompt...\n")
+            continue
         
         # Annotate the prompt
         try:

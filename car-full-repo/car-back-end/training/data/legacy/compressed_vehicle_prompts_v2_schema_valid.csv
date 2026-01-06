@@ -1,0 +1,200 @@
+id,prompt,annotated_json,completion_status
+1,"Show me all 2015 Lexus RX under $25000, with ventilated seats, no remote start.",,unannotated
+2,"Show me convertible vehicles max $25000, with apple carplay, no panoramic roof.",,unannotated
+3,Show me minivan vehicles under $15000.,,unannotated
+4,"Show me other transmission cars within 50 miles, no leather seats.",,unannotated
+5,"Show me van vehicles up to $20000, with apple carplay.",,unannotated
+6,"Show me all 2013 Subaru Outback max $15000, with premium audio.",,unannotated
+7,"Show me all 2021 Subaru Outback approximately $30000, with backup camera, no adaptive cruise control.",,unannotated
+8,"Show me sedan vehicles below $20000, with lane keep assist.",,unannotated
+9,"Show me coupe vehicles up to $30000, with rear entertainment system, no adaptive cruise control.",,unannotated
+10,"Show me suv vehicles max $25000, with wireless charging.",,unannotated
+11,"Show me automatic transmission cars within 100 miles, no keyless entry.",,unannotated
+12,Show me all 2017 Ford F-150 up to $15000.,,unannotated
+13,"Show me dual_clutch transmission cars within 25 miles, no leather seats.",,unannotated
+14,Show me truck vehicles approximately $35000.,,unannotated
+15,"Show me all 2014 Jeep Wrangler under $30000, with panoramic roof, no sliding doors.",,unannotated
+16,"Show me all 2021 Toyota Camry below $35000, with tow package, no bluetooth.",,unannotated
+17,"Show me sedan vehicles under $25000, no heated steering wheel.",,unannotated
+18,"Show me truck vehicles approximately $35000, with adaptive cruise control.",,unannotated
+19,"Show me other transmission cars within 100 miles, no bluetooth.",,unannotated
+20,"Show me RWD cars within 10 miles, with wireless charging.",,unannotated
+21,"Show me automatic transmission cars within 25 miles, with panoramic sunroof.",,unannotated
+22,"Show me all 2017 BMW 3 Series around $30000, with heated steering wheel.",,unannotated
+23,"Show me all 2013 Audi A4 under $35000, with panoramic roof.",,unannotated
+24,"Show me other transmission cars within 10 miles, with lane keep assist, no memory seats.",,unannotated
+25,"Show me hatchback vehicles approximately $40000, no lane keep assist.",,unannotated
+26,"Show me crossover vehicles up to $40000, no premium audio.",,unannotated
+27,"Show me all 2012 Audi A4 below $20000, no wireless charging.",,unannotated
+28,"Show me wagon vehicles up to $20000, no keyless entry.",,unannotated
+29,Show me all 2013 Lexus RX approximately $40000.,,unannotated
+30,"Show me dual_clutch transmission cars within 75 miles, no keyless entry.",,unannotated
+31,Show me dual_clutch transmission cars within 25 miles.,,unannotated
+32,"Show me cvt transmission cars within 100 miles, with blind spot monitoring, no front parking sensors.",,unannotated
+33,"Show me other transmission cars within 75 miles, with keyless entry, no sunroof.",,unannotated
+34,"Show me truck vehicles below $30000, no panoramic roof.",,unannotated
+35,"Show me other transmission cars within 10 miles, with heated seats.",,unannotated
+36,"Show me AWD cars within 50 miles, with sliding doors, no premium audio.",,unannotated
+37,Show me all 2019 Lexus RX up to $30000.,,unannotated
+38,Show me crossover vehicles under $30000.,,unannotated
+39,"Show me all 2015 Subaru Outback under $25000, no wireless charging.",,unannotated
+40,Show me all 2013 Audi A4 up to $20000.,,unannotated
+41,"Show me hatchback vehicles max $30000, no rear entertainment system.",,unannotated
+42,"Show me AWD cars within 50 miles, with roof rack.",,unannotated
+43,Show me coupe vehicles below $20000.,,unannotated
+44,"Show me cvt transmission cars within 100 miles, with apple carplay.",,unannotated
+45,"Show me minivan vehicles approximately $15000, with adaptive cruise control.",,unannotated
+46,Show me all 2018 Toyota Camry approximately $25000.,,unannotated
+47,"Show me FWD cars within 10 miles, no heated seats.",,unannotated
+48,"Show me sedan vehicles max $30000, no sliding doors.",,unannotated
+49,"Show me all 2013 Audi A4 up to $40000, with third row seating.",,unannotated
+50,"Show me FWD cars within 100 miles, no android auto.",,unannotated
+51,"Show me truck vehicles max $20000, with rear entertainment system.",,unannotated
+52,Show me sedan vehicles below $20000.,,unannotated
+53,Show me FWD cars within 50 miles.,,unannotated
+54,"Show me 4WD cars within 50 miles, with rear entertainment system, no third row seating.",,unannotated
+55,"Show me all 2016 Honda Civic below $30000, with sliding doors.",,unannotated
+56,"Show me all 2014 Jeep Wrangler max $30000, with memory seats, no rear parking sensors.",,unannotated
+58,"Show me all 2017 Honda Civic under $25000, with roof rack.",,unannotated
+59,"Show me hatchback vehicles max $30000, with lane keep assist, no roof rack.",,unannotated
+60,"Show me all 2021 Subaru Outback below $40000, with heated steering wheel.",,unannotated
+61,Show me crossover vehicles approximately $40000.,,unannotated
+62,Show me dual_clutch transmission cars within 75 miles.,,unannotated
+63,Show me 4WD cars within 50 miles.,,unannotated
+64,"Show me cvt transmission cars within 50 miles, with rear parking sensors.",,unannotated
+65,"Show me dual_clutch transmission cars within 50 miles, with heated steering wheel.",,unannotated
+66,"Show me AWD cars within 25 miles, with lane departure warning, no sunroof.",,unannotated
+67,"Show me FWD cars within 50 miles, with wireless charging, no premium audio.",,unannotated
+68,"Show me wagon vehicles under $20000, with leather seats, no panoramic sunroof.",,unannotated
+69,"Show me coupe vehicles max $25000, no heated seats.",,unannotated
+70,"Show me all 2016 Ford F-150 max $40000, with panoramic sunroof.",,unannotated
+71,"Show me automatic transmission cars within 25 miles, no wireless charging.",,unannotated
+72,Show me sedan vehicles below $35000.,,unannotated
+73,"Show me AWD cars within 50 miles, with heated steering wheel.",,unannotated
+74,"Show me van vehicles approximately $15000, with panoramic sunroof, no wireless charging.",,unannotated
+75,"Show me RWD cars within 75 miles, no tow package.",,unannotated
+76,"Show me cvt transmission cars within 100 miles, with android auto.",,unannotated
+77,Show me other transmission cars within 25 miles.,,unannotated
+78,"Show me other transmission cars within 100 miles, no panoramic sunroof.",,unannotated
+79,"Show me all 2015 Lexus RX below $20000, with sliding doors.",,unannotated
+80,"Show me dual_clutch transmission cars within 100 miles, with roof rack.",,unannotated
+81,Show me all 2021 Toyota Camry under $15000.,,unannotated
+82,"Show me dual_clutch transmission cars within 75 miles, no tow package.",,unannotated
+83,"Show me all 2022 BMW 3 Series around $20000, no tow package.",,unannotated
+84,"Show me 4WD cars within 75 miles, with lane keep assist, no adaptive cruise control.",,unannotated
+85,"Show me all 2021 Ford F-150 below $40000, with ventilated seats, no leather seats.",,unannotated
+86,"Show me other transmission cars within 100 miles, with memory seats, no rear parking sensors.",,unannotated
+87,"Show me coupe vehicles below $30000, no sunroof.",,unannotated
+88,Show me AWD cars within 50 miles.,,unannotated
+89,"Show me other transmission cars within 100 miles, with sliding doors, no sunroof.",,unannotated
+90,"Show me convertible vehicles around $30000, with leather seats.",,unannotated
+91,"Show me RWD cars within 100 miles, with ventilated seats.",,unannotated
+92,"Show me all 2012 Toyota Camry below $30000, with sunroof.",,unannotated
+93,"Show me RWD cars within 25 miles, with lane keep assist.",,unannotated
+94,"Show me crossover vehicles under $30000, with memory seats, no keyless entry.",,unannotated
+95,Show me all 2020 BMW 3 Series under $30000.,,unannotated
+96,"Show me 4WD cars within 10 miles, with keyless entry, no rear entertainment system.",,unannotated
+97,"Show me all 2014 Chevrolet Silverado approximately $35000, with front parking sensors, no premium audio.",,unannotated
+98,"Show me AWD cars within 25 miles, with wireless charging.",,unannotated
+99,"Show me hatchback vehicles approximately $35000, with bluetooth, no wireless charging.",,unannotated
+100,"Show me all 2014 Subaru Outback approximately $40000, no roof rack.",,unannotated
+101,"Show me minivan vehicles below $30000, with built in navigation, no wireless charging.",,unannotated
+102,"Show me RWD cars within 100 miles, no lane departure warning.",,unannotated
+103,"Show me suv vehicles max $35000, with bluetooth.",,unannotated
+104,Show me hatchback vehicles approximately $40000.,,unannotated
+105,"Show me AWD cars within 25 miles, with android auto.",,unannotated
+106,"Show me hatchback vehicles around $40000, no lane departure warning.",,unannotated
+107,"Show me sedan vehicles max $20000, no wireless charging.",,unannotated
+108,"Show me convertible vehicles around $25000, no panoramic roof.",,unannotated
+109,"Show me all 2020 Audi A4 max $40000, no premium audio.",,unannotated
+110,"Show me other transmission cars within 100 miles, with roof rack, no leather seats.",,unannotated
+111,"Show me all 2023 Chevrolet Silverado max $40000, with sunroof, no keyless entry.",,unannotated
+112,"Show me all 2016 Honda Civic approximately $40000, with lane departure warning, no front parking sensors.",,unannotated
+113,"Show me other transmission cars within 10 miles, with rear parking sensors, no keyless entry.",,unannotated
+114,"Show me all 2019 BMW 3 Series max $30000, with panoramic sunroof.",,unannotated
+115,Show me all 2020 BMW 3 Series up to $15000.,,unannotated
+116,Show me 4WD cars within 25 miles.,,unannotated
+117,Show me crossover vehicles max $30000.,,unannotated
+118,Show me 4WD cars within 75 miles.,,unannotated
+119,"Show me all 2017 BMW 3 Series max $15000, with ventilated seats.",,unannotated
+120,Show me 4WD cars within 75 miles.,,unannotated
+121,Show me truck vehicles up to $40000.,,unannotated
+122,"Show me all 2021 Mazda CX-5 under $25000, with blind spot monitoring.",,unannotated
+123,"Show me suv vehicles up to $15000, with heated steering wheel, no android auto.",,unannotated
+124,"Show me all 2023 Ford F-150 under $40000, with heated seats, no tow package.",,unannotated
+125,"Show me manual transmission cars within 100 miles, with bluetooth, no built in navigation.",,unannotated
+126,"Show me all 2013 Subaru Outback max $15000, with rear entertainment system, no wireless charging.",,unannotated
+127,Show me crossover vehicles up to $15000.,,unannotated
+128,"Show me suv vehicles below $25000, with rear parking sensors.",,unannotated
+129,"Show me all 2023 Chevrolet Silverado under $40000, no tow package.",,unannotated
+130,"Show me cvt transmission cars within 100 miles, no lane keep assist.",,unannotated
+131,"Show me all 2017 Mazda CX-5 up to $20000, with panoramic sunroof.",,unannotated
+132,"Show me minivan vehicles below $30000, no android auto.",,unannotated
+133,"Show me dual_clutch transmission cars within 10 miles, with keyless entry.",,unannotated
+134,"Show me AWD cars within 100 miles, with wireless charging, no adaptive cruise control.",,unannotated
+135,Show me other transmission cars within 100 miles.,,unannotated
+136,"Show me coupe vehicles approximately $30000, with apple carplay.",,unannotated
+137,"Show me truck vehicles approximately $15000, no android auto.",,unannotated
+138,"Show me RWD cars within 50 miles, with panoramic roof, no memory seats.",,unannotated
+139,Show me AWD cars within 75 miles.,,unannotated
+140,"Show me AWD cars within 75 miles, with panoramic sunroof.",,unannotated
+141,"Show me manual transmission cars within 75 miles, no remote start.",,unannotated
+142,"Show me van vehicles under $40000, with rear parking sensors, no sliding doors.",,unannotated
+143,"Show me dual_clutch transmission cars within 75 miles, no apple carplay.",,unannotated
+144,Show me AWD cars within 50 miles.,,unannotated
+145,"Show me wagon vehicles up to $30000, with panoramic roof, no premium audio.",,unannotated
+146,"Show me AWD cars within 75 miles, with android auto, no leather seats.",,unannotated
+147,Show me automatic transmission cars within 10 miles.,,unannotated
+148,"Show me 4WD cars within 10 miles, no roof rack.",,unannotated
+149,"Show me automatic transmission cars within 25 miles, with heated steering wheel.",,unannotated
+150,"Show me all 2015 BMW 3 Series up to $40000, with sunroof, no built in navigation.",,unannotated
+151,"Show me all 2012 Lexus RX approximately $40000, no lane keep assist.",,unannotated
+152,"Show me sedan vehicles below $40000, no premium audio.",,unannotated
+153,"Show me van vehicles up to $25000, with bluetooth, no panoramic sunroof.",,unannotated
+154,"Show me other transmission cars within 25 miles, with heated seats, no sunroof.",,unannotated
+155,"Show me cvt transmission cars within 25 miles, with blind spot monitoring, no remote start.",,unannotated
+156,"Show me RWD cars within 50 miles, with leather seats, no tow package.",,unannotated
+157,Show me FWD cars within 75 miles.,,unannotated
+158,Show me dual_clutch transmission cars within 100 miles.,,unannotated
+159,"Show me all 2016 Toyota Camry up to $20000, no leather seats.",,unannotated
+160,"Show me cvt transmission cars within 25 miles, no sunroof.",,unannotated
+161,"Show me convertible vehicles max $25000, with keyless entry, no rear parking sensors.",,unannotated
+162,"Show me truck vehicles under $40000, with third row seating, no wireless charging.",,unannotated
+163,"Show me all 2017 Subaru Outback under $35000, with keyless entry, no leather seats.",,unannotated
+164,Show me FWD cars within 100 miles.,,unannotated
+165,"Show me other transmission cars within 25 miles, with lane keep assist.",,unannotated
+166,"Show me convertible vehicles max $40000, with built in navigation.",,unannotated
+167,"Show me truck vehicles up to $40000, with third row seating, no memory seats.",,unannotated
+168,"Show me hatchback vehicles approximately $40000, with heated seats.",,unannotated
+169,Show me AWD cars within 10 miles.,,unannotated
+170,"Show me 4WD cars within 10 miles, with android auto.",,unannotated
+171,"Show me RWD cars within 75 miles, no front parking sensors.",,unannotated
+172,Show me sedan vehicles under $35000.,,unannotated
+173,"Show me hatchback vehicles under $15000, with premium audio, no backup camera.",,unannotated
+174,Show me dual_clutch transmission cars within 100 miles.,,unannotated
+175,"Show me coupe vehicles below $30000, with rear entertainment system, no third row seating.",,unannotated
+176,"Show me other transmission cars within 10 miles, with built in navigation.",,unannotated
+177,Show me van vehicles around $35000.,,unannotated
+178,"Show me automatic transmission cars within 75 miles, with blind spot monitoring.",,unannotated
+179,"Show me AWD cars within 25 miles, with tow package, no built in navigation.",,unannotated
+180,"Show me AWD cars within 50 miles, no third row seating.",,unannotated
+181,Show me all 2012 Chevrolet Silverado approximately $20000.,,unannotated
+182,"Show me dual_clutch transmission cars within 75 miles, with adaptive cruise control, no heated seats.",,unannotated
+183,"Show me FWD cars within 10 miles, with rear parking sensors.",,unannotated
+184,"Show me FWD cars within 100 miles, no sunroof.",,unannotated
+185,"Show me all 2019 Jeep Wrangler up to $25000, with keyless entry, no backup camera.",,unannotated
+186,"Show me coupe vehicles approximately $25000, with remote start.",,unannotated
+187,Show me FWD cars within 25 miles.,,unannotated
+188,"Show me crossover vehicles below $15000, with panoramic sunroof.",,unannotated
+189,Show me all 2019 Audi A4 below $15000.,,unannotated
+190,Show me cvt transmission cars within 75 miles.,,unannotated
+191,"Show me FWD cars within 100 miles, with apple carplay.",,unannotated
+192,"Show me sedan vehicles below $30000, no sliding doors.",,unannotated
+193,"Show me dual_clutch transmission cars within 100 miles, with keyless entry.",,unannotated
+194,"Show me other transmission cars within 50 miles, no heated seats.",,unannotated
+195,"Show me 4WD cars within 75 miles, with ventilated seats.",,unannotated
+196,"Show me FWD cars within 50 miles, with remote start, no ventilated seats.",,unannotated
+197,"Show me cvt transmission cars within 10 miles, no roof rack.",,unannotated
+198,"Show me crossover vehicles approximately $30000, no backup camera.",,unannotated
+199,"Show me other transmission cars within 50 miles, with heated steering wheel, no remote start.",,unannotated
+200,"Show me cvt transmission cars within 50 miles, no lane departure warning.",,unannotated

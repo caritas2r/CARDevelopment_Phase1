@@ -1,0 +1,201 @@
+id,prompt,annotated_json,completion_status
+1,"Show me all 2021 Honda Civic max $40000, with heated seats, no backup camera.",,unannotated
+2,"Show me all 2013 Chevrolet Silverado approximately $35000, with all-wheel drive, no sunroof.",,unannotated
+3,"Show me AWD cars within 25 miles, with all-wheel drive, no heated seats.",,unannotated
+4,"Show me all 2011 Honda Civic under $30000, with heated seats, no third-row seating.",,unannotated
+5,Show me automatic cars within 75 miles.,,unannotated
+6,"Show me all 2023 Lexus RX approximately $25000, with all-wheel drive, no heated seats.",,unannotated
+7,"Show me RWD cars within 10 miles, no navigation.",,unannotated
+8,"Show me RWD cars within 25 miles, no adaptive cruise control.",,unannotated
+9,"Show me automatic cars within 100 miles, with heated seats.",,unannotated
+10,"Show me all 2014 Jeep Wrangler max $20000, with navigation, no all-wheel drive.",,unannotated
+11,Show me automatic cars within 10 miles.,,unannotated
+12,"Show me automatic cars within 75 miles, with sunroof, no third-row seating.",,unannotated
+13,Show me automatic cars within 50 miles.,,unannotated
+14,"Show me 4WD cars within 100 miles, with heated seats.",,unannotated
+15,"Show me automatic cars within 10 miles, with backup camera.",,unannotated
+16,"Show me 4WD cars within 100 miles, with backup camera.",,unannotated
+17,"Show me AWD cars within 10 miles, with adaptive cruise control.",,unannotated
+18,Show me all 2022 Audi A4 below $15000.,,unannotated
+19,"Show me manual cars within 100 miles, with leather seats.",,unannotated
+20,"Show me RWD cars within 100 miles, with sunroof.",,unannotated
+21,"Show me all 2018 Jeep Wrangler approximately $15000, with third-row seating.",,unannotated
+22,"Show me manual cars within 25 miles, with sunroof.",,unannotated
+23,"Show me AWD cars within 100 miles, with sunroof, no adaptive cruise control.",,unannotated
+24,"Show me FWD cars within 50 miles, with adaptive cruise control.",,unannotated
+25,Show me all 2013 Jeep Wrangler max $40000.,,unannotated
+26,"Show me 4WD cars within 100 miles, no third-row seating.",,unannotated
+27,"Show me automatic cars within 100 miles, with navigation, no leather seats.",,unannotated
+28,"Show me RWD cars within 10 miles, with leather seats, no leather seats.",,unannotated
+29,"Show me all 2021 Lexus RX around $35000, with adaptive cruise control, no backup camera.",,unannotated
+30,Show me FWD cars within 10 miles.,,unannotated
+31,"Show me 4WD cars within 10 miles, no all-wheel drive.",,unannotated
+32,Show me all 2010 Subaru Outback below $40000.,,unannotated
+33,"Show me FWD cars within 75 miles, with navigation.",,unannotated
+34,"Show me AWD cars within 75 miles, with navigation.",,unannotated
+35,"Show me all 2022 Chevrolet Silverado around $20000, with leather seats.",,unannotated
+36,"Show me automatic cars within 75 miles, with all-wheel drive.",,unannotated
+37,"Show me RWD cars within 75 miles, no adaptive cruise control.",,unannotated
+38,Show me all 2018 Tesla Model 3 up to $20000.,,unannotated
+39,"Show me automatic cars within 50 miles, with leather seats.",,unannotated
+40,"Show me FWD cars within 10 miles, with adaptive cruise control.",,unannotated
+41,"Show me all 2020 Chevrolet Silverado under $30000, with backup camera, no sunroof.",,unannotated
+42,"Show me all 2016 Lexus RX approximately $35000, with leather seats.",,unannotated
+43,"Show me automatic cars within 50 miles, no third-row seating.",,unannotated
+44,"Show me automatic cars within 10 miles, with heated seats.",,unannotated
+45,Show me automatic cars within 10 miles.,,unannotated
+46,"Show me all 2011 Chevrolet Silverado below $25000, with heated seats, no third-row seating.",,unannotated
+47,"Show me AWD cars within 100 miles, with heated seats.",,unannotated
+48,"Show me manual cars within 10 miles, no backup camera.",,unannotated
+49,"Show me FWD cars within 50 miles, no heated seats.",,unannotated
+50,Show me 4WD cars within 50 miles.,,unannotated
+51,"Show me AWD cars within 10 miles, with all-wheel drive.",,unannotated
+52,Show me manual cars within 25 miles.,,unannotated
+53,"Show me all 2011 Honda Civic up to $40000, with all-wheel drive.",,unannotated
+54,"Show me all 2012 Subaru Outback under $20000, with third-row seating.",,unannotated
+55,"Show me automatic cars within 25 miles, with leather seats.",,unannotated
+56,"Show me all 2021 Ford F-150 up to $20000, with all-wheel drive.",,unannotated
+57,"Show me 4WD cars within 25 miles, no third-row seating.",,unannotated
+58,"Show me manual cars within 25 miles, with sunroof, no leather seats.",,unannotated
+59,Show me RWD cars within 25 miles.,,unannotated
+60,"Show me AWD cars within 50 miles, with navigation, no heated seats.",,unannotated
+61,"Show me automatic cars within 10 miles, no third-row seating.",,unannotated
+62,"Show me manual cars within 50 miles, with heated seats, no all-wheel drive.",,unannotated
+63,Show me manual cars within 100 miles.,,unannotated
+64,"Show me RWD cars within 75 miles, with all-wheel drive, no navigation.",,unannotated
+65,Show me RWD cars within 10 miles.,,unannotated
+66,Show me all 2020 Subaru Outback around $25000.,,unannotated
+67,"Show me all 2020 Ford F-150 approximately $35000, with backup camera, no all-wheel drive.",,unannotated
+68,"Show me manual cars within 100 miles, with leather seats, no navigation.",,unannotated
+69,Show me all 2017 Chevrolet Silverado around $35000.,,unannotated
+70,"Show me all 2011 Chevrolet Silverado below $40000, with sunroof, no third-row seating.",,unannotated
+71,"Show me FWD cars within 75 miles, no leather seats.",,unannotated
+72,"Show me all 2020 Lexus RX max $20000, no all-wheel drive.",,unannotated
+73,"Show me all 2022 Honda Civic up to $30000, with all-wheel drive, no leather seats.",,unannotated
+74,Show me 4WD cars within 10 miles.,,unannotated
+75,"Show me all 2022 Tesla Model 3 approximately $40000, with sunroof.",,unannotated
+76,"Show me all 2021 Jeep Wrangler approximately $30000, with adaptive cruise control.",,unannotated
+77,Show me manual cars within 75 miles.,,unannotated
+78,Show me manual cars within 100 miles.,,unannotated
+79,"Show me manual cars within 25 miles, no sunroof.",,unannotated
+80,"Show me manual cars within 25 miles, with sunroof, no navigation.",,unannotated
+81,"Show me all 2018 Tesla Model 3 under $30000, with all-wheel drive.",,unannotated
+82,"Show me 4WD cars within 75 miles, no leather seats.",,unannotated
+83,"Show me 4WD cars within 100 miles, no all-wheel drive.",,unannotated
+84,Show me all 2013 Tesla Model 3 below $20000.,,unannotated
+85,"Show me automatic cars within 75 miles, with all-wheel drive, no all-wheel drive.",,unannotated
+86,Show me 4WD cars within 100 miles.,,unannotated
+87,"Show me all 2012 Tesla Model 3 under $20000, no all-wheel drive.",,unannotated
+88,"Show me manual cars within 75 miles, with navigation.",,unannotated
+89,Show me manual cars within 10 miles.,,unannotated
+90,"Show me manual cars within 25 miles, with leather seats.",,unannotated
+91,"Show me all 2013 Chevrolet Silverado approximately $15000, with leather seats.",,unannotated
+92,"Show me FWD cars within 75 miles, with adaptive cruise control.",,unannotated
+93,"Show me all 2022 Ford F-150 under $25000, with third-row seating, no sunroof.",,unannotated
+94,"Show me all 2016 Subaru Outback up to $40000, with heated seats.",,unannotated
+95,"Show me AWD cars within 100 miles, with navigation, no heated seats.",,unannotated
+96,"Show me AWD cars within 100 miles, with all-wheel drive.",,unannotated
+97,"Show me all 2011 Subaru Outback max $25000, with all-wheel drive.",,unannotated
+98,Show me manual cars within 100 miles.,,unannotated
+99,Show me all 2023 Lexus RX below $25000.,,unannotated
+100,"Show me FWD cars within 75 miles, no adaptive cruise control.",,unannotated
+101,"Show me all 2017 Audi A4 around $20000, no leather seats.",,unannotated
+102,"Show me AWD cars within 100 miles, with heated seats, no heated seats.",,unannotated
+103,"Show me FWD cars within 75 miles, with all-wheel drive.",,unannotated
+104,Show me all 2010 Honda Civic up to $25000.,,unannotated
+105,"Show me manual cars within 100 miles, no third-row seating.",,unannotated
+106,"Show me all 2014 BMW 3 Series up to $25000, with third-row seating, no adaptive cruise control.",,unannotated
+107,"Show me FWD cars within 25 miles, no backup camera.",,unannotated
+108,"Show me all 2023 Chevrolet Silverado up to $25000, with heated seats.",,unannotated
+109,"Show me automatic cars within 50 miles, with leather seats.",,unannotated
+110,Show me FWD cars within 75 miles.,,unannotated
+111,Show me 4WD cars within 75 miles.,,unannotated
+112,"Show me automatic cars within 10 miles, with leather seats, no adaptive cruise control.",,unannotated
+113,"Show me automatic cars within 25 miles, with leather seats, no heated seats.",,unannotated
+114,"Show me FWD cars within 100 miles, with all-wheel drive.",,unannotated
+115,"Show me manual cars within 100 miles, with adaptive cruise control, no all-wheel drive.",,unannotated
+116,"Show me all 2013 Chevrolet Silverado max $25000, with sunroof.",,unannotated
+117,"Show me FWD cars within 10 miles, with backup camera.",,unannotated
+118,"Show me manual cars within 50 miles, with adaptive cruise control, no navigation.",,unannotated
+119,"Show me all 2014 Lexus RX up to $40000, no navigation.",,unannotated
+120,"Show me manual cars within 25 miles, with navigation.",,unannotated
+121,"Show me RWD cars within 75 miles, with heated seats.",,unannotated
+122,"Show me RWD cars within 100 miles, with heated seats.",,unannotated
+123,"Show me all 2016 Audi A4 below $35000, with sunroof.",,unannotated
+124,"Show me RWD cars within 100 miles, with leather seats.",,unannotated
+125,"Show me RWD cars within 25 miles, no adaptive cruise control.",,unannotated
+126,"Show me all 2017 Audi A4 below $30000, with adaptive cruise control.",,unannotated
+127,Show me manual cars within 75 miles.,,unannotated
+128,"Show me all 2018 Toyota Camry under $30000, with all-wheel drive.",,unannotated
+129,"Show me manual cars within 100 miles, with sunroof.",,unannotated
+130,Show me 4WD cars within 10 miles.,,unannotated
+131,"Show me AWD cars within 25 miles, with adaptive cruise control.",,unannotated
+132,"Show me manual cars within 10 miles, with heated seats.",,unannotated
+133,Show me FWD cars within 25 miles.,,unannotated
+134,"Show me manual cars within 10 miles, with all-wheel drive, no sunroof.",,unannotated
+135,Show me all 2021 BMW 3 Series max $35000.,,unannotated
+136,"Show me automatic cars within 75 miles, with adaptive cruise control.",,unannotated
+137,"Show me all 2018 Ford F-150 below $15000, with navigation.",,unannotated
+138,"Show me manual cars within 50 miles, with heated seats.",,unannotated
+139,"Show me all 2017 Jeep Wrangler below $30000, with adaptive cruise control.",,unannotated
+140,"Show me manual cars within 25 miles, with all-wheel drive.",,unannotated
+141,"Show me all 2010 Audi A4 around $40000, with all-wheel drive, no all-wheel drive.",,unannotated
+142,"Show me all 2017 Toyota Camry approximately $20000, no backup camera.",,unannotated
+143,"Show me all 2017 Honda Civic around $35000, with sunroof.",,unannotated
+144,Show me FWD cars within 10 miles.,,unannotated
+145,"Show me automatic cars within 50 miles, no all-wheel drive.",,unannotated
+146,"Show me all 2020 Tesla Model 3 under $35000, no third-row seating.",,unannotated
+147,"Show me all 2021 Honda Civic under $30000, with heated seats.",,unannotated
+148,"Show me all 2021 BMW 3 Series under $15000, no backup camera.",,unannotated
+149,"Show me manual cars within 25 miles, no third-row seating.",,unannotated
+150,"Show me 4WD cars within 100 miles, with backup camera, no sunroof.",,unannotated
+151,"Show me all 2017 BMW 3 Series under $40000, with backup camera, no heated seats.",,unannotated
+152,Show me automatic cars within 10 miles.,,unannotated
+153,Show me manual cars within 75 miles.,,unannotated
+154,"Show me all 2023 Tesla Model 3 up to $15000, with heated seats, no all-wheel drive.",,unannotated
+155,"Show me manual cars within 10 miles, with heated seats.",,unannotated
+156,"Show me all 2020 Toyota Camry max $35000, with leather seats.",,unannotated
+157,Show me automatic cars within 100 miles.,,unannotated
+158,"Show me automatic cars within 10 miles, with navigation.",,unannotated
+159,"Show me all 2010 Lexus RX max $25000, no adaptive cruise control.",,unannotated
+160,"Show me FWD cars within 25 miles, with heated seats, no all-wheel drive.",,unannotated
+161,Show me RWD cars within 100 miles.,,unannotated
+162,Show me all 2014 Tesla Model 3 max $25000.,,unannotated
+163,Show me automatic cars within 25 miles.,,unannotated
+164,Show me 4WD cars within 100 miles.,,unannotated
+165,"Show me manual cars within 50 miles, with all-wheel drive, no sunroof.",,unannotated
+166,"Show me all 2023 Audi A4 max $15000, no all-wheel drive.",,unannotated
+167,"Show me FWD cars within 10 miles, with third-row seating.",,unannotated
+168,Show me all 2014 Subaru Outback up to $15000.,,unannotated
+169,"Show me AWD cars within 10 miles, no adaptive cruise control.",,unannotated
+170,"Show me RWD cars within 100 miles, no adaptive cruise control.",,unannotated
+171,"Show me automatic cars within 75 miles, with backup camera.",,unannotated
+172,"Show me all 2013 Tesla Model 3 up to $30000, with heated seats, no third-row seating.",,unannotated
+173,"Show me manual cars within 10 miles, with third-row seating.",,unannotated
+174,"Show me manual cars within 10 miles, with sunroof.",,unannotated
+175,"Show me all 2013 Ford F-150 up to $35000, with leather seats, no third-row seating.",,unannotated
+176,Show me FWD cars within 25 miles.,,unannotated
+177,Show me automatic cars within 50 miles.,,unannotated
+178,Show me FWD cars within 10 miles.,,unannotated
+179,"Show me all 2022 Chevrolet Silverado below $35000, no third-row seating.",,unannotated
+180,"Show me AWD cars within 10 miles, with leather seats, no all-wheel drive.",,unannotated
+181,"Show me automatic cars within 75 miles, with third-row seating.",,unannotated
+182,"Show me all 2023 Jeep Wrangler around $25000, with leather seats.",,unannotated
+183,"Show me all 2023 Subaru Outback max $30000, no adaptive cruise control.",,unannotated
+184,"Show me RWD cars within 100 miles, with adaptive cruise control, no sunroof.",,unannotated
+185,"Show me RWD cars within 75 miles, with heated seats.",,unannotated
+186,"Show me all 2016 Honda Civic under $40000, with adaptive cruise control.",,unannotated
+187,Show me all 2021 Chevrolet Silverado around $30000.,,unannotated
+188,"Show me RWD cars within 75 miles, with adaptive cruise control, no sunroof.",,unannotated
+189,"Show me manual cars within 10 miles, no backup camera.",,unannotated
+190,"Show me RWD cars within 25 miles, no sunroof.",,unannotated
+191,"Show me all 2016 Audi A4 around $40000, with third-row seating.",,unannotated
+192,"Show me all 2015 Honda Civic approximately $35000, with heated seats.",,unannotated
+193,"Show me RWD cars within 100 miles, with adaptive cruise control, no sunroof.",,unannotated
+194,"Show me manual cars within 100 miles, with heated seats.",,unannotated
+195,Show me all 2010 Lexus RX max $40000.,,unannotated
+196,"Show me manual cars within 50 miles, with heated seats.",,unannotated
+197,"Show me manual cars within 10 miles, with backup camera.",,unannotated
+198,Show me AWD cars within 100 miles.,,unannotated
+199,"Show me RWD cars within 50 miles, with adaptive cruise control, no third-row seating.",,unannotated
+200,"Show me all 2020 Honda Civic around $25000, with leather seats, no leather seats.",,unannotated
