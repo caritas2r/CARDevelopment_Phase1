@@ -30456,3 +30456,1069 @@ prompt_400,"Show me convertible vehicles around $25000, no panoramic roof.","{
     ""radius_miles"": ""unspecified""
   }
 }",complete
+prompt_401,"Show me all 2020 Audi A5 max $40000, no premium audio.","{
+  ""query_text"": ""Show me all 2020 Audi A5 max $40000, no premium audio."",
+  ""make"": [
+    ""Audi""
+  ],
+  ""model"": [
+    ""A5""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""premium_audio""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 40000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2020,
+      ""max"": 2020
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_402,"Show me other transmission cars within 100 miles, with roof rack, no leather seats.","{
+  ""query_text"": ""Show me other transmission cars within 100 miles, with roof rack, no leather seats."",
+  ""make"": [
+    ""unspecified""
+  ],
+  ""model"": [
+    ""unspecified""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""other"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""roof_rack""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""leather_seats""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": 100
+  }
+}",complete
+prompt_403,"Show me all 2023 Chevrolet S10 Blazer max $40000, with sunroof, no keyless entry.","{
+  ""query_text"": ""Show me all 2023 Chevrolet S10 Blazer max $40000, with sunroof, no keyless entry."",
+  ""make"": [
+    ""Chevrolet""
+  ],
+  ""model"": [
+    ""S10""
+  ],
+  ""trim"": ""Blazer"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""sunroof""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""keyless_entry""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 40000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2023,
+      ""max"": 2023
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_404,"Show me all 2016 Honda Odyssey approximately $40000, with lane departure warning, no front parking sensors.","{
+  ""query_text"": ""Show me all 2016 Honda Odyssey approximately $40000, with lane departure warning, no front parking sensors."",
+  ""make"": [
+    ""Honda""
+  ],
+  ""model"": [
+    ""Odyssey""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""lane_departure_warning""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""front_parking_sensors""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 40000,
+      ""strict_max"": ""false""
+    },
+    ""year"": {
+      ""min"": 2016,
+      ""max"": 2016
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_405,"Show me other transmission cars within 10 miles, with rear parking sensors, no keyless entry.","{
+  ""query_text"": ""Show me other transmission cars within 10 miles, with rear parking sensors, no keyless entry."",
+  ""make"": [
+    ""unspecified""
+  ],
+  ""model"": [
+    ""unspecified""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""other"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""rear_parking_sensors""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""keyless_entry""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": 10
+  }
+}",complete
+prompt_406,"Show me all 2019 BMW 1 Series max $30000, with panoramic sunroof.","{
+  ""query_text"": ""Show me all 2019 BMW 1 Series max $30000, with panoramic sunroof."",
+  ""make"": [
+    ""BMW""
+  ],
+  ""model"": [
+    ""1 Series""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""panoramic_sunroof""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 30000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_407,Show me all 2020 Ford E350 up to $15000.,"{
+  ""query_text"": ""Show me all 2020 Ford E350 up to $15000."",
+  ""make"": [
+    ""Ford""
+  ],
+  ""model"": [
+    ""E350""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 15000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2020,
+      ""max"": 2020
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_408,Show me 4WD cars within 25 miles.,"{
+  ""query_text"": ""Show me 4WD cars within 25 miles."",
+  ""make"": [
+    ""unspecified""
+  ],
+  ""model"": [
+    ""unspecified""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""4WD"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": 25
+  }
+}",complete
+prompt_409,Show me Ford Thunderbird crossover vehicles max $30000.,"{
+  ""query_text"": ""Show me Ford Thunderbird crossover vehicles max $30000."",
+  ""make"": [
+    ""Ford""
+  ],
+  ""model"": [
+    ""Thunderbird""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""crossover""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 30000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_410,Show me 4WD cars within 75 miles.,"{
+  ""query_text"": ""Show me 4WD cars within 75 miles."",
+  ""make"": [
+    ""unspecified""
+  ],
+  ""model"": [
+    ""unspecified""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""4WD"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": 75
+  }
+}",complete
+prompt_411,"Show me all 2017 Chrysler 300 max $15000, with ventilated seats.","{
+  ""query_text"": ""Show me all 2017 Chrysler 300 max $15000, with ventilated seats."",
+  ""make"": [
+    ""Chrysler""
+  ],
+  ""model"": [
+    ""300""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""ventilated_seats""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 15000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": 2017,
+      ""max"": 2017
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
+prompt_412,Show me BMW 745 4WD cars within 75 miles.,"{
+  ""query_text"": ""Show me BMW 745 4WD cars within 75 miles."",
+  ""make"": [
+    ""BMW""
+  ],
+  ""model"": [
+    ""745""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""unspecified""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""4WD"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified"",
+      ""strict_max"": ""unspecified""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": 75
+  }
+}",complete
+prompt_413,Show me Volkswagen Passat truck vehicles up to $40000.,"{
+  ""query_text"": ""Show me Volkswagen Passat truck vehicles up to $40000."",
+  ""make"": [
+    ""Volkswagen""
+  ],
+  ""model"": [
+    ""Passat""
+  ],
+  ""trim"": ""unspecified"",
+  ""vehicle_type"": {
+    ""include_body_styles"": [
+      ""truck""
+    ],
+    ""exclude_body_styles"": [
+      ""unspecified""
+    ]
+  },
+  ""capacity_practicality"": {
+    ""min_seating_capacity"": ""unspecified"",
+    ""kid_count"": ""unspecified"",
+    ""pet_count"": ""unspecified"",
+    ""cargo_priority"": ""unspecified"",
+    ""cargo_flexibility"": {
+      ""wants_hatch_access"": ""unspecified"",
+      ""wants_fold_flat_seats"": ""unspecified""
+    }
+  },
+  ""intended_use"": {
+    ""use_case_tags"": [
+      ""unspecified""
+    ]
+  },
+  ""powertrain_drivability"": {
+    ""transmission"": ""unspecified"",
+    ""drivetrain"": ""unspecified"",
+    ""powertrain_type"": [
+      ""unspecified""
+    ],
+    ""fuel_economy_priority"": ""unspecified""
+  },
+  ""features_amenities"": {
+    ""must_have"": [
+      ""unspecified""
+    ],
+    ""nice_to_have"": [
+      ""unspecified""
+    ],
+    ""avoid"": [
+      ""unspecified""
+    ]
+  },
+  ""ownership_constraints"": {
+    ""budget"": {
+      ""currency"": 840,
+      ""min"": ""unspecified"",
+      ""max"": 40000,
+      ""strict_max"": ""true""
+    },
+    ""year"": {
+      ""min"": ""unspecified"",
+      ""max"": ""unspecified""
+    },
+    ""mileage"": {
+      ""max"": ""unspecified"",
+      ""qualitative"": [
+        ""unspecified""
+      ]
+    },
+    ""number_of_owners"": ""unspecified""
+  },
+  ""preference_signals"": {
+    ""reliability_maintenance_priority"": ""unspecified"",
+    ""color"": [
+      ""unspecified""
+    ]
+  },
+  ""location_constraints"": {
+    ""city"": ""unspecified"",
+    ""state_region"": ""unspecified"",
+    ""radius_miles"": ""unspecified""
+  }
+}",complete
