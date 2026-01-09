@@ -176,6 +176,40 @@ function setupFormHandlers() {
             }
             
             if (data.success) {
+                // Format extracted fields for display
+                let extractedFieldsHtml = '';
+                if (data.extracted_fields && Object.keys(data.extracted_fields).length > 0) {
+                    const fieldsList = Object.entries(data.extracted_fields)
+                        .map(([path, value]) => {
+                            const displayValue = Array.isArray(value) 
+                                ? value.map(v => escapeHtml(String(v))).join(', ')
+                                : escapeHtml(String(value));
+                            return `<div class="extracted-field-item"><strong>${escapeHtml(path)}:</strong> ${displayValue}</div>`;
+                        })
+                        .join('');
+                    
+                    extractedFieldsHtml = `
+                        <div class="extracted-fields-container">
+                            <h3>Extracted Fields</h3>
+                            <div class="extracted-fields-list">
+                                ${fieldsList}
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Format SQL query for display
+                let sqlHtml = '';
+                if (data.sql_query) {
+                    const formattedSql = formatSqlQuery(data.sql_query, data.sql_params || []);
+                    sqlHtml = `
+                        <div class="sql-query-container">
+                            <h3>Generated SQL Query</h3>
+                            <pre class="sql-query-display">${escapeHtml(formattedSql)}</pre>
+                        </div>
+                    `;
+                }
+                
                 // Display results
                 let resultsHtml = '';
                 if (data.results && data.results.length > 0) {
@@ -214,6 +248,8 @@ function setupFormHandlers() {
                     <div class="cds-status-details success">
                         <p><strong>Query:</strong> ${escapeHtml(queryText)}</p>
                         ${data.poc_mode ? '<p><em>PoC Mode: Returning sample vehicle</em></p>' : ''}
+                        ${extractedFieldsHtml}
+                        ${sqlHtml}
                         ${resultsHtml}
                     </div>
                 `;
@@ -255,6 +291,47 @@ function escapeHtml(s) {
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;');
+}
+
+// Format SQL query with parameters for display
+function formatSqlQuery(sql, params) {
+    let formatted = sql;
+    
+    // Replace ? placeholders with parameter values
+    if (params && params.length > 0) {
+        params.forEach((param, idx) => {
+            // Handle different parameter types
+            let displayValue;
+            if (param === null || param === undefined) {
+                displayValue = 'NULL';
+            } else if (typeof param === 'string') {
+                displayValue = `'${param.replace(/'/g, "''")}'`; // Escape single quotes in SQL strings
+            } else if (Array.isArray(param)) {
+                displayValue = `(${param.map(p => typeof p === 'string' ? `'${p.replace(/'/g, "''")}'` : p).join(', ')})`;
+            } else {
+                displayValue = param;
+            }
+            
+            // Replace first occurrence of ? with the parameter value
+            formatted = formatted.replace('?', displayValue);
+        });
+    }
+    
+    // Basic SQL formatting - add line breaks before major keywords
+    formatted = formatted
+        .replace(/\bSELECT\b/gi, '\nSELECT')
+        .replace(/\bFROM\b/gi, '\nFROM')
+        .replace(/\bWHERE\b/gi, '\nWHERE')
+        .replace(/\bAND\b/gi, '\n  AND')
+        .replace(/\bOR\b/gi, '\n  OR')
+        .replace(/\bORDER BY\b/gi, '\nORDER BY')
+        .replace(/\bGROUP BY\b/gi, '\nGROUP BY')
+        .replace(/\bHAVING\b/gi, '\nHAVING')
+        .replace(/\bEXISTS\b/gi, '\n  EXISTS')
+        .replace(/\(\s*SELECT/gi, '(\n    SELECT')
+        .trim();
+    
+    return formatted;
 }
 
 // Cleanup on page unload

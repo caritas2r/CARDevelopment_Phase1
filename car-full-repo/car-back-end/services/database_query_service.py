@@ -43,3 +43,38 @@ class DatabaseQueryService:
             sqlite3.Connection: Database connection object
         """
         return self.connection_service.get_connection()
+    
+    def execute_query(self, sql_query: str, params: list = None):
+        """
+        Execute a SQL query and return results
+        
+        Args:
+            sql_query: SQL query string
+            params: List of parameters for parameterized query (optional)
+        
+        Returns:
+            List of dictionaries representing query results, or empty list if no results
+        
+        Raises:
+            Exception: If query execution fails
+        """
+        if params is None:
+            params = []
+        
+        conn = self.get_connection()
+        cursor = conn.cursor()
+        
+        try:
+            cursor.execute(sql_query, params)
+            rows = cursor.fetchall()
+            
+            # Convert rows to list of dictionaries
+            if rows:
+                columns = [description[0] for description in cursor.description]
+                results = [dict(zip(columns, row)) for row in rows]
+                return results
+            return []
+        except Exception as e:
+            raise Exception(f"Query execution failed: {str(e)}")
+        finally:
+            cursor.close()

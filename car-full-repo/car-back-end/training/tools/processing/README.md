@@ -4,10 +4,15 @@ This directory contains scripts for converting and transforming training data.
 
 ## Files
 
+### Training Data Preparation
 - **`csv_to_template_free_mapped.py`**: Converts annotated CSV to template-free segments JSONL format with key mapping
 - **`apply_key_mapping.py`**: Applies key shortening mapping to JSON in existing JSONL files
 - **`prepare_training_data_v2.py`**: Complete pipeline - converts CSV to mapped JSONL and splits into train/test/validation sets (80/10/10)
 - **`minify_jsonls_no_newlines.py`**: Minifies JSONL files by removing newlines from JSON payloads
+
+### SQL Conversion (Testing/Review)
+- **`batch_json_to_sql.py`**: Batch processes inference results and converts JSON to SQL queries for review
+- **`pretty_print_sql_results.py`**: Pretty prints SQL results with formatted queries and parameters
 
 ## Usage
 
@@ -42,4 +47,16 @@ Keys are shortened to reduce token usage:
 - etc.
 
 See `docs/key_mapping_schema.md` for the complete mapping.
+
+### Batch Convert Inference Results to SQL:
+```bash
+# From car-back-end/ directory:
+python training/tools/processing/batch_json_to_sql.py training/data/inference_results/inference_report_test_v2.jsonl --output training/data/inference_results/sql_results_test.jsonl
+```
+
+### Pretty Print SQL Results:
+```bash
+# From car-back-end/ directory:
+python training/tools/processing/pretty_print_sql_results.py training/data/inference_results/sql_results_test.jsonl --output training/data/inference_results/sql_queries.txt
+```
 

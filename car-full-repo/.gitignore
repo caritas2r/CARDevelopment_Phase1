@@ -60,3 +60,15 @@ htmlcov/
 instance/
 .webassets-cache
 
+# Model artifacts
+car-models/
+**/car-models/
+
+# Inference virtual environment
+car-back-end/car_inference_env/
+**/car_inference_env/
+
+# HuggingFace cache
+hf_cache/
+**/hf_cache/
+

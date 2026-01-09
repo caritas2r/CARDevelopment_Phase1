@@ -173,6 +173,87 @@
     color: var(--cds-text-primary);
 }
 
+/* Extracted Fields Display */
+.extracted-fields-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+}
+
+.extracted-fields-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+.extracted-fields-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+}
+
+.extracted-field-item {
+    padding: 0.5rem;
+    background-color: var(--cds-layer);
+    border-left: 3px solid var(--cds-interactive);
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+}
+
+.extracted-field-item strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+    margin-right: 0.5rem;
+}
+
+.extracted-field-item {
+    color: var(--cds-text-secondary);
+}
+
+/* SQL Query Display */
+.sql-query-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+}
+
+.sql-query-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+.sql-query-display {
+    margin: 0;
+    padding: 1rem;
+    background-color: var(--cds-layer);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: var(--cds-text-primary);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 672px) {
     .cds-query-card {
