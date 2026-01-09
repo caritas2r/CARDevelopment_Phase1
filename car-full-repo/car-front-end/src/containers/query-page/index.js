@@ -176,83 +176,24 @@ function setupFormHandlers() {
             }
             
             if (data.success) {
-                // Format extracted fields for display
-                let extractedFieldsHtml = '';
-                if (data.extracted_fields && Object.keys(data.extracted_fields).length > 0) {
-                    const fieldsList = Object.entries(data.extracted_fields)
-                        .map(([path, value]) => {
-                            const displayValue = Array.isArray(value) 
-                                ? value.map(v => escapeHtml(String(v))).join(', ')
-                                : escapeHtml(String(value));
-                            return `<div class="extracted-field-item"><strong>${escapeHtml(path)}:</strong> ${displayValue}</div>`;
-                        })
-                        .join('');
-                    
-                    extractedFieldsHtml = `
-                        <div class="extracted-fields-container">
-                            <h3>Extracted Fields</h3>
-                            <div class="extracted-fields-list">
-                                ${fieldsList}
-                            </div>
-                        </div>
-                    `;
-                }
+                // Store results in sessionStorage for results page
+                sessionStorage.setItem('queryResults', JSON.stringify(data));
                 
-                // Format SQL query for display
-                let sqlHtml = '';
-                if (data.sql_query) {
-                    const formattedSql = formatSqlQuery(data.sql_query, data.sql_params || []);
-                    sqlHtml = `
-                        <div class="sql-query-container">
-                            <h3>Generated SQL Query</h3>
-                            <pre class="sql-query-display">${escapeHtml(formattedSql)}</pre>
-                        </div>
-                    `;
-                }
-                
-                // Display results
-                let resultsHtml = '';
-                if (data.results && data.results.length > 0) {
-                    resultsHtml = `
-                        <h3>Results (${data.result_count || data.results.length}):</h3>
-                        <div class="query-results">
-                            ${data.results.map((vehicle, idx) => `
-                                <div class="query-result-item">
-                                    <h4>${escapeHtml(vehicle.make || '')} ${escapeHtml(vehicle.model || '')} ${vehicle.year || ''}</h4>
-                                    <div class="result-details">
-                                        <p><strong>Price:</strong> $${vehicle.price?.toLocaleString() || 'N/A'} (${vehicle.currency === 840 ? 'USD' : vehicle.currency})</p>
-                                        <p><strong>Mileage:</strong> ${vehicle.mileage?.toLocaleString() || 'N/A'} miles</p>
-                                        <p><strong>Body Style:</strong> ${escapeHtml(vehicle.body_style || 'N/A')}</p>
-                                        <p><strong>Transmission:</strong> ${escapeHtml(vehicle.transmission || 'N/A')}</p>
-                                        <p><strong>Drivetrain:</strong> ${escapeHtml(vehicle.drivetrain || 'N/A')}</p>
-                                        ${vehicle.powertrain_types && vehicle.powertrain_types.length > 0 ? `<p><strong>Powertrain:</strong> ${vehicle.powertrain_types.map(pt => escapeHtml(pt)).join(', ')}</p>` : '<p><strong>Powertrain:</strong> N/A</p>'}
-                                        ${vehicle.seating_capacity ? `<p><strong>Seating:</strong> ${vehicle.seating_capacity}</p>` : ''}
-                                        ${vehicle.color ? `<p><strong>Color:</strong> ${escapeHtml(vehicle.color)}</p>` : ''}
-                                        <p><strong>Number of Owners:</strong> ${vehicle.number_of_owners !== null && vehicle.number_of_owners !== undefined ? vehicle.number_of_owners : 'N/A'}</p>
-                                        ${vehicle.features && vehicle.features.length > 0 ? `<p><strong>Features:</strong> ${vehicle.features.map(f => escapeHtml(f)).join(', ')}</p>` : ''}
-                                        ${vehicle.use_case_tags && vehicle.use_case_tags.length > 0 ? `<p><strong>Use Cases:</strong> ${vehicle.use_case_tags.map(t => escapeHtml(t)).join(', ')}</p>` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                } else {
-                    resultsHtml = '<p>No results found.</p>';
-                }
-                
+                // Show success message briefly, then navigate to results page
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator success">
                         <span class="cds-status-icon">✓</span>
-                        <span class="cds-status-text">Query processed successfully</span>
+                        <span class="cds-status-text">Query processed successfully. Found ${data.result_count || 0} result${(data.result_count || 0) !== 1 ? 's' : ''}.</span>
                     </div>
                     <div class="cds-status-details success">
-                        <p><strong>Query:</strong> ${escapeHtml(queryText)}</p>
-                        ${data.poc_mode ? '<p><em>PoC Mode: Returning sample vehicle</em></p>' : ''}
-                        ${extractedFieldsHtml}
-                        ${sqlHtml}
-                        ${resultsHtml}
+                        <p>Redirecting to results page...</p>
                     </div>
                 `;
+                
+                // Navigate to results page after brief delay
+                setTimeout(() => {
+                    window.location.hash = '#/results';
+                }, 1000);
             } else {
                 throw new Error(data.error || 'Query failed');
             }

@@ -1,0 +1,169 @@
+/* Payment Page Styles - Carbon Design System v11 */
+
+/* Payment card container */
+.cds-payment-card {
+    grid-column: 5 / 13;
+    background-color: var(--cds-layer);
+    padding: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+@media (max-width: 1056px) {
+    .cds-payment-card {
+        grid-column: 4 / 14;
+    }
+}
+
+@media (max-width: 672px) {
+    .cds-payment-card {
+        grid-column: 2 / 16;
+        padding: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .cds-payment-card {
+        grid-column: 1 / -1;
+        padding: 1rem;
+    }
+}
+
+/* Payment summary */
+.payment-summary {
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+}
+
+.payment-summary h2 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 1rem 0;
+    color: var(--cds-text-primary);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 0;
+    font-size: 0.875rem;
+    color: var(--cds-text-secondary);
+}
+
+.summary-item.total {
+    padding-top: 1rem;
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--cds-border-subtle);
+    font-size: 1rem;
+    color: var(--cds-text-primary);
+}
+
+.summary-item .price {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+}
+
+.summary-divider {
+    height: 1px;
+    background-color: var(--cds-border-subtle);
+    margin: 0.5rem 0;
+}
+
+/* Payment form */
+.payment-form {
+    margin-top: 2rem;
+}
+
+.payment-form h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--cds-text-primary);
+}
+
+.payment-note {
+    font-size: 0.875rem;
+    color: var(--cds-text-secondary);
+    margin: 0 0 1.5rem 0;
+    padding: 0.75rem;
+    background-color: var(--cds-layer);
+    border-left: 3px solid var(--cds-interactive);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 400;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-secondary);
+    margin-bottom: 0.5rem;
+}
+
+.cds-input {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    font-size: 1rem;
+    font-family: 'IBM Plex Sans', 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.5;
+    letter-spacing: 0;
+    color: var(--cds-text-primary);
+    background-color: var(--cds-layer);
+    border: 1px solid #8d8d8d;
+    border-radius: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.cds-input:focus {
+    outline: none;
+    border-color: var(--cds-interactive);
+    box-shadow: 0 0 0 2px rgba(15, 98, 254, 0.1);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 1rem;
+}
+
+.payment-submit {
+    width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.payment-submit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.payment-status {
+    margin-top: 1.5rem;
+}
+
+.payment-status .cds-status-indicator {
+    margin-bottom: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 672px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .cds-payment-card {
+        padding: 1rem;
+    }
+}
+

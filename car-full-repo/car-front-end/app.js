@@ -4,6 +4,8 @@
 import './src/containers/home-page/index.js';
 import './src/containers/db-schema-page/index.js';
 import './src/containers/query-page/index.js';
+import './src/containers/results-page/index.js';
+import './src/containers/payment-page/index.js';
 
 // Hash-based routing
 function route() {
@@ -23,7 +25,6 @@ function route() {
             window.renderDbSchemaPage();
         } else {
             console.error('[Router] renderDbSchemaPage not available! Retrying...');
-            // Retry after a short delay if function not available yet
             setTimeout(() => {
                 if (window.renderDbSchemaPage) {
                     window.renderDbSchemaPage();
@@ -38,12 +39,39 @@ function route() {
             window.renderQueryPage();
         } else {
             console.error('[Router] renderQueryPage not available! Retrying...');
-            // Retry after a short delay if function not available yet
             setTimeout(() => {
                 if (window.renderQueryPage) {
                     window.renderQueryPage();
                 } else {
                     console.error('[Router] renderQueryPage still not available after retry');
+                }
+            }, 100);
+        }
+    } else if (normalizedHash === '#/results') {
+        console.log('[Router] Routing to Results page');
+        if (window.renderResultsPage) {
+            window.renderResultsPage();
+        } else {
+            console.error('[Router] renderResultsPage not available! Retrying...');
+            setTimeout(() => {
+                if (window.renderResultsPage) {
+                    window.renderResultsPage();
+                } else {
+                    console.error('[Router] renderResultsPage still not available after retry');
+                }
+            }, 100);
+        }
+    } else if (normalizedHash === '#/payment') {
+        console.log('[Router] Routing to Payment page');
+        if (window.renderPaymentPage) {
+            window.renderPaymentPage();
+        } else {
+            console.error('[Router] renderPaymentPage not available! Retrying...');
+            setTimeout(() => {
+                if (window.renderPaymentPage) {
+                    window.renderPaymentPage();
+                } else {
+                    console.error('[Router] renderPaymentPage still not available after retry');
                 }
             }, 100);
         }
@@ -53,7 +81,6 @@ function route() {
             window.renderHomePage();
         } else {
             console.error('[Router] renderHomePage not available! Retrying...');
-            // Retry after a short delay if function not available yet
             setTimeout(() => {
                 if (window.renderHomePage) {
                     window.renderHomePage();

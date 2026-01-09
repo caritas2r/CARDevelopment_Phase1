@@ -95,11 +95,14 @@ class QueryService:
                 # Step 3: Convert JSON to SQL
                 sql_query, sql_params = self.json_converter_service.convert_to_sql(json_with_full_keys)
                 
-                # Step 4: Execute query
+                # Step 4: Execute query against database
+                print(f"[{self.name}] Executing SQL query: {sql_query[:200]}...")  # Log first 200 chars
+                print(f"[{self.name}] SQL parameters: {sql_params}")
                 results = self.database_query_service.execute_query(sql_query, sql_params)
+                print(f"[{self.name}] Query executed successfully. Found {len(results)} results.")
                 
                 # Step 5: Format and return results
-                return jsonify({
+                response_data = {
                     'success': True,
                     'query': query_text,
                     'extracted_fields': specified_fields,
@@ -107,7 +110,14 @@ class QueryService:
                     'sql_params': sql_params,
                     'results': results,
                     'result_count': len(results) if results else 0
-                }), 200
+                }
+                
+                print(f"[{self.name}] Returning response with {len(results)} results to frontend")
+                if results and len(results) > 0:
+                    print(f"[{self.name}] Sample result keys: {list(results[0].keys())}")
+                    print(f"[{self.name}] Sample result - Make: {results[0].get('make')}, Model: {results[0].get('model')}, Features: {len(results[0].get('features', []))}, Use Cases: {len(results[0].get('use_case_tags', []))}")
+                
+                return jsonify(response_data), 200
                 
             except Exception as e:
                 return jsonify({
