@@ -24,19 +24,19 @@ setlocal enabledelayedexpansion
 
 REM Check for --noinference flag
 set USE_MOCK=0
-if not "%~1"=="" if "%~1"=="--noinference" set USE_MOCK=1
-if not "%~2"=="" if "%~2"=="--noinference" set USE_MOCK=1
+if /i "%~1"=="--noinference" set USE_MOCK=1
+if /i "%~2"=="--noinference" set USE_MOCK=1
 
 echo ========================================
 echo Car Management System - Starting...
 if "%USE_MOCK%"=="1" (
-    echo MOCK MODE: --noinference flag detected
-    echo No inference/database - using mock service
+    echo MOCK MODE: --noinference - no GPU/model required
+    echo Using mock query service - accepts: pass, fail, insufficient
 ) else (
-    echo Starting with inference support
+    echo INFERENCE MODE: Full inference support enabled
 )
 echo ========================================
-echo.
+echo;
 
 REM Get script directory and convert to absolute path (remove trailing backslash)
 set "SCRIPT_DIR=%~dp0"
@@ -57,9 +57,29 @@ set "LORA_ADAPTER_PATH=%MODEL_DIR%"
 set "HF_TOKEN="
 set "HF_HOME=%SCRIPT_DIR%\hf_cache"
 
+REM Auto-detect: If model directory doesn't exist and flag not set, automatically use mock mode
+if "%USE_MOCK%"=="0" (
+    if not exist "%MODEL_DIR%" (
+        echo;
+        echo ========================================
+        echo WARNING: Model directory not found
+        echo ========================================
+        echo Model directory not found at: %MODEL_DIR%
+        echo;
+        echo Inference mode requires the model adapter.
+        echo Automatically switching to MOCK mode --noinference.
+        echo;
+        echo To use inference mode, ensure the model directory exists.
+        echo To explicitly use mock mode: create-venv.bat --noinference
+        echo ========================================
+        echo;
+        set USE_MOCK=1
+    )
+)
+
 echo Backend directory: %BACKEND_DIR%
 echo Frontend directory: %FRONTEND_DIR%
-echo.
+echo;
 
 if not exist "%BACKEND_DIR%" (
     echo ERROR: Backend directory not found at %BACKEND_DIR%
@@ -118,22 +138,20 @@ exit /b 1
 :python_found
 echo Found Python at: %PYTHON_EXE%
 %PYTHON_CMD% --version
-echo.
+echo;
 
-REM Resolve Python to absolute path
-for %%F in ("%PYTHON_EXE%") do set "PYTHON_EXE=%%~fF"
-echo Using Python: %PYTHON_EXE%
-echo.
-
-
-REM Check if model directory exists (skip in mock mode)
-if "%USE_MOCK%"=="0" (
-    if not exist "%MODEL_DIR%" (
-        echo WARNING: Model adapter directory not found at %MODEL_DIR%
-        echo The application may fail to start without the model.
-        echo.
-    )
+REM Resolve Python to absolute path (if it's a command name, keep it as-is)
+if exist "%PYTHON_EXE%" (
+    REM It's a file path, resolve to absolute
+    for %%F in ("%PYTHON_EXE%") do set "PYTHON_EXE=%%~fF"
+) else (
+    REM It's a command name like "py" or "python", use as-is
+    REM Don't resolve - it will be found via PATH
 )
+echo Using Python: %PYTHON_EXE%
+echo;
+
+
 
 REM Check if app.py exists
 if not exist "%BACKEND_DIR%\app.py" (
@@ -150,22 +168,34 @@ if "%USE_MOCK%"=="1" (
     echo Model: %HF_BASE_MODEL_ID%
     echo Adapter: %LORA_ADAPTER_PATH%
 )
-echo.
+echo;
 echo Starting in a new window - you can minimize it if needed.
 
 REM Build command with optional --noinference flag
-REM PYTHON_EXE is already an absolute path at this point
+REM Check if PYTHON_EXE is a file path or a command name
+if exist "%PYTHON_EXE%" (
+    REM It's a file path - quote it for paths with spaces
+    set "PYTHON_CMD_QUOTED=%PYTHON_EXE%"
+) else (
+    REM It's a command name like "py" or "python" - use as-is
+    set "PYTHON_CMD_QUOTED=%PYTHON_EXE%"
+)
+
 set "BACKEND_CMD=cd /d "%BACKEND_DIR%""
 if "%USE_MOCK%"=="0" (
     set "BACKEND_CMD=%BACKEND_CMD% && set HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID% && set LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH% && set HF_TOKEN=%HF_TOKEN% && set HF_HOME=%HF_HOME%"
 )
 if "%USE_MOCK%"=="1" (
-    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_EXE%" app.py --noinference"
+    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_CMD_QUOTED%" app.py --noinference"
 ) else (
-    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_EXE%" app.py"
+    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_CMD_QUOTED%" app.py"
 )
 
-REM Use absolute paths for start command - paths are already absolute
+REM Debug: Show what will be executed
+echo Executing backend command in new window...
+echo;
+
+REM Launch backend in new window
 start "Car Backend - Port 5000" cmd /k "%BACKEND_CMD%"
 
 REM Wait for backend to start (model load may take longer on first run)
@@ -174,28 +204,28 @@ timeout /t 10 /nobreak >nul
 
 echo Starting Frontend Server (Port 8000)...
 echo Starting in a new window - you can minimize it if needed.
-REM PYTHON_EXE is already an absolute path
-start "Car Frontend - Port 8000" cmd /k "cd /d "%FRONTEND_DIR%" && "%PYTHON_EXE%" -m http.server 8000"
+REM Use the same PYTHON_CMD_QUOTED variable
+start "Car Frontend - Port 8000" cmd /k "cd /d "%FRONTEND_DIR%" && "%PYTHON_CMD_QUOTED%" -m http.server 8000"
 
 REM Wait for frontend to start
 echo Waiting for frontend to initialize...
 timeout /t 5 /nobreak >nul
 
 REM Open browser to frontend
-echo.
+echo;
 echo Opening browser to http://localhost:8000...
 echo If the page doesn't load, wait a few more seconds and refresh.
 start http://localhost:8000
 
-echo.
+echo;
 echo ========================================
 echo Application is starting!
 echo ========================================
-echo.
+echo;
 echo Backend: http://localhost:5000
 echo Frontend: http://localhost:8000
-echo.
+echo;
 echo Both servers are running in separate windows.
 echo Close those windows to stop the servers.
-echo.
+echo;
 pause
