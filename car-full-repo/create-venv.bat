@@ -57,6 +57,33 @@ set "LORA_ADAPTER_PATH=%MODEL_DIR%"
 set "HF_TOKEN="
 set "HF_HOME=%SCRIPT_DIR%\hf_cache"
 
+REM Stripe configuration (sandbox/test API key)
+REM Load from env_var file in the same directory as this script
+REM Format: API_KEY = <your_key_here>
+REM If not set, payment processing will be disabled
+set "STRIPE_API_KEY="
+if exist "%SCRIPT_DIR%\env_var" (
+    REM Read API_KEY from env_var file and set as STRIPE_API_KEY
+    for /f "usebackq tokens=1,* delims==" %%a in ("%SCRIPT_DIR%\env_var") do (
+        REM Trim whitespace from variable name and value
+        for /f "tokens=*" %%n in ("%%a") do set "VAR_NAME=%%n"
+        for /f "tokens=*" %%v in ("%%b") do set "VAR_VALUE=%%v"
+        REM Remove any remaining leading/trailing spaces
+        set "VAR_NAME=!VAR_NAME: =!"
+        set "VAR_VALUE=!VAR_VALUE: =!"
+        REM Check if this is API_KEY (case-insensitive)
+        if /i "!VAR_NAME!"=="API_KEY" (
+            set "STRIPE_API_KEY=!VAR_VALUE!"
+        )
+    )
+)
+REM Debug: Check if API key was loaded (but don't print the actual key for security)
+if "!STRIPE_API_KEY!"=="" (
+    echo WARNING: STRIPE_API_KEY not found in env_var file - payment processing will be disabled
+) else (
+    echo Stripe API key loaded from env_var file
+)
+
 REM Auto-detect: If model directory doesn't exist and flag not set, automatically use mock mode
 if "%USE_MOCK%"=="0" (
     if not exist "%MODEL_DIR%" (
@@ -182,21 +209,23 @@ if exist "%PYTHON_EXE%" (
 )
 
 set "BACKEND_CMD=cd /d "%BACKEND_DIR%""
+REM Set STRIPE_API_KEY for both modes (use delayed expansion to get the value)
+set "BACKEND_CMD=!BACKEND_CMD! && set STRIPE_API_KEY=!STRIPE_API_KEY!"
 if "%USE_MOCK%"=="0" (
-    set "BACKEND_CMD=%BACKEND_CMD% && set HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID% && set LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH% && set HF_TOKEN=%HF_TOKEN% && set HF_HOME=%HF_HOME%"
+    set "BACKEND_CMD=!BACKEND_CMD! && set HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID% && set LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH% && set HF_TOKEN=%HF_TOKEN% && set HF_HOME=%HF_HOME%"
 )
 if "%USE_MOCK%"=="1" (
-    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_CMD_QUOTED%" app.py --noinference"
+    set "BACKEND_CMD=!BACKEND_CMD! && "%PYTHON_CMD_QUOTED%" app.py --noinference"
 ) else (
-    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_CMD_QUOTED%" app.py"
+    set "BACKEND_CMD=!BACKEND_CMD! && "%PYTHON_CMD_QUOTED%" app.py"
 )
 
 REM Debug: Show what will be executed
 echo Executing backend command in new window...
 echo;
 
-REM Launch backend in new window
-start "Car Backend - Port 5000" cmd /k "%BACKEND_CMD%"
+REM Launch backend in new window (use delayed expansion for BACKEND_CMD)
+start "Car Backend - Port 5000" cmd /k "!BACKEND_CMD!"
 
 REM Wait for backend to start (model load may take longer on first run)
 echo Waiting for backend to initialize (this may take 10-30 seconds on first run)...

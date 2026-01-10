@@ -175,6 +175,10 @@ function setupFormHandlers() {
                 throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
             
+            // Store query text for potential feedback submission
+            sessionStorage.setItem('lastQueryText', queryText);
+            sessionStorage.setItem('lastQueryData', JSON.stringify(data));
+            
             // Check for insufficient criteria (warning case)
             if (!data.success && (data.error_type === 'insufficient_criteria' || queryText.toLowerCase().trim() === 'insufficient')) {
                 statusDiv.innerHTML = `
@@ -184,6 +188,11 @@ function setupFormHandlers() {
                     </div>
                     <div class="cds-status-details warning">
                         <p><strong>Warning:</strong> Insufficient criteria detected, please refine your search parameters.</p>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                             Results Not Satisfactory
+                        </button>
                     </div>
                 `;
                 return;
@@ -198,6 +207,11 @@ function setupFormHandlers() {
                     </div>
                     <div class="cds-status-details error">
                         <p><strong>Error:</strong> Unable to process query.</p>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                             Results Not Satisfactory
+                        </button>
                     </div>
                 `;
                 return;
@@ -226,6 +240,9 @@ function setupFormHandlers() {
                 throw new Error(data.error || 'Query failed');
             }
         } catch (error) {
+            // Store query text for potential feedback submission even on error
+            sessionStorage.setItem('lastQueryText', queryText);
+            
             statusDiv.innerHTML = `
                 <div class="cds-status-indicator error">
                     <span class="cds-status-icon">✕</span>
@@ -309,6 +326,86 @@ window.addEventListener('beforeunload', () => {
         clearInterval(placeholderInterval);
     }
 });
+
+// Feedback submission function for query page (fail/insufficient cases)
+window.submitQueryFeedback = function() {
+    const feedbackButton = document.getElementById('feedbackButton');
+    if (!feedbackButton) return;
+    
+    // Disable button to prevent double-submission
+    feedbackButton.disabled = true;
+    feedbackButton.textContent = 'Submitting...';
+    
+    // Get the query text and data from sessionStorage
+    const queryText = sessionStorage.getItem('lastQueryText') || '';
+    const queryDataStr = sessionStorage.getItem('lastQueryData');
+    
+    if (!queryText) {
+        alert('Unable to submit feedback: query data not found');
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+        return;
+    }
+    
+    let queryData = {};
+    if (queryDataStr) {
+        try {
+            queryData = JSON.parse(queryDataStr);
+        } catch (e) {
+            console.warn('Could not parse query data:', e);
+        }
+    }
+    
+    // Prompt for reason (optional)
+    const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
+    if (reason === null) {
+        // User cancelled - don't submit
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+        return;
+    }
+    
+    // Submit feedback
+    fetch(`${API_BASE_URL}/api/query/feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            query: queryText,
+            extracted_fields: queryData.extracted_fields || {},
+            sql_query: queryData.sql_query || '',
+            sql_params: queryData.sql_params || [],
+            reason: reason || ''
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            feedbackButton.textContent = '✓ Feedback Submitted';
+            feedbackButton.style.backgroundColor = 'var(--cds-support-success)';
+            feedbackButton.style.color = 'white';
+            feedbackButton.style.borderColor = 'var(--cds-support-success)';
+            setTimeout(() => {
+                feedbackButton.disabled = false;
+                feedbackButton.textContent = ' Results Not Satisfactory';
+                feedbackButton.style.backgroundColor = '';
+                feedbackButton.style.color = '';
+                feedbackButton.style.borderColor = '';
+            }, 3000);
+        } else {
+            alert('Failed to submit feedback: ' + (result.error || 'Unknown error'));
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = ' Results Not Satisfactory';
+        }
+    })
+    .catch(error => {
+        console.error('Feedback submission error:', error);
+        alert('Failed to submit feedback: ' + error.message);
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+    });
+};
 
 // Expose renderQueryPage for routing
 window.renderQueryPage = renderQueryPage;

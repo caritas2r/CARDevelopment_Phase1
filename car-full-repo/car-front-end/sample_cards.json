@@ -1,0 +1,80 @@
+[
+    {
+        "brand": "Visa",
+        "number": "4242424242424242",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Visa (debit)",
+        "number": "4000056655665556",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Mastercard",
+        "number": "5555555555554444",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Mastercard (2-series)",
+        "number": "2223003122003222",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Mastercard (debit)",
+        "number": "5200828282828210",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "American Express",
+        "number": "378282246310005",
+        "cvc": "1234",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "American Express",
+        "number": "371449635398431",
+        "cvc": "1234",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Discover",
+        "number": "6011111111111117",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Discover",
+        "number": "6011000990139424",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "Diners Club",
+        "number": "3056930009020004",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    },
+    {
+        "brand": "JCB",
+        "number": "3566002020360505",
+        "cvc": "123",
+        "exp_month": 12,
+        "exp_year": 2026
+    }
+]
+

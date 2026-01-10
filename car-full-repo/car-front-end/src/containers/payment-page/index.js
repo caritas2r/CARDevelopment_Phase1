@@ -1,4 +1,42 @@
-// Payment Page - Stripe payment simulation for unlocking results
+// Payment Page - Stripe payment processing for unlocking results
+const API_BASE_URL = 'http://localhost:5000';
+
+// Test cards cache (loaded once)
+let testCardsCache = null;
+
+// Load test cards from sample_cards.json
+async function loadTestCards() {
+    if (testCardsCache) {
+        return testCardsCache;
+    }
+    
+    try {
+        const response = await fetch('/sample_cards.json');
+        if (!response.ok) {
+            throw new Error('Failed to load test cards');
+        }
+        testCardsCache = await response.json();
+        return testCardsCache;
+    } catch (error) {
+        console.error('Error loading test cards:', error);
+        // Fallback to a default test card
+        testCardsCache = [{
+            brand: "Visa",
+            number: "4242424242424242",
+            cvc: "123",
+            exp_month: 12,
+            exp_year: 2025
+        }];
+        return testCardsCache;
+    }
+}
+
+// Get a random test card from the list
+async function getRandomTestCard() {
+    const cards = await loadTestCards();
+    const randomIndex = Math.floor(Math.random() * cards.length);
+    return cards[randomIndex];
+}
 
 // Create and render the payment page
 function renderPaymentPage() {
@@ -47,7 +85,10 @@ function renderPaymentPage() {
                     
                     <div class="payment-form">
                         <h3>Payment Information</h3>
-                        <p class="payment-note">This is a simulation - no real payment will be processed</p>
+                        <p class="payment-note">Secure payment processing via Stripe (sandbox/test mode)</p>
+                        <p class="payment-note" style="font-size: 0.875rem; color: #666; margin-top: 0.5rem;">
+                            Note: For testing, a valid Stripe test card will be used automatically regardless of the entered card details.
+                        </p>
                         
                         <div class="form-group">
                             <label for="cardNumber">Card Number</label>
@@ -97,6 +138,11 @@ function renderPaymentPage() {
                             Pay $9.99
                         </button>
                         
+                        <div id="debugCardInfo" class="debug-card-info" style="display: none; margin-top: 1rem; padding: 0.75rem; background-color: #f4f4f4; border: 1px solid #ddd; border-radius: 4px; font-size: 0.875rem;">
+                            <strong>Card details being sent to Stripe:</strong>
+                            <div id="debugCardDetails" style="margin-top: 0.5rem; font-family: monospace; color: #333;"></div>
+                        </div>
+                        
                         <div id="paymentStatus" class="payment-status"></div>
                     </div>
                 </div>
@@ -123,14 +169,65 @@ function setupPaymentForm() {
         });
     }
     
-    // Format expiry date (MM/YY)
+    // Format expiry date (MM/YY) - improved to allow full editing including backspace
     if (expiryInput) {
         expiryInput.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, '');
+            const cursorPos = e.target.selectionStart;
+            let value = e.target.value.replace(/\D/g, ''); // Remove all non-digits
+            
+            // Limit to 4 digits
+            if (value.length > 4) {
+                value = value.substring(0, 4);
+            }
+            
+            // Format as MM/YY
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
             }
+            
             e.target.value = value;
+            
+            // Adjust cursor position - if we added a slash, move cursor forward
+            let newCursorPos = cursorPos;
+            if (value.length > 0 && value.includes('/')) {
+                // If cursor was at position 2 (after first 2 digits), move it past the slash
+                if (cursorPos === 2 && value.length > 2) {
+                    newCursorPos = 3;
+                }
+                // If we just typed a digit and it created a slash, move past it
+                else if (value.length === 3 && cursorPos === 2) {
+                    newCursorPos = 3;
+                }
+            }
+            
+            // Set cursor position
+            setTimeout(() => {
+                e.target.setSelectionRange(newCursorPos, newCursorPos);
+            }, 0);
+        });
+        
+        // Handle backspace to allow deleting through the slash
+        expiryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace') {
+                const cursorPos = e.target.selectionStart;
+                const value = e.target.value;
+                
+                // If cursor is right after the slash, delete the slash and the digit before it
+                if (cursorPos === 3 && value.length > 0 && value[2] === '/') {
+                    e.preventDefault();
+                    let digits = value.replace(/\D/g, '');
+                    if (digits.length > 0) {
+                        digits = digits.substring(0, digits.length - 1);
+                        if (digits.length >= 2) {
+                            e.target.value = digits.substring(0, 2) + '/' + digits.substring(2, 4);
+                            e.target.setSelectionRange(2, 2); // Position cursor before where slash was
+                        } else {
+                            e.target.value = digits;
+                            e.target.setSelectionRange(digits.length, digits.length);
+                        }
+                    }
+                }
+            }
         });
     }
     
@@ -143,7 +240,7 @@ function setupPaymentForm() {
     
     // Handle payment submission
     if (submitButton) {
-        submitButton.addEventListener('click', () => {
+        submitButton.addEventListener('click', async () => {
             const cardNumber = cardNumberInput?.value.replace(/\s/g, '') || '';
             const expiry = expiryInput?.value || '';
             const cvv = cvvInput?.value || '';
@@ -190,7 +287,7 @@ function setupPaymentForm() {
                 return;
             }
             
-            // Simulate payment processing
+            // Process payment through Stripe API
             submitButton.disabled = true;
             submitButton.textContent = 'Processing...';
             statusDiv.innerHTML = `
@@ -200,9 +297,104 @@ function setupPaymentForm() {
                 </div>
             `;
             
-            // Simulate API call delay
-            setTimeout(() => {
-                // Mark payment as completed in sessionStorage
+            // Parse expiry date (MM/YY format) with validation
+            const expiryParts = expiry.split('/');
+            if (expiryParts.length !== 2 || !expiryParts[0] || !expiryParts[1]) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Invalid expiry date format</span>
+                    </div>
+                `;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay $9.99';
+                return;
+            }
+            
+            const expMonth = expiryParts[0].trim();
+            const expYear = expiryParts[1].trim();
+            
+            // Validate month (1-12)
+            const monthInt = parseInt(expMonth, 10);
+            if (isNaN(monthInt) || monthInt < 1 || monthInt > 12) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Invalid expiry month (must be 01-12)</span>
+                    </div>
+                `;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay $9.99';
+                return;
+            }
+            
+            // Validate year (should be 2 digits)
+            if (expYear.length !== 2 || isNaN(parseInt(expYear, 10))) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Invalid expiry year format (must be YY)</span>
+                    </div>
+                `;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay $9.99';
+                return;
+            }
+            
+            // Prepare payment data using Stripe PaymentMethod ID (recommended approach)
+            // Using pm_card_visa test PaymentMethod ID
+            const paymentMethodId = 'pm_card_visa';
+            
+            const paymentData = {
+                amount: 999, // $9.99 in cents
+                currency: 'usd',
+                payment_method: paymentMethodId  // Stripe test PaymentMethod ID
+            };
+            
+            // Display payment method details being sent (for debugging)
+            const debugCardInfo = document.getElementById('debugCardInfo');
+            const debugCardDetails = document.getElementById('debugCardDetails');
+            if (debugCardInfo && debugCardDetails) {
+                debugCardDetails.innerHTML = `
+                    <div><strong>Payment Method ID:</strong> ${paymentMethodId}</div>
+                    <div><strong>Amount:</strong> $9.99 (999 cents)</div>
+                    <div><strong>Currency:</strong> USD</div>
+                    <div><strong>Cardholder Name (from form):</strong> ${cardName.trim() || 'Test User'}</div>
+                    <div style="margin-top: 0.5rem; font-size: 0.8125rem; color: #666;">
+                        Note: Using Stripe test PaymentMethod ID (pm_card_visa) - this simulates a successful Visa payment.
+                    </div>
+                `;
+                debugCardInfo.style.display = 'block';
+            }
+            
+            // Call backend payment API
+            fetch(`${API_BASE_URL}/api/payment/process`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(async response => {
+                // Check HTTP status before parsing JSON
+                let result;
+                try {
+                    result = await response.json();
+                } catch (e) {
+                    // If JSON parsing fails, create error response
+                    throw new Error(`Server error: HTTP ${response.status} ${response.statusText}`);
+                }
+                
+                // Check if response indicates failure (non-2xx status or success:false)
+                if (!response.ok || !result.success) {
+                    const errorMsg = result.error || `Payment failed (HTTP ${response.status})`;
+                    throw new Error(errorMsg);
+                }
+                
+                return result;
+            })
+            .then(result => {
+                // Payment succeeded
                 sessionStorage.setItem('paymentCompleted', 'true');
                 
                 statusDiv.innerHTML = `
@@ -216,7 +408,21 @@ function setupPaymentForm() {
                 setTimeout(() => {
                     window.location.hash = '#/results';
                 }, 1500);
-            }, 2000);
+            })
+            .catch(error => {
+                console.error('Payment processing error:', error);
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Payment failed</span>
+                    </div>
+                    <div class="cds-status-details error">
+                        <p><strong>Error:</strong> ${escapeHtml(error.message || 'Failed to process payment. Please try again.')}</p>
+                    </div>
+                `;
+                submitButton.disabled = false;
+                submitButton.textContent = 'Pay $9.99';
+            });
         });
     }
 }

@@ -139,6 +139,14 @@
     color: #8c6800;
 }
 
+/* Feedback button styling */
+.feedback-button {
+    margin-top: 1rem;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
 /* Action buttons in main content */
 .cds-action-buttons {
     margin-top: 2rem;
