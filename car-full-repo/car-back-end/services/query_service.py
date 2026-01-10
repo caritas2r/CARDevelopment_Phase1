@@ -8,7 +8,7 @@ from services.output_quality_service import OutputQualityService
 class QueryService:
     """Service responsible for orchestrating the query processing pipeline"""
     
-    def __init__(self, inference_service, key_mapping_service, json_converter_service, database_query_service, mock_nlp_trip_service=None):
+    def __init__(self, inference_service=None, key_mapping_service=None, json_converter_service=None, database_query_service=None, mock_nlp_trip_service=None, mock_query_service=None):
         """
         Initialize the query service
         
@@ -36,8 +36,14 @@ class QueryService:
         self.json_converter_service = json_converter_service
         self.database_query_service = database_query_service
         self.mock_nlp_trip_service = mock_nlp_trip_service
-        self.quality_service = OutputQualityService()
-        self.quality_service.initialize()
+        self.mock_query_service = mock_query_service
+        
+        # Only initialize quality service if not in mock mode
+        if mock_query_service is None:
+            self.quality_service = OutputQualityService()
+            self.quality_service.initialize()
+        else:
+            self.quality_service = None
     
     def register(self, app):
         """
@@ -79,7 +85,20 @@ class QueryService:
                         'error_type': 'validation'
                     }), 400
                 
-                # Full query processing pipeline:
+                # Check if we're in mock mode
+                if self.mock_query_service is not None:
+                    # Mock mode: Use MockQueryService (no inference, no database)
+                    try:
+                        result = self.mock_query_service.process_query(query_text)
+                        return jsonify(result), 200
+                    except ValueError as e:
+                        return jsonify({
+                            'success': False,
+                            'error': str(e),
+                            'error_type': 'validation'
+                        }), 400
+                
+                # Normal mode: Full query processing pipeline
                 # 1. Process through inference service (NLP -> JSON with shortened keys)
                 # 2. Expand shortened keys to full keys (mk -> make, md -> model, etc.)
                 # 3. Convert JSON to SQL
@@ -89,12 +108,16 @@ class QueryService:
                 # Step 1: Process through inference service
                 json_with_short_keys = self.inference_service.process_query(query_text)
                 
-                # Step 1.5: Check output quality
-                is_acceptable, quality_warnings = self.quality_service.check_output_quality(
-                    json_with_short_keys, query_text
-                )
-                if quality_warnings:
-                    print(f"[{self.name}] Quality warnings: {', '.join(quality_warnings)}")
+                # Step 1.5: Check output quality (only if quality service is available)
+                if self.quality_service:
+                    is_acceptable, quality_warnings = self.quality_service.check_output_quality(
+                        json_with_short_keys, query_text
+                    )
+                    if quality_warnings:
+                        print(f"[{self.name}] Quality warnings: {', '.join(quality_warnings)}")
+                else:
+                    quality_warnings = []
+                    is_acceptable = True
                 
                 # Extract specified fields (non-unspecified) from the JSON
                 specified_fields = self.inference_service._extract_specified_fields(json_with_short_keys)
