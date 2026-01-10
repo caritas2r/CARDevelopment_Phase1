@@ -1,25 +1,23 @@
 @echo off
 REM ========================================================================
-REM Car Management System - Application Launcher with Inference Support
+REM Car Management System - Application Launcher
 REM ========================================================================
 REM
-REM This script sets up the inference environment and starts the application
-REM with full end-to-end inference capabilities:
+REM This script launches the application:
 REM
-REM 1. Creates/verifies the inference virtual environment (car_inference_env)
-REM 2. Installs PyTorch (GPU if NVIDIA detected, otherwise CPU)
-REM 3. Installs all ML inference dependencies (transformers, peft, accelerate, etc.)
-REM 4. Starts the backend server (port 5000) with inference model configured
-REM 5. Starts the frontend server (port 8000)
-REM 6. Opens the browser to the frontend
+REM 1. Finds Python executable (python or py command)
+REM 2. Starts the backend server (port 5000)
+REM 3. Starts the frontend server (port 8000)
+REM 4. Opens the browser to the frontend
 REM
 REM Requirements:
 REM - Python 3.10+ installed and in PATH
-REM - Model adapter directory at car-models/qwen25_3b_base_MAPPED_v2 (or update MODEL_DIR)
-REM - requirements.inference.txt in car-back-end directory
+REM - All dependencies already installed (install separately if needed)
+REM - Model adapter directory at car-models/qwen25_3b_base_MAPPED_v2 (for inference mode)
 REM
-REM This is the RECOMMENDED way to start the application with inference.
-REM See README-START.md for detailed documentation.
+REM Usage:
+REM   create-venv.bat              - Start with inference (requires dependencies)
+REM   create-venv.bat --noinference - Start in mock mode (minimal dependencies)
 REM ========================================================================
 
 setlocal enabledelayedexpansion
@@ -35,28 +33,32 @@ if "%USE_MOCK%"=="1" (
     echo MOCK MODE: --noinference flag detected
     echo No inference/database - using mock service
 ) else (
-    echo Creating Inference Virtual Environment
+    echo Starting with inference support
 )
 echo ========================================
 echo.
 
+REM Get script directory and convert to absolute path (remove trailing backslash)
 set "SCRIPT_DIR=%~dp0"
-set BACKEND_DIR=%SCRIPT_DIR%car-back-end
-set FRONTEND_DIR=%SCRIPT_DIR%car-front-end
-set VENV_DIR=%BACKEND_DIR%\car_inference_env
-set PYTHON_EXE=%VENV_DIR%\Scripts\python.exe
-set PIP_EXE=%VENV_DIR%\Scripts\pip.exe
-set REQUIREMENTS_FILE=%BACKEND_DIR%\requirements.inference.txt
+REM Remove trailing backslash if present for cleaner path handling
+if "%SCRIPT_DIR:~-1%"=="\" set "SCRIPT_DIR=%SCRIPT_DIR:~0,-1%"
 
-REM Model configuration
+REM Convert to absolute paths using cd (most reliable method)
+cd /d "%SCRIPT_DIR%"
+set "SCRIPT_DIR=%CD%"
+
+set "BACKEND_DIR=%SCRIPT_DIR%\car-back-end"
+set "FRONTEND_DIR=%SCRIPT_DIR%\car-front-end"
+
+REM Model configuration (using absolute paths)
 set "HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B"
-set MODEL_DIR=%SCRIPT_DIR%car-models\qwen25_3b_base_MAPPED_v2
-set LORA_ADAPTER_PATH=%MODEL_DIR%
-set HF_TOKEN=
-set HF_HOME=%SCRIPT_DIR%hf_cache
+set "MODEL_DIR=%SCRIPT_DIR%\car-models\qwen25_3b_base_MAPPED_v2"
+set "LORA_ADAPTER_PATH=%MODEL_DIR%"
+set "HF_TOKEN="
+set "HF_HOME=%SCRIPT_DIR%\hf_cache"
 
 echo Backend directory: %BACKEND_DIR%
-echo Virtual environment: %VENV_DIR%
+echo Frontend directory: %FRONTEND_DIR%
 echo.
 
 if not exist "%BACKEND_DIR%" (
@@ -71,260 +73,58 @@ if not exist "%FRONTEND_DIR%" (
     exit /b 1
 )
 
-if not exist "%REQUIREMENTS_FILE%" (
-    echo ERROR: requirements.inference.txt not found at %REQUIREMENTS_FILE%
-    pause
-    exit /b 1
-)
 
-REM Try to find Python - check both 'python' and 'py' commands
+REM Find Python executable - check both 'python' and 'py' commands
+set PYTHON_EXE=
 set PYTHON_CMD=
+
+REM Try 'python' first
 python --version >nul 2>&1
 if not errorlevel 1 (
-    set PYTHON_CMD=python
-    echo Found Python: 
-    python --version
-) else (
-    py --version >nul 2>&1
-    if not errorlevel 1 (
-        set PYTHON_CMD=py
-        echo Found Python: 
-        py --version
-    ) else (
-        echo ERROR: Python is not installed or not in PATH
-        echo Please install Python 3.10+ from https://www.python.org/
-        echo Make sure to check "Add Python to PATH" during installation
-        pause
-        exit /b 1
+    REM Find the full path to python.exe
+    for /f "delims=" %%i in ('where python 2^>nul') do (
+        if exist "%%i" (
+            set "PYTHON_EXE=%%i"
+            set "PYTHON_CMD=python"
+            goto :python_found
+        )
     )
 )
+
+REM Try 'py' launcher
+py --version >nul 2>&1
+if not errorlevel 1 (
+    REM Use py launcher to get actual Python path
+    for /f "tokens=*" %%i in ('py -c "import sys; print(sys.executable)" 2^>nul') do (
+        if exist "%%i" (
+            set "PYTHON_EXE=%%i"
+            set "PYTHON_CMD=py"
+            goto :python_found
+        )
+    )
+    REM If py launcher works but we can't get path, just use 'py'
+    set "PYTHON_EXE=py"
+    set "PYTHON_CMD=py"
+    goto :python_found
+)
+
+REM Python not found
+echo ERROR: Python is not installed or not in PATH
+echo Please install Python 3.10+ from https://www.python.org/
+echo Make sure to check "Add Python to PATH" during installation
+pause
+exit /b 1
+
+:python_found
+echo Found Python at: %PYTHON_EXE%
+%PYTHON_CMD% --version
 echo.
 
-REM Only create venv if not in mock mode (mock mode doesn't need ML dependencies)
-if "%USE_MOCK%"=="0" (
-    REM Check if venv exists and is valid
-    set VENV_VALID=0
-    if exist "%VENV_DIR%" (
-        if exist "%VENV_DIR%\Scripts\python.exe" (
-            set VENV_VALID=1
-        )
-    )
-    
-    if "%VENV_VALID%"=="0" (
-        REM Clean up broken/incomplete venv if it exists
-        if exist "%VENV_DIR%" (
-            echo Removing incomplete or broken virtual environment...
-            rmdir /s /q "%VENV_DIR%" 2>nul
-            timeout /t 1 /nobreak >nul
-        )
-        
-        echo Creating virtual environment: car_inference_env...
-        cd /d "%BACKEND_DIR%"
-        %PYTHON_CMD% -m venv car_inference_env
-        if errorlevel 1 (
-            echo ERROR: Failed to create virtual environment
-            echo Make sure Python is properly installed and 'venv' module is available
-            echo Try running: %PYTHON_CMD% -m venv --help
-            pause
-            exit /b 1
-        )
-        
-        REM Wait a moment for file system to catch up
-        timeout /t 2 /nobreak >nul
-        
-        REM Verify the venv was created correctly
-        if not exist "%VENV_DIR%" (
-            echo ERROR: Virtual environment directory was not created
-            echo Check if you have write permissions in: %BACKEND_DIR%
-            pause
-            exit /b 1
-        )
-        
-        if not exist "%VENV_DIR%\Scripts\python.exe" (
-            echo ERROR: Virtual environment was created but python.exe not found
-            echo Expected at: %VENV_DIR%\Scripts\python.exe
-            echo.
-            echo Checking what was created:
-            if exist "%VENV_DIR%\Scripts" (
-                echo Scripts directory exists. Contents:
-                dir /b "%VENV_DIR%\Scripts" 2>nul
-            ) else (
-                echo Scripts directory does not exist!
-                echo Venv directory contents:
-                dir /b "%VENV_DIR%" 2>nul
-            )
-            echo.
-            echo This may indicate:
-            echo   - Python 3.13.2 venv module issue
-            echo   - Antivirus blocking file creation
-            echo   - Insufficient permissions
-            pause
-            exit /b 1
-        )
-        echo Virtual environment created successfully.
-        echo Verified Python at: %PYTHON_EXE%
-        echo.
-    ) else (
-        echo Virtual environment already exists and appears valid.
-        echo.
-    )
-) else (
-    echo Mock mode: Skipping virtual environment setup (not needed)
-    echo Using system Python...
-    set PYTHON_EXE=%PYTHON_CMD%
-    set PIP_EXE=pip
-    echo.
-)
-
-REM Only install packages if not in mock mode
-if "%USE_MOCK%"=="0" (
-    echo Upgrading pip...
-    "%PYTHON_EXE%" -m pip install --upgrade pip --quiet
-    if errorlevel 1 (
-        echo ERROR: Failed to upgrade pip
-        pause
-        exit /b 1
-    )
-    echo Pip upgraded successfully.
-    echo.
-
-    echo Installing PyTorch...
-    where nvidia-smi >nul 2>&1
-    if not errorlevel 1 (
-        echo NVIDIA GPU detected. Installing CUDA 12.4 PyTorch...
-        "%PIP_EXE%" install torch --index-url https://download.pytorch.org/whl/cu124 --quiet
-        if errorlevel 1 (
-            echo WARNING: CUDA PyTorch install failed. Falling back to CPU PyTorch...
-            "%PIP_EXE%" install torch --quiet
-            if errorlevel 1 (
-                echo ERROR: Failed to install CPU PyTorch
-                pause
-                exit /b 1
-            )
-        ) else (
-            echo PyTorch with CUDA support installed successfully.
-        )
-    ) else (
-        echo No NVIDIA GPU detected. Installing CPU PyTorch...
-        "%PIP_EXE%" install torch --quiet
-        if errorlevel 1 (
-            echo ERROR: Failed to install CPU PyTorch
-            pause
-            exit /b 1
-        ) else (
-            echo CPU PyTorch installed successfully.
-        )
-    )
-    echo.
-
-    echo Checking installed packages...
-    "%PIP_EXE%" show transformers >nul 2>&1
-    if errorlevel 1 (
-        echo Installing inference requirements from %REQUIREMENTS_FILE%...
-        "%PIP_EXE%" install -r "%REQUIREMENTS_FILE%" --quiet
-        if errorlevel 1 (
-            echo ERROR: Failed to install requirements
-            pause
-            exit /b 1
-        )
-        echo Requirements installed successfully.
-    ) else (
-        echo Requirements already installed. Skipping installation.
-    )
-    echo.
-) else (
-    echo Mock mode: Skipping ML package installation (only need Flask and basic packages)
-    echo Installing minimal requirements...
-    "%PYTHON_EXE%" -m pip install flask flask-cors --quiet
-    if errorlevel 1 (
-        echo WARNING: Failed to install Flask - you may need to install manually
-    )
-    echo.
-)
-
-echo ========================================
-echo Virtual environment setup complete!
-echo ========================================
+REM Resolve Python to absolute path
+for %%F in ("%PYTHON_EXE%") do set "PYTHON_EXE=%%~fF"
+echo Using Python: %PYTHON_EXE%
 echo.
 
-REM Verify venv exists before launching
-if "%USE_MOCK%"=="0" (
-    echo Verifying virtual environment...
-    echo Expected Python path: %PYTHON_EXE%
-    if not exist "%VENV_DIR%" (
-        echo ERROR: Virtual environment directory not found: %VENV_DIR%
-        echo The venv creation may have failed silently.
-        pause
-        exit /b 1
-    )
-    
-    if not exist "%VENV_DIR%\Scripts" (
-        echo ERROR: Scripts directory not found in venv: %VENV_DIR%\Scripts
-        echo The venv structure may be incorrect.
-        echo Directory contents:
-        dir /b "%VENV_DIR%"
-        pause
-        exit /b 1
-    )
-    
-    REM Use full path resolution for the check
-    cd /d "%BACKEND_DIR%"
-    set FULL_PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
-    if not exist "car_inference_env\Scripts\python.exe" (
-        echo ERROR: Python executable not found at: %PYTHON_EXE%
-        echo Full path checked: %FULL_PYTHON_EXE%
-        echo Current directory: %CD%
-        echo Virtual environment directory exists but python.exe is missing.
-        echo.
-        echo Checking Scripts directory contents:
-        if exist "car_inference_env\Scripts" (
-            dir /b "car_inference_env\Scripts" | findstr /i "python"
-        ) else (
-            echo Scripts directory does not exist!
-            if exist "car_inference_env" (
-                echo Venv directory contents:
-                dir /b "car_inference_env"
-            )
-        )
-        echo.
-        echo This may indicate:
-        echo   1. Venv creation failed partially
-        echo   2. Python 3.13.2 has a different venv structure
-        echo   3. Antivirus blocked file creation
-        echo   4. Path resolution issue
-        echo.
-        echo Trying to recreate virtual environment...
-        if exist "car_inference_env" (
-            rmdir /s /q "car_inference_env" 2>nul
-            timeout /t 2 /nobreak >nul
-        )
-        %PYTHON_CMD% -m venv car_inference_env
-        if errorlevel 1 (
-            echo ERROR: Failed to recreate virtual environment
-            pause
-            exit /b 1
-        )
-        timeout /t 2 /nobreak >nul
-        if not exist "car_inference_env\Scripts\python.exe" (
-            echo ERROR: Python executable still not found after recreation
-            echo Please check your Python 3.13.2 installation
-            echo Try manually: %PYTHON_CMD% -m venv test_venv
-            pause
-            exit /b 1
-        )
-        echo Virtual environment recreated successfully.
-        REM Reset PYTHON_EXE to use the verified path
-        set PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
-        set PIP_EXE=%CD%\car_inference_env\Scripts\pip.exe
-    ) else (
-        echo Virtual environment verified successfully.
-        echo Using Python at: %FULL_PYTHON_EXE%
-        REM Ensure paths use current directory context
-        set PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
-        set PIP_EXE=%CD%\car_inference_env\Scripts\pip.exe
-    )
-    echo.
-)
 
 REM Check if model directory exists (skip in mock mode)
 if "%USE_MOCK%"=="0" (
@@ -354,15 +154,18 @@ echo.
 echo Starting in a new window - you can minimize it if needed.
 
 REM Build command with optional --noinference flag
-set BACKEND_CMD=cd /d %BACKEND_DIR%
+REM PYTHON_EXE is already an absolute path at this point
+set "BACKEND_CMD=cd /d "%BACKEND_DIR%""
 if "%USE_MOCK%"=="0" (
-    set BACKEND_CMD=%BACKEND_CMD% && set "HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID%" && set "LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH%" && set "HF_TOKEN=%HF_TOKEN%" && set "HF_HOME=%HF_HOME%"
+    set "BACKEND_CMD=%BACKEND_CMD% && set HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID% && set LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH% && set HF_TOKEN=%HF_TOKEN% && set HF_HOME=%HF_HOME%"
 )
-set BACKEND_CMD=%BACKEND_CMD% && %PYTHON_EXE% app.py
 if "%USE_MOCK%"=="1" (
-    set BACKEND_CMD=%BACKEND_CMD% --noinference
+    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_EXE%" app.py --noinference"
+) else (
+    set "BACKEND_CMD=%BACKEND_CMD% && "%PYTHON_EXE%" app.py"
 )
 
+REM Use absolute paths for start command - paths are already absolute
 start "Car Backend - Port 5000" cmd /k "%BACKEND_CMD%"
 
 REM Wait for backend to start (model load may take longer on first run)
@@ -371,7 +174,8 @@ timeout /t 10 /nobreak >nul
 
 echo Starting Frontend Server (Port 8000)...
 echo Starting in a new window - you can minimize it if needed.
-start "Car Frontend - Port 8000" cmd /k "cd /d %FRONTEND_DIR% && %PYTHON_EXE% -m http.server 8000"
+REM PYTHON_EXE is already an absolute path
+start "Car Frontend - Port 8000" cmd /k "cd /d "%FRONTEND_DIR%" && "%PYTHON_EXE%" -m http.server 8000"
 
 REM Wait for frontend to start
 echo Waiting for frontend to initialize...
