@@ -7,10 +7,12 @@ A lightweight frontend application built with IBM Carbon Design System v11.
 - IBM Carbon Design System v11 styling
 - Vanilla JavaScript (ES6 modules)
 - Container-based architecture
-- Hash-based routing (`#/`, `#/query`, `#/schema`)
+- Hash-based routing (`#/`, `#/query`, `#/results`, `#/payment`, `#/db-schema`)
 - Query submission interface with rotating placeholder text
-- Vehicle result display
+- Vehicle result display with paywall functionality
+- Payment processing integration with Stripe (test mode)
 - Database schema viewer
+- Query feedback system for unsatisfactory results
 - Responsive design
 
 ## Setup
@@ -92,9 +94,17 @@ car-front-end/
         ├── query-page/    # Query submission page
         │   ├── index.js   # Query page logic
         │   └── style.css  # Query page styles
+        ├── results-page/  # Results display page
+        │   ├── index.js   # Results page logic
+        │   └── style.css  # Results page styles
+        ├── payment-page/  # Payment processing page
+        │   ├── index.js   # Payment page logic
+        │   └── style.css  # Payment page styles
         └── db-schema-page/ # Database schema viewer
             ├── index.js   # Schema page logic
             └── style.css  # Schema page styles
+    └── utils/             # Utility functions
+        └── helpers.js     # Shared helper functions
 ```
 
 ## Design System
@@ -105,14 +115,18 @@ This application uses IBM Carbon Design System v11 for consistent, accessible UI
 
 The application uses hash-based routing:
 - `#/` - Home page
-- `#/query` - Query submission page (submit NLP queries, view results)
-- `#/schema` - Database schema viewer
+- `#/query` - Query submission page (submit NLP queries)
+- `#/results` - Results display page (view vehicle search results)
+- `#/payment` - Payment page (unlock full results via Stripe)
+- `#/db-schema` - Database schema viewer
 
 ## Configuration
 
 If your backend runs on a different URL/port, update the `API_BASE_URL` in each container file:
 - `src/containers/home-page/index.js`
 - `src/containers/query-page/index.js`
+- `src/containers/results-page/index.js`
+- `src/containers/payment-page/index.js`
 - `src/containers/db-schema-page/index.js`
 
 ```javascript

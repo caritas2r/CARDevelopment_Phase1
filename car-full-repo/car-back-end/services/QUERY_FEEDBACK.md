@@ -67,26 +67,29 @@ This endpoint collects problematic queries that can be:
 
 ## Storage
 
-Feedback is stored in:
-```
-car-back-end/training/data/feedback/unsatisfactory_queries.csv
-```
+Feedback is stored in the `flagged_prompts` table in the SQLite database.
 
-### CSV Format
+### Database Schema
 
-The CSV file contains the following columns:
-- `timestamp`: ISO format timestamp when feedback was submitted
-- `query`: Original query text
-- `extracted_fields`: JSON string of extracted fields
-- `sql_query`: Generated SQL query
-- `sql_params`: JSON string of SQL parameters
-- `reason`: User-provided reason (optional)
+The `flagged_prompts` table contains the following columns:
+- `id`: Primary key (auto-increment)
+- `prompt_text`: Original query text
+- `flagged_annotation`: JSON string of extracted fields
+- `flagged_query`: Generated SQL query
+- `flag_reason`: User-provided reason (optional)
+- `query_status`: Status of the query ('pass', 'fail', or 'insufficient')
 
-### Example CSV Entry
+### Example Database Entry
 
-```csv
-timestamp,query,extracted_fields,sql_query,sql_params,reason
-2024-01-15T10:30:00,"show me corvettes",{"mk":["Cadillac"]},"SELECT * FROM vehicles WHERE make IN (?)","["Cadillac"]","Model returned wrong make - asked for corvette but got Cadillac"
+```sql
+INSERT INTO flagged_prompts (prompt_text, flagged_annotation, flagged_query, flag_reason, query_status)
+VALUES (
+  'show me corvettes',
+  '{"mk":["Cadillac"]}',
+  'SELECT * FROM vehicles WHERE make IN (?)',
+  'Model returned wrong make - asked for corvette but got Cadillac',
+  'fail'
+);
 ```
 
 ## Frontend Integration
@@ -110,8 +113,9 @@ The frontend includes a "⚠️ Results Not Satisfactory" button on the results 
 To process collected feedback:
 
 1. **Review Feedback:**
-   ```bash
-   cat car-back-end/training/data/feedback/unsatisfactory_queries.csv
+   Query the `flagged_prompts` table in the database:
+   ```sql
+   SELECT * FROM flagged_prompts;
    ```
 
 2. **Add to Training Data:**
@@ -121,13 +125,14 @@ To process collected feedback:
    - Re-annotate and retrain the model
 
 3. **Analyze Patterns:**
-   - Identify common failure modes
+   - Identify common failure modes by querying `query_status` and `flag_reason`
    - Look for systematic issues (e.g., specific makes/models, query types)
    - Use insights to improve training data or model architecture
 
 ## Notes
 
-- The feedback directory is created automatically if it doesn't exist
-- Feedback is appended to the CSV file (never overwritten)
+- Feedback is stored in the database `flagged_prompts` table
+- The table schema is automatically created and validated on application startup
 - No limit on the number of feedback submissions
 - Feedback data can be manually reviewed and cleaned before adding to training data
+- The `query_status` field indicates whether the query was 'pass', 'fail', or 'insufficient'

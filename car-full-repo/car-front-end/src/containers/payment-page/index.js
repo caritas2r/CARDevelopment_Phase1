@@ -1,43 +1,6 @@
 // Payment Page - Stripe payment processing for unlocking results
 const API_BASE_URL = 'http://localhost:5000';
 
-// Test cards cache (loaded once)
-let testCardsCache = null;
-
-// Load test cards from sample_cards.json
-async function loadTestCards() {
-    if (testCardsCache) {
-        return testCardsCache;
-    }
-    
-    try {
-        const response = await fetch('/sample_cards.json');
-        if (!response.ok) {
-            throw new Error('Failed to load test cards');
-        }
-        testCardsCache = await response.json();
-        return testCardsCache;
-    } catch (error) {
-        console.error('Error loading test cards:', error);
-        // Fallback to a default test card
-        testCardsCache = [{
-            brand: "Visa",
-            number: "4242424242424242",
-            cvc: "123",
-            exp_month: 12,
-            exp_year: 2025
-        }];
-        return testCardsCache;
-    }
-}
-
-// Get a random test card from the list
-async function getRandomTestCard() {
-    const cards = await loadTestCards();
-    const randomIndex = Math.floor(Math.random() * cards.length);
-    return cards[randomIndex];
-}
-
 // Create and render the payment page
 function renderPaymentPage() {
     const appDiv = document.getElementById('app');

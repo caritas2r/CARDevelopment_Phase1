@@ -113,17 +113,7 @@ ensure_db_and_schema(Path("data/car_database.db"), connection=conn)
 
 ## Verification
 
-Use the inspection utility to verify the schema:
-
-```bash
-python utils/inspect_database.py
-```
-
-This will show:
-- Database path and existence
-- All tables and their columns
-- Row counts for each table
-- Database file size
+To verify the database schema, you can query the database directly using SQLite tools or check the schema definition in `db_bootstrap.py`.
 
 ## Differences from PoC
 
