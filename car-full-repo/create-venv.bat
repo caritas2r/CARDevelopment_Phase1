@@ -77,34 +77,101 @@ if not exist "%REQUIREMENTS_FILE%" (
     exit /b 1
 )
 
+REM Try to find Python - check both 'python' and 'py' commands
+set PYTHON_CMD=
 python --version >nul 2>&1
-if errorlevel 1 (
-    echo ERROR: Python is not installed or not in PATH
-    pause
-    exit /b 1
+if not errorlevel 1 (
+    set PYTHON_CMD=python
+    echo Found Python: 
+    python --version
+) else (
+    py --version >nul 2>&1
+    if not errorlevel 1 (
+        set PYTHON_CMD=py
+        echo Found Python: 
+        py --version
+    ) else (
+        echo ERROR: Python is not installed or not in PATH
+        echo Please install Python 3.10+ from https://www.python.org/
+        echo Make sure to check "Add Python to PATH" during installation
+        pause
+        exit /b 1
+    )
 )
+echo.
 
 REM Only create venv if not in mock mode (mock mode doesn't need ML dependencies)
 if "%USE_MOCK%"=="0" (
-    if not exist "%VENV_DIR%" (
+    REM Check if venv exists and is valid
+    set VENV_VALID=0
+    if exist "%VENV_DIR%" (
+        if exist "%VENV_DIR%\Scripts\python.exe" (
+            set VENV_VALID=1
+        )
+    )
+    
+    if "%VENV_VALID%"=="0" (
+        REM Clean up broken/incomplete venv if it exists
+        if exist "%VENV_DIR%" (
+            echo Removing incomplete or broken virtual environment...
+            rmdir /s /q "%VENV_DIR%" 2>nul
+            timeout /t 1 /nobreak >nul
+        )
+        
         echo Creating virtual environment: car_inference_env...
         cd /d "%BACKEND_DIR%"
-        python -m venv car_inference_env
+        %PYTHON_CMD% -m venv car_inference_env
         if errorlevel 1 (
             echo ERROR: Failed to create virtual environment
+            echo Make sure Python is properly installed and 'venv' module is available
+            echo Try running: %PYTHON_CMD% -m venv --help
+            pause
+            exit /b 1
+        )
+        
+        REM Wait a moment for file system to catch up
+        timeout /t 2 /nobreak >nul
+        
+        REM Verify the venv was created correctly
+        if not exist "%VENV_DIR%" (
+            echo ERROR: Virtual environment directory was not created
+            echo Check if you have write permissions in: %BACKEND_DIR%
+            pause
+            exit /b 1
+        )
+        
+        if not exist "%VENV_DIR%\Scripts\python.exe" (
+            echo ERROR: Virtual environment was created but python.exe not found
+            echo Expected at: %VENV_DIR%\Scripts\python.exe
+            echo.
+            echo Checking what was created:
+            if exist "%VENV_DIR%\Scripts" (
+                echo Scripts directory exists. Contents:
+                dir /b "%VENV_DIR%\Scripts" 2>nul
+            ) else (
+                echo Scripts directory does not exist!
+                echo Venv directory contents:
+                dir /b "%VENV_DIR%" 2>nul
+            )
+            echo.
+            echo This may indicate:
+            echo   - Python 3.13.2 venv module issue
+            echo   - Antivirus blocking file creation
+            echo   - Insufficient permissions
             pause
             exit /b 1
         )
         echo Virtual environment created successfully.
+        echo Verified Python at: %PYTHON_EXE%
         echo.
     ) else (
-        echo Virtual environment already exists.
+        echo Virtual environment already exists and appears valid.
         echo.
     )
 ) else (
     echo Mock mode: Skipping virtual environment setup (not needed)
     echo Using system Python...
-    set PYTHON_EXE=python
+    set PYTHON_EXE=%PYTHON_CMD%
     set PIP_EXE=pip
     echo.
 )
@@ -181,11 +248,82 @@ echo ========================================
 echo.
 
 REM Verify venv exists before launching
-if not exist "%PYTHON_EXE%" (
-    echo ERROR: Python executable not found at %PYTHON_EXE%
-    echo Virtual environment may not be properly set up.
-    pause
-    exit /b 1
+if "%USE_MOCK%"=="0" (
+    echo Verifying virtual environment...
+    echo Expected Python path: %PYTHON_EXE%
+    if not exist "%VENV_DIR%" (
+        echo ERROR: Virtual environment directory not found: %VENV_DIR%
+        echo The venv creation may have failed silently.
+        pause
+        exit /b 1
+    )
+    
+    if not exist "%VENV_DIR%\Scripts" (
+        echo ERROR: Scripts directory not found in venv: %VENV_DIR%\Scripts
+        echo The venv structure may be incorrect.
+        echo Directory contents:
+        dir /b "%VENV_DIR%"
+        pause
+        exit /b 1
+    )
+    
+    REM Use full path resolution for the check
+    cd /d "%BACKEND_DIR%"
+    set FULL_PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
+    if not exist "car_inference_env\Scripts\python.exe" (
+        echo ERROR: Python executable not found at: %PYTHON_EXE%
+        echo Full path checked: %FULL_PYTHON_EXE%
+        echo Current directory: %CD%
+        echo Virtual environment directory exists but python.exe is missing.
+        echo.
+        echo Checking Scripts directory contents:
+        if exist "car_inference_env\Scripts" (
+            dir /b "car_inference_env\Scripts" | findstr /i "python"
+        ) else (
+            echo Scripts directory does not exist!
+            if exist "car_inference_env" (
+                echo Venv directory contents:
+                dir /b "car_inference_env"
+            )
+        )
+        echo.
+        echo This may indicate:
+        echo   1. Venv creation failed partially
+        echo   2. Python 3.13.2 has a different venv structure
+        echo   3. Antivirus blocked file creation
+        echo   4. Path resolution issue
+        echo.
+        echo Trying to recreate virtual environment...
+        if exist "car_inference_env" (
+            rmdir /s /q "car_inference_env" 2>nul
+            timeout /t 2 /nobreak >nul
+        )
+        %PYTHON_CMD% -m venv car_inference_env
+        if errorlevel 1 (
+            echo ERROR: Failed to recreate virtual environment
+            pause
+            exit /b 1
+        )
+        timeout /t 2 /nobreak >nul
+        if not exist "car_inference_env\Scripts\python.exe" (
+            echo ERROR: Python executable still not found after recreation
+            echo Please check your Python 3.13.2 installation
+            echo Try manually: %PYTHON_CMD% -m venv test_venv
+            pause
+            exit /b 1
+        )
+        echo Virtual environment recreated successfully.
+        REM Reset PYTHON_EXE to use the verified path
+        set PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
+        set PIP_EXE=%CD%\car_inference_env\Scripts\pip.exe
+    ) else (
+        echo Virtual environment verified successfully.
+        echo Using Python at: %FULL_PYTHON_EXE%
+        REM Ensure paths use current directory context
+        set PYTHON_EXE=%CD%\car_inference_env\Scripts\python.exe
+        set PIP_EXE=%CD%\car_inference_env\Scripts\pip.exe
+    )
+    echo.
 )
 
 REM Check if model directory exists (skip in mock mode)
