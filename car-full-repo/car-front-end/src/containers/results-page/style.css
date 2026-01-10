@@ -1,8 +1,149 @@
 /* Results Page Styles - Carbon Design System v11 */
 
+/* Additional CSS variables if not defined in home-page */
+:root {
+    --cds-border-subtle: #e0e0e0;
+    --cds-border-strong: #8d8d8d;
+}
+
+/* Validation sidebar */
+.cds-validation-sidebar {
+    grid-column: 1 / 4;
+    background-color: var(--cds-layer);
+    padding: 1.5rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 1rem;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    align-self: start;
+}
+
+.cds-validation-sidebar h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    margin: 0 0 1.5rem 0;
+    color: var(--cds-text-primary);
+    border-bottom: 1px solid var(--cds-border-subtle);
+    padding-bottom: 0.75rem;
+}
+
+.validation-section {
+    margin-bottom: 2rem;
+}
+
+.validation-section:last-child {
+    margin-bottom: 0;
+}
+
+.validation-section h4 {
+    font-size: 0.875rem;
+    font-weight: 600;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+    margin: 0 0 0.75rem 0;
+    color: var(--cds-text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.extracted-fields {
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+}
+
+.fields-list {
+    margin: 0;
+    padding: 0;
+}
+
+.fields-list dt {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+    margin-top: 0.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.fields-list dt:first-child {
+    margin-top: 0;
+}
+
+.fields-list dd {
+    margin: 0 0 0.75rem 0;
+    color: var(--cds-text-secondary);
+    padding-left: 1rem;
+}
+
+.fields-list .value-text {
+    color: var(--cds-interactive);
+}
+
+.fields-list .value-array {
+    color: var(--cds-support-success);
+}
+
+.fields-list .value-null {
+    color: var(--cds-text-secondary);
+    font-style: italic;
+}
+
+.fields-list .value-object {
+    color: var(--cds-support-warning);
+}
+
+.no-data {
+    color: var(--cds-text-secondary);
+    font-style: italic;
+    margin: 0;
+}
+
+.sql-query-display {
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 4px;
+    padding: 1rem;
+    overflow-x: auto;
+}
+
+.sql-query-display pre {
+    margin: 0;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--cds-text-primary);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.sql-query-display code {
+    font-family: inherit;
+    color: inherit;
+}
+
+/* Scrollbar for sidebar */
+.cds-validation-sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.cds-validation-sidebar::-webkit-scrollbar-track {
+    background: var(--cds-layer);
+}
+
+.cds-validation-sidebar::-webkit-scrollbar-thumb {
+    background: var(--cds-border-subtle);
+    border-radius: 3px;
+}
+
+.cds-validation-sidebar::-webkit-scrollbar-thumb:hover {
+    background: var(--cds-border-strong);
+}
+
 /* Results card container */
 .cds-results-card {
-    grid-column: 4 / 14;
+    grid-column: 4 / 16;
     background-color: var(--cds-layer);
     padding: 2rem;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
@@ -13,12 +154,24 @@
 }
 
 @media (max-width: 1056px) {
+    .cds-validation-sidebar {
+        grid-column: 1 / 5;
+    }
+    
     .cds-results-card {
-        grid-column: 2 / 16;
+        grid-column: 5 / 16;
     }
 }
 
 @media (max-width: 672px) {
+    .cds-validation-sidebar {
+        grid-column: 1 / -1;
+        position: relative;
+        top: 0;
+        max-height: none;
+        margin-bottom: 1rem;
+    }
+    
     .cds-results-card {
         grid-column: 1 / -1;
         padding: 1.5rem;
@@ -30,6 +183,13 @@
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--cds-border-subtle);
     padding-bottom: 1rem;
+}
+
+.results-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
 }
 
 .results-header h2 {
@@ -45,6 +205,25 @@
     font-size: 0.875rem;
     color: var(--cds-text-secondary);
     margin: 0;
+}
+
+.feedback-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+@media (max-width: 672px) {
+    .results-header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .feedback-button {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
 }
 
 /* Scrollable results container */

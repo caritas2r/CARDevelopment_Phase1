@@ -29,6 +29,9 @@ function renderResultsPage() {
     const queryText = data.query || 'Your query';
     const results = data.results || [];
     const resultCount = data.result_count || results.length;
+    const extractedFields = data.extracted_fields || {};
+    const sqlQuery = data.sql_query || '';
+    const sqlParams = data.sql_params || [];
     
     // Check if payment has been completed
     const paymentCompleted = sessionStorage.getItem('paymentCompleted') === 'true';
@@ -49,15 +52,40 @@ function renderResultsPage() {
                 </nav>
             </header>
             <main class="cds-content">
+                <!-- Left Sidebar: Query Validation Info -->
+                <div class="cds-validation-sidebar">
+                    <h3>Query Validation</h3>
+                    <div class="validation-section">
+                        <h4>Extracted Fields</h4>
+                        <div class="extracted-fields">
+                            ${renderExtractedFields(extractedFields)}
+                        </div>
+                    </div>
+                    <div class="validation-section">
+                        <h4>Generated SQL</h4>
+                        <div class="sql-query-display">
+                            <pre><code>${escapeHtml(formatSqlQuery(sqlQuery, sqlParams))}</code></pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Main Results Card -->
                 <div class="cds-results-card">
                     <div class="results-header">
-                        <h2>Query: "${escapeHtml(queryText)}"</h2>
-                        <p class="results-count">
-                            ${paymentCompleted 
-                                ? `Showing all ${resultCount} result${resultCount !== 1 ? 's' : ''} (Unlocked)`
-                                : `Showing ${freeResults.length} of ${resultCount} results`
-                            }
-                        </p>
+                        <div class="results-header-top">
+                            <div>
+                                <h2>Query: "${escapeHtml(queryText)}"</h2>
+                                <p class="results-count">
+                                    ${paymentCompleted 
+                                        ? `Showing all ${resultCount} result${resultCount !== 1 ? 's' : ''} (Unlocked)`
+                                        : `Showing ${freeResults.length} of ${resultCount} results`
+                                    }
+                                </p>
+                            </div>
+                            <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitFeedback()">
+                                ⚠️ Results Not Satisfactory
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="results-container">
@@ -88,6 +116,85 @@ function renderResultsPage() {
     window.navigateToPayment = function() {
         window.location.hash = '#/payment';
     };
+    
+    // Expose feedback function to global scope
+    window.submitFeedback = function() {
+        const feedbackButton = document.getElementById('feedbackButton');
+        if (!feedbackButton) return;
+        
+        // Disable button to prevent double-submission
+        feedbackButton.disabled = true;
+        feedbackButton.textContent = 'Submitting...';
+        
+        // Get the original query data from sessionStorage
+        const resultsData = sessionStorage.getItem('queryResults');
+        if (!resultsData) {
+            alert('Unable to submit feedback: query data not found');
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(resultsData);
+        } catch (e) {
+            alert('Unable to submit feedback: invalid data');
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        // Prompt for reason (optional)
+        const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
+        if (reason === null) {
+            // User cancelled - don't submit
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        // Submit feedback
+        fetch(`${API_BASE_URL}/api/query/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: data.query || '',
+                extracted_fields: data.extracted_fields || {},
+                sql_query: data.sql_query || '',
+                sql_params: data.sql_params || [],
+                reason: reason || ''
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                feedbackButton.textContent = '✓ Feedback Submitted';
+                feedbackButton.style.backgroundColor = 'var(--cds-support-success)';
+                feedbackButton.style.color = 'white';
+                feedbackButton.style.borderColor = 'var(--cds-support-success)';
+                setTimeout(() => {
+                    feedbackButton.disabled = false;
+                    feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+                    feedbackButton.style.backgroundColor = '';
+                    feedbackButton.style.color = '';
+                    feedbackButton.style.borderColor = '';
+                }, 3000);
+            } else {
+                alert('Failed to submit feedback: ' + (result.error || 'Unknown error'));
+                feedbackButton.disabled = false;
+                feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            }
+        })
+        .catch(error => {
+            console.error('Feedback submission error:', error);
+            alert('Failed to submit feedback: ' + error.message);
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+        });
+    };
 }
 
 function renderVehicleCard(vehicle, index, isBlurred) {
@@ -114,6 +221,91 @@ function renderVehicleCard(vehicle, index, isBlurred) {
             </div>
         </div>
     `;
+}
+
+// Render extracted fields in a readable format
+function renderExtractedFields(fields) {
+    if (!fields || Object.keys(fields).length === 0) {
+        return '<p class="no-data">No fields extracted</p>';
+    }
+    
+    const formatValue = (value) => {
+        if (value === null || value === undefined) {
+            return '<span class="value-null">null</span>';
+        }
+        if (Array.isArray(value)) {
+            return `<span class="value-array">[${value.map(v => escapeHtml(String(v))).join(', ')}]</span>`;
+        }
+        if (typeof value === 'object') {
+            return `<span class="value-object">{${Object.keys(value).length} keys}</span>`;
+        }
+        return `<span class="value-text">${escapeHtml(String(value))}</span>`;
+    };
+    
+    const formatKey = (key) => {
+        // Convert snake_case or camelCase to Title Case
+        return key
+            .replace(/_/g, ' ')
+            .replace(/([A-Z])/g, ' $1')
+            .replace(/^./, str => str.toUpperCase())
+            .trim();
+    };
+    
+    let html = '<dl class="fields-list">';
+    for (const [key, value] of Object.entries(fields)) {
+        html += `
+            <dt>${escapeHtml(formatKey(key))}</dt>
+            <dd>${formatValue(value)}</dd>
+        `;
+    }
+    html += '</dl>';
+    
+    return html;
+}
+
+// Format SQL query with parameters for display
+function formatSqlQuery(sql, params) {
+    if (!sql) {
+        return 'No SQL query generated';
+    }
+    
+    let formatted = sql;
+    
+    // Replace ? placeholders with parameter values
+    if (params && params.length > 0) {
+        params.forEach((param) => {
+            // Handle different parameter types
+            let displayValue;
+            if (param === null || param === undefined) {
+                displayValue = 'NULL';
+            } else if (typeof param === 'string') {
+                displayValue = `'${param.replace(/'/g, "''")}'`; // Escape single quotes in SQL strings
+            } else if (Array.isArray(param)) {
+                displayValue = `(${param.map(p => typeof p === 'string' ? `'${p.replace(/'/g, "''")}'` : p).join(', ')})`;
+            } else {
+                displayValue = param;
+            }
+            
+            // Replace first occurrence of ? with the parameter value
+            formatted = formatted.replace('?', displayValue);
+        });
+    }
+    
+    // Basic SQL formatting - add line breaks before major keywords
+    formatted = formatted
+        .replace(/\bSELECT\b/gi, '\nSELECT')
+        .replace(/\bFROM\b/gi, '\nFROM')
+        .replace(/\bWHERE\b/gi, '\nWHERE')
+        .replace(/\bAND\b/gi, '\n  AND')
+        .replace(/\bOR\b/gi, '\n  OR')
+        .replace(/\bORDER BY\b/gi, '\nORDER BY')
+        .replace(/\bGROUP BY\b/gi, '\nGROUP BY')
+        .replace(/\bHAVING\b/gi, '\nHAVING')
+        .replace(/\bEXISTS\b/gi, '\n  EXISTS')
+        .replace(/\(\s*SELECT/gi, '(\n    SELECT')
+        .trim();
+    
+    return formatted;
 }
 
 // Escape HTML to prevent XSS

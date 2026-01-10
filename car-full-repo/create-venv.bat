@@ -24,9 +24,19 @@ REM ========================================================================
 
 setlocal enabledelayedexpansion
 
+REM Check for --noinference flag
+set USE_MOCK=0
+if not "%~1"=="" if "%~1"=="--noinference" set USE_MOCK=1
+if not "%~2"=="" if "%~2"=="--noinference" set USE_MOCK=1
+
 echo ========================================
 echo Car Management System - Starting...
-echo Creating Inference Virtual Environment
+if "%USE_MOCK%"=="1" (
+    echo MOCK MODE: --noinference flag detected
+    echo No inference/database - using mock service
+) else (
+    echo Creating Inference Virtual Environment
+)
 echo ========================================
 echo.
 
@@ -74,76 +84,96 @@ if errorlevel 1 (
     exit /b 1
 )
 
-if not exist "%VENV_DIR%" (
-    echo Creating virtual environment: car_inference_env...
-    cd /d "%BACKEND_DIR%"
-    python -m venv car_inference_env
+REM Only create venv if not in mock mode (mock mode doesn't need ML dependencies)
+if "%USE_MOCK%"=="0" (
+    if not exist "%VENV_DIR%" (
+        echo Creating virtual environment: car_inference_env...
+        cd /d "%BACKEND_DIR%"
+        python -m venv car_inference_env
+        if errorlevel 1 (
+            echo ERROR: Failed to create virtual environment
+            pause
+            exit /b 1
+        )
+        echo Virtual environment created successfully.
+        echo.
+    ) else (
+        echo Virtual environment already exists.
+        echo.
+    )
+) else (
+    echo Mock mode: Skipping virtual environment setup (not needed)
+    echo Using system Python...
+    set PYTHON_EXE=python
+    set PIP_EXE=pip
+    echo.
+)
+
+REM Only install packages if not in mock mode
+if "%USE_MOCK%"=="0" (
+    echo Upgrading pip...
+    "%PYTHON_EXE%" -m pip install --upgrade pip --quiet
     if errorlevel 1 (
-        echo ERROR: Failed to create virtual environment
+        echo ERROR: Failed to upgrade pip
         pause
         exit /b 1
     )
-    echo Virtual environment created successfully.
+    echo Pip upgraded successfully.
     echo.
-) else (
-    echo Virtual environment already exists.
-    echo.
-)
 
-echo Upgrading pip...
-"%PYTHON_EXE%" -m pip install --upgrade pip --quiet
-if errorlevel 1 (
-    echo ERROR: Failed to upgrade pip
-    pause
-    exit /b 1
-)
-echo Pip upgraded successfully.
-echo.
-
-echo Installing PyTorch...
-where nvidia-smi >nul 2>&1
-if not errorlevel 1 (
-    echo NVIDIA GPU detected. Installing CUDA 12.4 PyTorch...
-    "%PIP_EXE%" install torch --index-url https://download.pytorch.org/whl/cu124 --quiet
-    if errorlevel 1 (
-        echo WARNING: CUDA PyTorch install failed. Falling back to CPU PyTorch...
+    echo Installing PyTorch...
+    where nvidia-smi >nul 2>&1
+    if not errorlevel 1 (
+        echo NVIDIA GPU detected. Installing CUDA 12.4 PyTorch...
+        "%PIP_EXE%" install torch --index-url https://download.pytorch.org/whl/cu124 --quiet
+        if errorlevel 1 (
+            echo WARNING: CUDA PyTorch install failed. Falling back to CPU PyTorch...
+            "%PIP_EXE%" install torch --quiet
+            if errorlevel 1 (
+                echo ERROR: Failed to install CPU PyTorch
+                pause
+                exit /b 1
+            )
+        ) else (
+            echo PyTorch with CUDA support installed successfully.
+        )
+    ) else (
+        echo No NVIDIA GPU detected. Installing CPU PyTorch...
         "%PIP_EXE%" install torch --quiet
         if errorlevel 1 (
             echo ERROR: Failed to install CPU PyTorch
             pause
             exit /b 1
+        ) else (
+            echo CPU PyTorch installed successfully.
         )
-    ) else (
-        echo PyTorch with CUDA support installed successfully.
     )
-) else (
-    echo No NVIDIA GPU detected. Installing CPU PyTorch...
-    "%PIP_EXE%" install torch --quiet
-    if errorlevel 1 (
-        echo ERROR: Failed to install CPU PyTorch
-        pause
-        exit /b 1
-    ) else (
-        echo CPU PyTorch installed successfully.
-    )
-)
-echo.
+    echo.
 
-echo Checking installed packages...
-"%PIP_EXE%" show transformers >nul 2>&1
-if errorlevel 1 (
-    echo Installing inference requirements from %REQUIREMENTS_FILE%...
-    "%PIP_EXE%" install -r "%REQUIREMENTS_FILE%" --quiet
+    echo Checking installed packages...
+    "%PIP_EXE%" show transformers >nul 2>&1
     if errorlevel 1 (
-        echo ERROR: Failed to install requirements
-        pause
-        exit /b 1
+        echo Installing inference requirements from %REQUIREMENTS_FILE%...
+        "%PIP_EXE%" install -r "%REQUIREMENTS_FILE%" --quiet
+        if errorlevel 1 (
+            echo ERROR: Failed to install requirements
+            pause
+            exit /b 1
+        )
+        echo Requirements installed successfully.
+    ) else (
+        echo Requirements already installed. Skipping installation.
     )
-    echo Requirements installed successfully.
+    echo.
 ) else (
-    echo Requirements already installed. Skipping installation.
+    echo Mock mode: Skipping ML package installation (only need Flask and basic packages)
+    echo Installing minimal requirements...
+    "%PYTHON_EXE%" -m pip install flask flask-cors --quiet
+    if errorlevel 1 (
+        echo WARNING: Failed to install Flask - you may need to install manually
+    )
+    echo.
 )
-echo.
 
 echo ========================================
 echo Virtual environment setup complete!
@@ -158,11 +188,13 @@ if not exist "%PYTHON_EXE%" (
     exit /b 1
 )
 
-REM Check if model directory exists
-if not exist "%MODEL_DIR%" (
-    echo WARNING: Model adapter directory not found at %MODEL_DIR%
-    echo The application may fail to start without the model.
-    echo.
+REM Check if model directory exists (skip in mock mode)
+if "%USE_MOCK%"=="0" (
+    if not exist "%MODEL_DIR%" (
+        echo WARNING: Model adapter directory not found at %MODEL_DIR%
+        echo The application may fail to start without the model.
+        echo.
+    )
 )
 
 REM Check if app.py exists
@@ -173,11 +205,27 @@ if not exist "%BACKEND_DIR%\app.py" (
 )
 
 echo Starting Backend Server (Port 5000)...
-echo Model: %HF_BASE_MODEL_ID%
-echo Adapter: %LORA_ADAPTER_PATH%
+if "%USE_MOCK%"=="1" (
+    echo Mode: MOCK (--noinference)
+    echo Mock service will accept only: pass, fail, insufficient
+) else (
+    echo Model: %HF_BASE_MODEL_ID%
+    echo Adapter: %LORA_ADAPTER_PATH%
+)
 echo.
 echo Starting in a new window - you can minimize it if needed.
-start "Car Backend - Port 5000" cmd /k "cd /d %BACKEND_DIR% && set \"HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID%\" && set \"LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH%\" && set \"HF_TOKEN=%HF_TOKEN%\" && set \"HF_HOME=%HF_HOME%\" && %PYTHON_EXE% app.py"
+
+REM Build command with optional --noinference flag
+set BACKEND_CMD=cd /d %BACKEND_DIR%
+if "%USE_MOCK%"=="0" (
+    set BACKEND_CMD=%BACKEND_CMD% && set "HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID%" && set "LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH%" && set "HF_TOKEN=%HF_TOKEN%" && set "HF_HOME=%HF_HOME%"
+)
+set BACKEND_CMD=%BACKEND_CMD% && %PYTHON_EXE% app.py
+if "%USE_MOCK%"=="1" (
+    set BACKEND_CMD=%BACKEND_CMD% --noinference
+)
+
+start "Car Backend - Port 5000" cmd /k "%BACKEND_CMD%"
 
 REM Wait for backend to start (model load may take longer on first run)
 echo Waiting for backend to initialize (this may take 10-30 seconds on first run)...
