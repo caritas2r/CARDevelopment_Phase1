@@ -107,5 +107,17 @@ class CSVManager:
             return json.loads(json_str)
         except json.JSONDecodeError:
             return None
+    
+    def remove_row(self, row_index: int):
+        """
+        Remove a row from the CSV
+        
+        Args:
+            row_index: Index of row to remove
+        """
+        if row_index >= len(self.rows):
+            raise IndexError(f"Row index {row_index} out of range")
+        
+        self.rows.pop(row_index)
 
 

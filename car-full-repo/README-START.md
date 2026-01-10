@@ -1,53 +1,134 @@
 # How to Start the Application
 
-This repository includes several launcher scripts to start both the backend and frontend servers automatically.
+This repository includes several launcher scripts to start both the backend and frontend servers automatically with full inference support.
 
 ## Quick Start (Windows - Recommended)
 
-**Double-click `start-app.bat`** - This is the easiest way to start both servers!
+**Double-click `create-venv.bat`** - This is the recommended way to start the application with inference end-to-end!
 
 The script will:
-1. Start the backend server (port 5000) in a new window
-2. Wait 10 seconds for the backend to initialize
-3. Start the frontend server (port 8000) in a new window
-4. Wait 5 seconds for the frontend to initialize
-5. **Automatically open your default browser to http://localhost:8000**
+1. **Create/verify the inference virtual environment** (`car_inference_env`)
+2. **Install PyTorch** (with GPU support if NVIDIA is detected, otherwise CPU)
+3. **Install all inference dependencies** (transformers, peft, accelerate, etc.)
+4. **Start the backend server** (port 5000) with inference model configured in a new window
+   - Sets up environment variables for model loading (`HF_BASE_MODEL_ID`, `LORA_ADAPTER_PATH`, `HF_HOME`)
+   - Uses the virtual environment Python to run `app.py` with full inference capabilities
+5. **Start the frontend server** (port 8000) in a new window
+6. **Automatically open your default browser** to http://localhost:8000
 
-**Note:** The servers run in visible windows so you can see logs. You can minimize them if needed. If the browser page doesn't load immediately, wait a few more seconds and refresh.
+**Note:** 
+- The servers run in visible windows so you can see logs. You can minimize them if needed.
+- First-time setup may take several minutes to download and install dependencies.
+- Model loading on first run may take 10-30 seconds.
+- If the browser page doesn't load immediately, wait a few more seconds and refresh.
+
+**Requirements:**
+- Python 3.10+ installed and in PATH
+- Model adapter directory at `car-models/qwen25_3b_base_MAPPED_v2` (or update the script)
+- `requirements.inference.txt` in the `car-back-end` directory
 
 ## Alternative Methods
 
-### Option 1: Batch File (Windows)
-- **File:** `start-app.bat`
+### Windows - Batch File with Inference Support
+- **File:** `create-venv.bat`
 - **Usage:** Double-click the file
-- **Best for:** Windows users who want the simplest solution
+- **Best for:** Windows users who want full inference support (recommended)
+- **Features:** Sets up venv, installs PyTorch and ML dependencies, starts application with inference model
 
-### Option 2: PowerShell Script (Windows)
+### Windows - PowerShell Script (Alternative)
 - **File:** `start-app.ps1`
 - **Usage:** Right-click → "Run with PowerShell"
 - **Note:** If you get an execution policy error, run:
   ```powershell
   Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
   ```
+- **Note:** This script also sets up the inference environment and starts both servers
 
-### Option 3: Python Script (Cross-platform)
+### Cross-platform - Python Script (Alternative)
 - **File:** `start-app.py`
 - **Usage:** 
   - Windows: Double-click (if Python is associated with .py files)
   - Or run: `python start-app.py`
 - **Best for:** Cross-platform compatibility
+- **Note:** This script also sets up the inference environment and starts both servers
+
+### Legacy Script (Not Recommended)
+- **File:** `start-app.bat`
+- **Status:** Redundant/nonfunctional - use `create-venv.bat` instead
 
 ## Manual Start (If Scripts Don't Work)
 
 If the launcher scripts don't work, you can start the servers manually:
 
-### Terminal 1 - Backend:
+### Step 1: Set up the Inference Environment
+
+First, create and activate the virtual environment:
+
 ```bash
 cd car-back-end
-python app.py
+python -m venv car_inference_env
+
+# Windows:
+car_inference_env\Scripts\activate
+
+# macOS/Linux:
+source car_inference_env/bin/activate
 ```
 
-### Terminal 2 - Frontend:
+Then install dependencies:
+
+```bash
+# Upgrade pip
+python -m pip install --upgrade pip
+
+# Install PyTorch (GPU if NVIDIA available, otherwise CPU)
+# For GPU (NVIDIA):
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+
+# For CPU:
+pip install torch
+
+# Install inference requirements
+pip install -r requirements.inference.txt
+```
+
+### Step 2: Set Environment Variables
+
+Set the following environment variables before starting:
+
+**Windows (Command Prompt):**
+```cmd
+set HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+set LORA_ADAPTER_PATH=path\to\car-models\qwen25_3b_base_MAPPED_v2
+set HF_HOME=path\to\repo\hf_cache
+```
+
+**Windows (PowerShell):**
+```powershell
+$env:HF_BASE_MODEL_ID = "Qwen/Qwen2.5-3B"
+$env:LORA_ADAPTER_PATH = "path\to\car-models\qwen25_3b_base_MAPPED_v2"
+$env:HF_HOME = "path\to\repo\hf_cache"
+```
+
+**macOS/Linux:**
+```bash
+export HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+export LORA_ADAPTER_PATH=path/to/car-models/qwen25_3b_base_MAPPED_v2
+export HF_HOME=path/to/repo/hf_cache
+```
+
+### Step 3: Start the Servers
+
+**Terminal 1 - Backend:**
+```bash
+cd car-back-end
+# Make sure the virtual environment is activated
+car_inference_env\Scripts\python.exe app.py  # Windows
+# or
+car_inference_env/bin/python app.py          # macOS/Linux
+```
+
+**Terminal 2 - Frontend:**
 ```bash
 cd car-front-end
 python -m http.server 8000

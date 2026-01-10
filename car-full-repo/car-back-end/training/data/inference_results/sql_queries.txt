@@ -1,0 +1,978 @@
+SQL QUERY RESULTS
+================================================================
+
+Total Records: 36
+Successful: 34
+Failed: 2
+
+================================================================
+
+================================================================
+Record #0
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I do a mix of commuting and traveling, which is why a crossover with good comfort matters, but I don’t want to spend more than $34k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'crossover'
+  2. 'commute'
+  3. 'travel'
+  4. 34000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('crossover') AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('commute','travel')) AND price <= 34000
+
+================================================================
+
+================================================================
+Record #1
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want enough space for groceries and trips, but I’m not trying to move furniture regularly, with a budget of $31k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE cargo_space = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'medium'
+  2. 'cargo'
+  3. 31000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE cargo_space = 'medium' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('cargo')) AND price <= 31000
+
+================================================================
+
+================================================================
+Record #2
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Looking for a smaller pickup that's easy to drive daily but still useful for hauling bikes or outdoor gear on weekends.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND cargo_space = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'pickup'
+  2. 'medium'
+  3. 'cargo'
+  4. 'off_road'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('pickup') AND cargo_space = 'medium' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('cargo','off_road'))
+
+================================================================
+
+================================================================
+Record #3
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me good all-around options under $35k with reasonable mileage.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 35000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE price <= 35000
+
+================================================================
+
+================================================================
+Record #4
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a Toyota Venza Hybrid, under $35k, with cloth seats but premium audio.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?,?,?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Toyota'
+  2. 'Venza'
+  3. 'cloth_seats'
+  4. 'hybrid'
+  5. 'plug_in_hybrid'
+  6. 'mild_hybrid'
+  7. 35000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Toyota') AND model IN ('Venza') AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('cloth_seats')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('hybrid','plug_in_hybrid','mild_hybrid')) AND price <= 35000
+
+================================================================
+
+================================================================
+Record #5
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m being pretty picky on specs because I plan to keep it for years. I’m looking for a 2017–2018 Audi Q5 as my next coupe and I want it between $22,000 and $28,000 with does not matter mileage; 2 owners max. It should be plug_in_hybrid with a cvt transmission and 4wd drivetrain, and it needs to fit seating for 8, 1 kid, no pets. Primary use cases are pleasure, luxury, off_road, so I want hatch access for loading and my maintenance priority is low cost. Must-haves: panoramic roof, roof rack, adaptive cruise control, lane departure warning, backup camera. Nice-to-haves: leather seats, heated steering wheel, rear parking sensors, ventilated seats. Please avoid: wireless charging. I prefer blue exterior, and I’m explicitly not shopping for minivan, crossover body styles.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND number_of_owners <= ? AND body_style IN (?) AND price >= ? AND transmission = ? AND drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?,?,?,?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?)) AND color IN (?) AND seating_capacity >= ? AND reliability = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?,?)) AND price <= ? AND body_style NOT IN (?,?) AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Audi'
+  2. 'Q5'
+  3. 2017
+  4. 2018
+  5. 2
+  6. 'coupe'
+  7. 22000
+  8. 'cvt'
+  9. '4WD'
+  10. 'panoramic_roof'
+  11. 'roof_rack'
+  12. 'adaptive_cruise_control'
+  13. 'lane_departure_warning'
+  14. 'backup_camera'
+  15. 'plug_in_hybrid'
+  16. 'blue'
+  17. 8
+  18. 'low'
+  19. 'pleasure'
+  20. 'luxury'
+  21. 'off_road'
+  22. 28000
+  23. 'minivan'
+  24. 'crossover'
+  25. 'wireless_charging'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Audi') AND model IN ('Q5') AND year >= 2017 AND year <= 2018 AND number_of_owners <= 2 AND body_style IN ('coupe') AND price >= 22000 AND transmission = 'cvt' AND drivetrain = '4WD' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('panoramic_roof','roof_rack','adaptive_cruise_control','lane_departure_warning','backup_camera')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('plug_in_hybrid')) AND color IN ('blue') AND seating_capacity >= 8 AND reliability = 'low' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('pleasure','luxury','off_road')) AND price <= 28000 AND body_style NOT IN ('minivan','crossover') AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('wireless_charging'))
+
+================================================================
+
+================================================================
+Record #6
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m being pretty picky on specs because I plan to keep it for years. I’m looking for a 2022–2024 Toyota Prius as my next hatchback within 25 miles of North Las Vegas, NV, and I want it under $30,000 with moderate mileage; owners not a major concern. It should be plug_in_hybrid with a cvt transmission and 4wd drivetrain, and it needs to fit seating for 6, 2 kids, 2 pets. Primary use cases are travel, family, so cargo is moderate and my maintenance priority is low cost. Must-haves: apple carplay, adaptive cruise control, panoramic roof. Nice-to-haves: third row seating, rear parking sensors, remote start, wireless charging. Please avoid: front parking sensors, blind spot monitoring, sunroof. I prefer silver or black exterior, and I’m explicitly not shopping for coupe, crossover body styles.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND body_style IN (?) AND transmission = ? AND drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?,?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?)) AND color IN (?,?) AND seating_capacity >= ? AND cargo_space = ? AND reliability = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?)) AND city = ? AND state_region = ? AND price <= ? AND body_style NOT IN (?,?) AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?,?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Toyota'
+  2. 'Prius'
+  3. 2022
+  4. 2024
+  5. 'hatchback'
+  6. 'cvt'
+  7. '4WD'
+  8. 'apple_carplay'
+  9. 'adaptive_cruise_control'
+  10. 'panoramic_roof'
+  11. 'plug_in_hybrid'
+  12. 'black'
+  13. 'silver'
+  14. 6
+  15. 'medium'
+  16. 'low'
+  17. 'family'
+  18. 'travel'
+  19. 'North Las Vegas'
+  20. 'NV'
+  21. 30000
+  22. 'coupe'
+  23. 'crossover'
+  24. 'front_parking_sensors'
+  25. 'blind_spot_monitoring'
+  26. 'sunroof'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Toyota') AND model IN ('Prius') AND year >= 2022 AND year <= 2024 AND body_style IN ('hatchback') AND transmission = 'cvt' AND drivetrain = '4WD' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('apple_carplay','adaptive_cruise_control','panoramic_roof')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('plug_in_hybrid')) AND color IN ('black','silver') AND seating_capacity >= 6 AND cargo_space = 'medium' AND reliability = 'low' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('family','travel')) AND city = 'North Las Vegas' AND state_region = 'NV' AND price <= 30000 AND body_style NOT IN ('coupe','crossover') AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('front_parking_sensors','blind_spot_monitoring','sunroof'))
+
+================================================================
+
+================================================================
+Record #7
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Pleasure car, performance first priority, under $50k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'performance'
+  2. 50000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('performance')) AND price <= 50000
+
+================================================================
+
+================================================================
+Record #8
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me BMW X5 dual_clutch transmission cars within 75 miles, no tow package.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND transmission = ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'BMW'
+  2. 'X5'
+  3. 'dual_clutch'
+  4. 'tow_package'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('BMW') AND model IN ('X5') AND transmission = 'dual_clutch' AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('tow_package'))
+
+================================================================
+
+================================================================
+Record #9
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me cvt transmission cars within 50 miles, with rear parking sensors.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE transmission = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'cvt'
+  2. 'rear_parking_sensors'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE transmission = 'cvt' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('rear_parking_sensors'))
+
+================================================================
+
+================================================================
+Record #10
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a truck that balances work usefulness with everyday comfort.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'truck'
+  2. 'work_light'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('truck') AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('work_light'))
+
+================================================================
+
+================================================================
+Record #11
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me convertible vehicles around $30000, with leather seats.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'convertible'
+  2. 'leather_seats'
+  3. 30000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('convertible') AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('leather_seats')) AND price <= 30000
+
+================================================================
+
+================================================================
+Record #12
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me truck vehicles max $20000, with rear entertainment system.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'truck'
+  2. 'rear_entertainment_system'
+  3. 20000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('truck') AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('rear_entertainment_system')) AND price <= 20000
+
+================================================================
+
+================================================================
+Record #13
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a 2019 Honda Accord, automatic, under $26k, with adaptive cruise control but Android Auto instead.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND transmission = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Honda'
+  2. 'Accord'
+  3. 2019
+  4. 2019
+  5. 'automatic'
+  6. 'adaptive_cruise_control'
+  7. 26000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Honda') AND model IN ('Accord') AND year >= 2019 AND year <= 2019 AND transmission = 'automatic' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('adaptive_cruise_control')) AND price <= 26000
+
+================================================================
+
+================================================================
+Record #14
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m looking for a 2017+ Tesla Model Y in the crossover category, located within 15 miles of Cleveland, OH. Budget is under $25,000, with moderate mileage. It should be diesel-powered, have a manual transmission and AWD drivetrain. Primary use will be outdoor trips, commuting, and ownership costs should stay balanced. Must-have features include premium audio, panoramic roof, sunroof, heated seats; nice to have blind spot monitoring, and I want to avoid adaptive cruise control. Preferred exterior colors are silver.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND body_style IN (?) AND transmission = ? AND drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?,?,?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?)) AND color IN (?) AND reliability = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?)) AND city = ? AND state_region = ? AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Tesla'
+  2. 'Model Y'
+  3. 2017
+  4. 'crossover'
+  5. 'manual'
+  6. 'AWD'
+  7. 'premium_audio'
+  8. 'panoramic_roof'
+  9. 'sunroof'
+  10. 'heated_seats'
+  11. 'diesel'
+  12. 'silver'
+  13. 'medium'
+  14. 'travel'
+  15. 'commute'
+  16. 'Cleveland'
+  17. 'OH'
+  18. 25000
+  19. 'adaptive_cruise_control'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Tesla') AND model IN ('Model Y') AND year >= 2017 AND body_style IN ('crossover') AND transmission = 'manual' AND drivetrain = 'AWD' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('premium_audio','panoramic_roof','sunroof','heated_seats')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('diesel')) AND color IN ('silver') AND reliability = 'medium' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('travel','commute')) AND city = 'Cleveland' AND state_region = 'OH' AND price <= 25000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('adaptive_cruise_control'))
+
+================================================================
+
+================================================================
+Record #15
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a minivan that’s family focused, preferably Toyota or Honda, under $40k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'minivan'
+  2. 'family'
+  3. 40000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('minivan') AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('family')) AND price <= 40000
+
+================================================================
+
+================================================================
+Record #16
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want performance-first priorities, but comfort matters more than speed.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'performance'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('performance'))
+
+================================================================
+
+================================================================
+Record #17
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want Apple CarPlay and Android Auto, but not a cluttered infotainment system.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'apple_carplay'
+  2. 'android_auto'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('apple_carplay','android_auto'))
+
+================================================================
+
+================================================================
+Record #18
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me all 2013 Mazda RX-8 approximately $40000.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Mazda'
+  2. 'RX-8'
+  3. 2013
+  4. 2013
+  5. 40000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Mazda') AND model IN ('RX-8') AND year >= 2013 AND year <= 2013 AND price <= 40000
+
+================================================================
+
+================================================================
+Record #19
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a Toyota Tacoma, automatic, under $34k, with 4WD but no tow package.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND transmission = ? AND drivetrain = ? AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Toyota'
+  2. 'Tacoma'
+  3. 'automatic'
+  4. '4WD'
+  5. 34000
+  6. 'tow_package'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Toyota') AND model IN ('Tacoma') AND transmission = 'automatic' AND drivetrain = '4WD' AND price <= 34000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('tow_package'))
+
+================================================================
+
+================================================================
+Record #20
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want something that feels modern and well-equipped without being excessive. I’m looking for a 2015–2025 Volkswagen Golf GTI as my next truck and I want it under $28,000 with under 60,000 miles; no more than 3 owners. It should be mild_hybrid with a dual_clutch transmission and 4wd drivetrain, and it needs to fit seating for 5, 3 kids, 1 pet. Primary use cases are rideshare, commute, travel, so cargo matters a lot and my maintenance priority is luxury ok. Must-haves: ventilated seats, lane keep assist, premium audio, apple carplay, blind spot monitoring. Nice-to-haves: leather seats, front parking sensors, heated steering wheel. Please avoid: roof rack, android auto. I prefer black or blue exterior, and I’m explicitly not shopping for coupe body styles.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND trim = ? AND year >= ? AND year <= ? AND mileage <= ? AND number_of_owners <= ? AND transmission = ? AND drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?,?,?,?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?)) AND color IN (?,?) AND seating_capacity >= ? AND cargo_space = ? AND reliability = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?,?)) AND price <= ? AND body_style NOT IN (?) AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Volkswagen'
+  2. 'Golf'
+  3. 'GTI'
+  4. 2015
+  5. 2025
+  6. 60000
+  7. 3
+  8. 'dual_clutch'
+  9. '4WD'
+  10. 'ventilated_seats'
+  11. 'lane_keep_assist'
+  12. 'premium_audio'
+  13. 'apple_carplay'
+  14. 'blind_spot_monitoring'
+  15. 'mild_hybrid'
+  16. 'black'
+  17. 'blue'
+  18. 5
+  19. 'high'
+  20. 'high'
+  21. 'commute'
+  22. 'travel'
+  23. 'rideshare'
+  24. 28000
+  25. 'coupe'
+  26. 'roof_rack'
+  27. 'android_auto'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Volkswagen') AND model IN ('Golf') AND trim = 'GTI' AND year >= 2015 AND year <= 2025 AND mileage <= 60000 AND number_of_owners <= 3 AND transmission = 'dual_clutch' AND drivetrain = '4WD' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('ventilated_seats','lane_keep_assist','premium_audio','apple_carplay','blind_spot_monitoring')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('mild_hybrid')) AND color IN ('black','blue') AND seating_capacity >= 5 AND cargo_space = 'high' AND reliability = 'high' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('commute','travel','rideshare')) AND price <= 28000 AND body_style NOT IN ('coupe') AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('roof_rack','android_auto'))
+
+================================================================
+
+================================================================
+Record #21
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me all 2014 Jeep Patriot under $30000, with panoramic roof, no sliding doors.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Jeep'
+  2. 'Patriot'
+  3. 2014
+  4. 2014
+  5. 'panoramic_roof'
+  6. 30000
+  7. 'sliding_doors'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Jeep') AND model IN ('Patriot') AND year >= 2014 AND year <= 2014 AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('panoramic_roof')) AND price <= 30000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('sliding_doors'))
+
+================================================================
+
+================================================================
+Record #22
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m interested in FWD, but not something underpowered, and I still want decent acceleration.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'FWD'
+  2. 'performance'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE drivetrain = 'FWD' AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('performance'))
+
+================================================================
+
+================================================================
+Record #23
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m looking for an SUV-style vehicle that’s easy to drive daily, and I don’t want to go beyond $35k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'suv'
+  2. 'commute'
+  3. 35000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('suv') AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('commute')) AND price <= 35000
+
+================================================================
+
+================================================================
+Record #24
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m searching for a Chevrolet Colorado, automatic, under $32k, with heated seats and tow package, but not a full-size truck.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND body_style IN (?) AND transmission = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?)) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?)) AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Chevrolet'
+  2. 'Colorado'
+  3. 'truck'
+  4. 'automatic'
+  5. 'heated_seats'
+  6. 'tow_package'
+  7. 'cargo'
+  8. 'towing'
+  9. 32000
+  10. 'full_size'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Chevrolet') AND model IN ('Colorado') AND body_style IN ('truck') AND transmission = 'automatic' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('heated_seats','tow_package')) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('cargo','towing')) AND price <= 32000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('full_size'))
+
+================================================================
+
+================================================================
+Record #25
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me all 2021 Subaru Brat approximately $30000, with backup camera, no adaptive cruise control.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Subaru'
+  2. 'Brat'
+  3. 2021
+  4. 2021
+  5. 'backup_camera'
+  6. 30000
+  7. 'adaptive_cruise_control'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Subaru') AND model IN ('Brat') AND year >= 2021 AND year <= 2021 AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('backup_camera')) AND price <= 30000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('adaptive_cruise_control'))
+
+================================================================
+
+================================================================
+Record #26
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I'm after a minivan with diesel power, 4WD, and a manual transmission. My budget is around $30000. It needs to handle travel, animals, commute use. It must have lane keep assist, premium audio; I'd like to avoid adaptive cruise control. Nice to have roof rack, panoramic roof. Prefer 2021+ and under 80000 miles. If possible, Hyundai Sonata.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND mileage <= ? AND body_style IN (?) AND transmission = ? AND drivetrain = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?,?)) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?)) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?,?,?)) AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Hyundai'
+  2. 'Sonata'
+  3. 2021
+  4. 80000
+  5. 'minivan'
+  6. 'manual'
+  7. '4WD'
+  8. 'lane_keep_assist'
+  9. 'premium_audio'
+  10. 'diesel'
+  11. 'animals'
+  12. 'commute'
+  13. 'travel'
+  14. 30000
+  15. 'adaptive_cruise_control'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Hyundai') AND model IN ('Sonata') AND year >= 2021 AND mileage <= 80000 AND body_style IN ('minivan') AND transmission = 'manual' AND drivetrain = '4WD' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('lane_keep_assist','premium_audio')) AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('diesel')) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('animals','commute','travel')) AND price <= 30000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('adaptive_cruise_control'))
+
+================================================================
+
+================================================================
+Record #27
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m looking for a commuter car that won’t give me headaches, under about twenty-five grand, with modern tech like Apple CarPlay.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'apple_carplay'
+  2. 'commute'
+  3. 25000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('apple_carplay')) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('commute')) AND price <= 25000
+
+================================================================
+
+================================================================
+Record #28
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a vehicle that feels modern and comfortable without being luxurious.
+
+CONVERSION FAILED:
+----------------------------------------------------------------
+Inconclusive search results, please refine your query criteria.
+
+================================================================
+
+================================================================
+Record #29
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me Saab 9-5 cvt transmission cars within 100 miles, with apple carplay.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND transmission = ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Saab'
+  2. '9-5'
+  3. 'cvt'
+  4. 'apple_carplay'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Saab') AND model IN ('9-5') AND transmission = 'cvt' AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('apple_carplay'))
+
+================================================================
+
+================================================================
+Record #30
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m not super picky, I just want something that works well overall.
+
+CONVERSION FAILED:
+----------------------------------------------------------------
+Inconclusive search results, please refine your query criteria.
+
+================================================================
+
+================================================================
+Record #31
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Sedan with strong performance but still practical, under $36k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'sedan'
+  2. 'performance'
+  3. 36000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE body_style IN ('sedan') AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('performance')) AND price <= 36000
+
+================================================================
+
+================================================================
+Record #32
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I’m drawn to vehicles with thoughtful interior features, as long as they stay under $34k.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 34000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE price <= 34000
+
+================================================================
+
+================================================================
+Record #33
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+I want a hybrid that prioritizes efficiency, but I don’t want to think about efficiency at all.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE fuel_economy = ? AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN (?,?,?)) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'high'
+  2. 'hybrid'
+  3. 'plug_in_hybrid'
+  4. 'mild_hybrid'
+  5. 'performance'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE fuel_economy = 'high' AND EXISTS (SELECT 1 FROM vehicle_powertrain_types jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.powertrain_type IN ('hybrid','plug_in_hybrid','mild_hybrid')) AND EXISTS (SELECT 1 FROM vehicle_use_case_tags jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.use_case_tag IN ('performance'))
+
+================================================================
+
+================================================================
+Record #34
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me all 2012 Toyota Land Cruiser below $30000, with sunroof.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND year >= ? AND year <= ? AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ?
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Toyota'
+  2. 'Land Cruiser'
+  3. 2012
+  4. 2012
+  5. 'sunroof'
+  6. 30000
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Toyota') AND model IN ('Land Cruiser') AND year >= 2012 AND year <= 2012 AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('sunroof')) AND price <= 30000
+
+================================================================
+
+================================================================
+Record #35
+================================================================
+
+INPUT TEXT:
+----------------------------------------------------------------
+Show me Jaguar XJ Series minivan vehicles below $30000, with built in navigation, no wireless charging.
+
+SQL QUERY:
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN (?) AND model IN (?) AND body_style IN (?) AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?)) AND price <= ? AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN (?))
+
+SQL PARAMETERS:
+----------------------------------------------------------------
+  1. 'Jaguar'
+  2. 'XJ'
+  3. 'minivan'
+  4. 'built_in_navigation'
+  5. 30000
+  6. 'wireless_charging'
+
+FORMATTED QUERY (for reference only):
+----------------------------------------------------------------
+SELECT * FROM vehicles WHERE make IN ('Jaguar') AND model IN ('XJ') AND body_style IN ('minivan') AND EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('built_in_navigation')) AND price <= 30000 AND NOT EXISTS (SELECT 1 FROM vehicle_features jt WHERE jt.vehicle_id = vehicles.vehicle_id AND jt.feature_tag IN ('wireless_charging'))
+
+================================================================

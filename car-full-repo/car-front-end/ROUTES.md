@@ -50,11 +50,4 @@ Both pages have navigation buttons in the header:
 
 3. Check browser console for CSS errors
 
-## Testing Routes
-
-1. Start both servers (backend on 5000, frontend on 8000)
-2. Open `http://localhost:8000/` - should show home page with "System Status" card
-3. Click "View DB Schema" button - should navigate to schema page
-4. Click "Back to Home" button - should navigate back to home page
-5. Manually navigate to `http://localhost:8000/#/db-schema` - should show schema page
 

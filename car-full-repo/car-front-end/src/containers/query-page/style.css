@@ -1,5 +1,10 @@
 /* Query Page Styles - Carbon Design System v11 */
 
+/* CSS Variables (if not defined globally) */
+:root {
+    --cds-support-warning: #f1c21b;
+}
+
 /* Query card using Carbon tile pattern */
 .cds-query-card {
     grid-column: 4 / 14;
@@ -112,6 +117,28 @@
     margin-top: 1rem;
 }
 
+/* Warning status indicator (same yellow/orange as loading) */
+.cds-status-indicator.warning {
+    background-color: #fff3cd;
+    border-left: 4px solid var(--cds-support-warning);
+}
+
+.cds-status-indicator.warning .cds-status-text {
+    color: #8c6800;
+}
+
+.cds-status-details.warning {
+    background-color: #fffbf0;
+}
+
+.cds-status-details.warning p {
+    color: #8c6800;
+}
+
+.cds-status-details.warning strong {
+    color: #8c6800;
+}
+
 /* Action buttons in main content */
 .cds-action-buttons {
     margin-top: 2rem;
@@ -171,6 +198,87 @@
     line-height: 1.4;
     letter-spacing: 0.16px;
     color: var(--cds-text-primary);
+}
+
+/* Extracted Fields Display */
+.extracted-fields-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+}
+
+.extracted-fields-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+.extracted-fields-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 0.75rem;
+}
+
+.extracted-field-item {
+    padding: 0.5rem;
+    background-color: var(--cds-layer);
+    border-left: 3px solid var(--cds-interactive);
+    font-size: 0.875rem;
+    line-height: 1.43;
+    letter-spacing: 0.16px;
+}
+
+.extracted-field-item strong {
+    font-weight: 600;
+    color: var(--cds-text-primary);
+    margin-right: 0.5rem;
+}
+
+.extracted-field-item {
+    color: var(--cds-text-secondary);
+}
+
+/* SQL Query Display */
+.sql-query-container {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--cds-background);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+}
+
+.sql-query-container h3 {
+    margin: 0 0 1rem 0;
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.16px;
+    color: var(--cds-text-primary);
+}
+
+.sql-query-display {
+    margin: 0;
+    padding: 1rem;
+    background-color: var(--cds-layer);
+    border: 1px solid var(--cds-border-subtle);
+    border-radius: 0;
+    font-family: 'IBM Plex Mono', 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    letter-spacing: 0;
+    color: var(--cds-text-primary);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-x: auto;
+    max-height: 400px;
+    overflow-y: auto;
 }
 
 /* Responsive adjustments */

@@ -35,18 +35,23 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
 
 ### Key Vocabularies
 
-- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck, unspecified
-- **Use Cases**: family, animals, commute, cargo, travel, work_light, pleasure, performance, unspecified
-- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating, unspecified
-- **Powertrain Types**: gas, hybrid, plug_in_hybrid, electric, diesel, unspecified
+- **Body Styles**: sedan, coupe, hatchback, wagon, suv, crossover, van, truck, convertible, minivan, unspecified
+- **Use Cases**: family, animals, commute, cargo, travel, work_light, pleasure, performance, rideshare, towing, off_road, luxury, budget_value, unspecified
+- **Features**: backup_camera, blind_spot_monitoring, adaptive_cruise_control, apple_carplay, android_auto, heated_seats, leather_seats, sunroof, third_row_seating, lane_keep_assist, lane_departure_warning, front_parking_sensors, rear_parking_sensors, remote_start, heated_steering_wheel, ventilated_seats, wireless_charging, premium_audio, built_in_navigation, roof_rack, tow_package, panoramic_roof, memory_seats, keyless_entry, unspecified
+- **Powertrain Types**: gas, hybrid, plug_in_hybrid, electric, diesel, mild_hybrid, unspecified
   - **Note**: `powertrain_type` is an **array** - users can select multiple types (e.g., gas, hybrid, electric)
+- **Transmission**: automatic, manual, other, cvt, dual_clutch, unspecified
 - **Drivetrains**: AWD, 4WD, FWD, RWD, unspecified
+- **Maintenance Priority**: low_cost, balanced, performance_first, luxury_ok, unspecified
+- **Mileage Qualitative**: low, moderate, high, low_or_moderate, very_low, very_high, does_not_matter, unspecified
 - **Colors**: black, white, silver, gray, grey, red, blue, green, brown, beige, tan, gold, orange, yellow, purple, burgundy, maroon, navy, teal, pink, unspecified
 
 ## Key Schema Features
 
 - **"unspecified" sentinel**: All enum fields use "unspecified" instead of null to represent "not mentioned"
 - **Array fields**: Several fields support multiple selections:
+  - `make[]` - **Array of make names** (e.g., ["Toyota", "Honda"] for multiple makes)
+  - `model[]` - **Array of model names** (e.g., ["Camry", "Accord"] for multiple models)
   - `vehicle_type.include_body_styles[]` - Array of body styles
   - `vehicle_type.exclude_body_styles[]` - Array of excluded body styles
   - `intended_use.use_case_tags[]` - Array of use case tags
@@ -54,9 +59,12 @@ All enum values are defined in `vehicle_selection_v1_vocab.py`. These should be 
   - `features_amenities.must_have[]` - Array of required features
   - `features_amenities.nice_to_have[]` - Array of preferred features
   - `features_amenities.avoid[]` - Array of features to avoid
+  - `preference_signals.color[]` - **Array of color preferences** (e.g., ["black", "silver"] for multiple colors)
+  - `ownership_constraints.mileage.qualitative[]` - **Array of qualitative mileage descriptions** (e.g., ["low", "moderate"] for multiple preferences)
 - **Integer/Number with unspecified**: Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners` can be integers/numbers or "unspecified"
+- **Mileage qualitative**: The `mileage.qualitative[]` field is an **array** that supports qualitative mileage descriptions (low, moderate, high, very_low, very_high, does_not_matter, or unspecified)
 - **Boolean with unspecified**: Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max` support "true", "false", or "unspecified"
-- **String fields**: `make` and `model` are plain strings (no enums), `trim` is a string with "unspecified" option
+- **String fields**: `trim` is a string with "unspecified" option. `make` and `model` are now **arrays of strings** to support multiple makes/models
 
 ## Usage for Training
 
@@ -80,16 +88,22 @@ When creating training examples, ensure:
 ```json
 {
   "query_text": "I need an SUV for my family of 5, under $30k, with AWD and backup camera",
+  "make": ["unspecified"],
+  "model": ["unspecified"],
+  "trim": "unspecified",
   "vehicle_type": {
     "include_body_styles": ["suv"],
-    "exclude_body_styles": []
+    "exclude_body_styles": ["unspecified"]
   },
   "capacity_practicality": {
     "min_seating_capacity": 5,
-    "kid_count": null,
-    "pet_count": null,
-    "cargo_priority": null,
-    "cargo_flexibility": {}
+    "kid_count": "unspecified",
+    "pet_count": "unspecified",
+    "cargo_priority": "unspecified",
+    "cargo_flexibility": {
+      "wants_hatch_access": "unspecified",
+      "wants_fold_flat_seats": "unspecified"
+    }
   },
   "intended_use": {
     "use_case_tags": ["family"]
@@ -102,29 +116,35 @@ When creating training examples, ensure:
   },
   "features_amenities": {
     "must_have": ["backup_camera"],
-    "nice_to_have": [],
-    "avoid": []
+    "nice_to_have": ["unspecified"],
+    "avoid": ["unspecified"]
   },
   "ownership_constraints": {
     "budget": {
-      "currency": "USD",
-      "min": null,
+      "currency": 840,
+      "min": "unspecified",
       "max": 30000,
-      "strict_max": true
+      "strict_max": "unspecified"
     },
     "year": {
-      "min": null,
-      "max": null
+      "min": "unspecified",
+      "max": "unspecified"
     },
     "mileage": {
-      "max": null,
-      "qualitative": null
-    }
+      "max": "unspecified",
+      "qualitative": ["unspecified"]
+    },
+    "number_of_owners": "unspecified"
   },
   "preference_signals": {
-    "reliability_maintenance_priority": "unspecified"
+    "reliability_maintenance_priority": "unspecified",
+    "color": ["unspecified"]
   },
-  "location_constraints": null
+  "location_constraints": {
+    "city": "unspecified",
+    "state_region": "unspecified",
+    "radius_miles": "unspecified"
+  }
 }
 ```
 

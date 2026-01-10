@@ -40,17 +40,24 @@ car-full-repo/
 │   │   ├── field_prompter.py        # Field input prompting
 │   │   ├── schema_traverser.py      # Schema traversal logic
 │   │   ├── reset_csv.py             # CSV reset utility
-│   │   ├── prompts.csv              # Sample prompts CSV
+│   │   ├── unannotated_nlp_prompts.csv  # Source prompts (input, never modified)
+│   │   ├── annotated_nlp_prompts.csv    # Completed annotations (output)
+│   │   ├── prompts.csv              # Sample prompts CSV (for direct mode)
 │   │   └── README.md                # Training pipeline documentation
-│   ├── utils/                       # Utility scripts
-│   │   ├── __init__.py
-│   │   ├── database_setup_script.py # Database setup script
-│   │   ├── db_bootstrap.py          # Database schema bootstrap (PoC pattern)
-│   │   ├── DB_BOOTSTRAP_README.md   # Database bootstrap documentation
-│   │   ├── inspect_database.py      # Database inspection utility
-│   │   └── schema_validator.py      # Schema validation utility
-│   └── docs/                        # Documentation
-│       └── json_to_db_mapping.md    # JSON schema to database mapping
+│   ├── scripts/                     # Utility scripts
+│   │   ├── test_pipeline.py         # Pipeline testing script
+│   │   └── ...                      # Other utility scripts
+│   └── utils/                       # Utility scripts
+│       ├── __init__.py
+│       ├── database_setup_script.py # Database setup script
+│       ├── db_bootstrap.py          # Database schema bootstrap (PoC pattern)
+│       ├── DB_BOOTSTRAP_README.md   # Database bootstrap documentation
+│       ├── inspect_database.py      # Database inspection utility
+│       └── schema_validator.py      # Schema validation utility
+│   ├── docs/                        # Documentation
+│   │   ├── json_to_db_mapping.md    # JSON schema to database mapping
+│   │   ├── end_to_end_pipeline.md   # End-to-end pipeline documentation
+│   │   └── training_and_inference.md # Training and inference documentation
 │
 └── car-front-end/                   # Lightweight frontend
     ├── index.html                   # Main HTML file
@@ -74,57 +81,86 @@ car-full-repo/
 
 ## Quick Start
 
-### Option 1: Use the Launcher Script (Recommended)
+### Option 1: Use the Launcher Script with Inference (Recommended)
 
-**Windows:**
+**Windows (Recommended):**
 ```bash
-start-app.bat
+create-venv.bat
 ```
 
-**PowerShell:**
-```powershell
-.\start-app.ps1
-```
-
-**Python (Cross-platform):**
-```bash
-python start-app.py
-```
-
-This will automatically:
-- Start the backend server on port 5000
+This script will automatically:
+- Create/verify the inference virtual environment (`car_inference_env`)
+- Install PyTorch (with GPU support if NVIDIA is detected, otherwise CPU)
+- Install all ML inference dependencies (transformers, peft, accelerate, safetensors, etc.)
+- Set up environment variables for model inference
+- Start the backend server on port 5000 with full inference capabilities
 - Start the frontend server on port 8000
 - Open your browser to the frontend
 
-### Option 2: Manual Setup
+**Alternative Scripts:**
+- **PowerShell:** `.\start-app.ps1` (also sets up inference environment)
+- **Cross-platform Python:** `python start-app.py` (also sets up inference environment)
 
-#### Backend Setup
+**Note:** `start-app.bat` is legacy/redundant - use `create-venv.bat` instead.
+
+### Option 2: Manual Setup (Without Launcher Scripts)
+
+#### Backend Setup with Inference
 
 1. Navigate to the backend directory:
 ```bash
 cd car-back-end
 ```
 
-2. Create and activate a virtual environment:
+2. Create and activate the inference virtual environment:
 ```bash
-python -m venv venv
+python -m venv car_inference_env
 # Windows:
-venv\Scripts\activate
+car_inference_env\Scripts\activate
 # macOS/Linux:
-source venv/bin/activate
+source car_inference_env/bin/activate
 ```
 
-3. Install dependencies:
+3. Install PyTorch (GPU if NVIDIA available, otherwise CPU):
 ```bash
-pip install -r requirements.txt
+# For GPU (NVIDIA):
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+
+# For CPU:
+pip install torch
 ```
 
-4. Run the Flask server:
+4. Install inference dependencies:
+```bash
+pip install -r requirements.inference.txt
+```
+
+5. Set environment variables for model inference:
+```bash
+# Windows (Command Prompt):
+set HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+set LORA_ADAPTER_PATH=path\to\car-models\qwen25_3b_base_MAPPED_v2
+set HF_HOME=path\to\repo\hf_cache
+
+# Windows (PowerShell):
+$env:HF_BASE_MODEL_ID = "Qwen/Qwen2.5-3B"
+$env:LORA_ADAPTER_PATH = "path\to\car-models\qwen25_3b_base_MAPPED_v2"
+$env:HF_HOME = "path\to\repo\hf_cache"
+
+# macOS/Linux:
+export HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+export LORA_ADAPTER_PATH=path/to/car-models/qwen25_3b_base_MAPPED_v2
+export HF_HOME=path/to/repo/hf_cache
+```
+
+6. Run the Flask server:
 ```bash
 python app.py
 ```
 
-The API will be available at `http://localhost:5000`
+The API will be available at `http://localhost:5000` with full inference support.
+
+**Note:** For basic setup without inference (e.g., testing API endpoints only), you can use `requirements.txt` instead of `requirements.inference.txt`, but inference queries will not work.
 
 #### Frontend Setup
 
@@ -206,10 +242,15 @@ cd car-front-end
 
 ### Training Pipeline
 - Interactive annotation tool for labeling NLP prompts
+- Two-file workflow: `unannotated_nlp_prompts.csv` → `annotated_nlp_prompts.csv` (original file never modified)
+- Automatic duplicate detection (by ID) - skips already processed prompts (only counts rows marked as "complete")
 - CSV-based data management
-- Schema-aware field prompting
+- Schema-aware field prompting with default "unspecified" values (press Enter to accept)
+- **Schema reference window** - displays all enum values and types (stays open throughout session)
+- **Prompt window** - displays current NLP prompt (closes after each annotation)
 - Support for arrays, enums, and complex nested structures
 - Progress tracking and resume capability
+- Temporary file workflow for safe processing
 
 ## Architecture
 
@@ -271,19 +312,20 @@ The system uses a structured schema for vehicle selection queries. This schema:
 - Defines a frozen V1 contract for NLP-to-JSON translation
 - Includes canonical vocabularies for consistent training
 - Supports comprehensive vehicle selection criteria:
+  - **Make and model** - **arrays of strings** (supports multiple makes/models)
   - Vehicle type (body styles) - arrays for include/exclude
   - Capacity and practicality (seating, cargo, kids, pets)
   - Intended use cases - array of tags
   - Powertrain and drivability - **powertrain_type is an array** (supports multiple selections like gas, hybrid, electric)
   - Features and amenities - arrays for must-have, nice-to-have, avoid
   - Ownership constraints (budget, year, mileage, number_of_owners)
-  - Preference signals (reliability, color)
+  - Preference signals (reliability, **color as array**)
   - Location constraints
-  - Make, model, trim (string fields)
+  - Trim (string field)
 
 **Key Features:**
 - Uses "unspecified" as sentinel value instead of null for enum fields
-- Supports arrays for multi-select fields (body styles, powertrain types, features, use cases)
+- Supports arrays for multi-select fields: **make, model, body styles, powertrain types, features, use cases, colors, mileage qualitative**
 - Integer/number fields can be values or "unspecified"
 - Boolean fields support "true", "false", or "unspecified"
 

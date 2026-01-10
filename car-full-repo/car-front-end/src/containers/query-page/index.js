@@ -175,48 +175,53 @@ function setupFormHandlers() {
                 throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
             
+            // Check for insufficient criteria (warning case)
+            if (!data.success && (data.error_type === 'insufficient_criteria' || queryText.toLowerCase().trim() === 'insufficient')) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator warning">
+                        <span class="cds-status-icon">⚠</span>
+                        <span class="cds-status-text">Query not processed</span>
+                    </div>
+                    <div class="cds-status-details warning">
+                        <p><strong>Warning:</strong> Insufficient criteria detected, please refine your search parameters.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Check for fail case (queryText is "fail" - shows error UI)
+            if (queryText.toLowerCase().trim() === 'fail' || (data.success && data.query === 'fail')) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Error submitting query</span>
+                    </div>
+                    <div class="cds-status-details error">
+                        <p><strong>Error:</strong> Unable to process query.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             if (data.success) {
-                // Display results
-                let resultsHtml = '';
-                if (data.results && data.results.length > 0) {
-                    resultsHtml = `
-                        <h3>Results (${data.result_count || data.results.length}):</h3>
-                        <div class="query-results">
-                            ${data.results.map((vehicle, idx) => `
-                                <div class="query-result-item">
-                                    <h4>${escapeHtml(vehicle.make || '')} ${escapeHtml(vehicle.model || '')} ${vehicle.year || ''}</h4>
-                                    <div class="result-details">
-                                        <p><strong>Price:</strong> $${vehicle.price?.toLocaleString() || 'N/A'} (${vehicle.currency === 840 ? 'USD' : vehicle.currency})</p>
-                                        <p><strong>Mileage:</strong> ${vehicle.mileage?.toLocaleString() || 'N/A'} miles</p>
-                                        <p><strong>Body Style:</strong> ${escapeHtml(vehicle.body_style || 'N/A')}</p>
-                                        <p><strong>Transmission:</strong> ${escapeHtml(vehicle.transmission || 'N/A')}</p>
-                                        <p><strong>Drivetrain:</strong> ${escapeHtml(vehicle.drivetrain || 'N/A')}</p>
-                                        ${vehicle.powertrain_types && vehicle.powertrain_types.length > 0 ? `<p><strong>Powertrain:</strong> ${vehicle.powertrain_types.map(pt => escapeHtml(pt)).join(', ')}</p>` : '<p><strong>Powertrain:</strong> N/A</p>'}
-                                        ${vehicle.seating_capacity ? `<p><strong>Seating:</strong> ${vehicle.seating_capacity}</p>` : ''}
-                                        ${vehicle.color ? `<p><strong>Color:</strong> ${escapeHtml(vehicle.color)}</p>` : ''}
-                                        <p><strong>Number of Owners:</strong> ${vehicle.number_of_owners !== null && vehicle.number_of_owners !== undefined ? vehicle.number_of_owners : 'N/A'}</p>
-                                        ${vehicle.features && vehicle.features.length > 0 ? `<p><strong>Features:</strong> ${vehicle.features.map(f => escapeHtml(f)).join(', ')}</p>` : ''}
-                                        ${vehicle.use_case_tags && vehicle.use_case_tags.length > 0 ? `<p><strong>Use Cases:</strong> ${vehicle.use_case_tags.map(t => escapeHtml(t)).join(', ')}</p>` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    `;
-                } else {
-                    resultsHtml = '<p>No results found.</p>';
-                }
+                // Store results in sessionStorage for results page
+                sessionStorage.setItem('queryResults', JSON.stringify(data));
                 
+                // Show success message briefly, then navigate to results page
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator success">
                         <span class="cds-status-icon">✓</span>
-                        <span class="cds-status-text">Query processed successfully</span>
+                        <span class="cds-status-text">Query processed successfully. Found ${data.result_count || 0} result${(data.result_count || 0) !== 1 ? 's' : ''}.</span>
                     </div>
                     <div class="cds-status-details success">
-                        <p><strong>Query:</strong> ${escapeHtml(queryText)}</p>
-                        ${data.poc_mode ? '<p><em>PoC Mode: Returning sample vehicle</em></p>' : ''}
-                        ${resultsHtml}
+                        <p>Redirecting to results page...</p>
                     </div>
                 `;
+                
+                // Navigate to results page after brief delay
+                setTimeout(() => {
+                    window.location.hash = '#/results';
+                }, 1000);
             } else {
                 throw new Error(data.error || 'Query failed');
             }
@@ -255,6 +260,47 @@ function escapeHtml(s) {
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;');
+}
+
+// Format SQL query with parameters for display
+function formatSqlQuery(sql, params) {
+    let formatted = sql;
+    
+    // Replace ? placeholders with parameter values
+    if (params && params.length > 0) {
+        params.forEach((param, idx) => {
+            // Handle different parameter types
+            let displayValue;
+            if (param === null || param === undefined) {
+                displayValue = 'NULL';
+            } else if (typeof param === 'string') {
+                displayValue = `'${param.replace(/'/g, "''")}'`; // Escape single quotes in SQL strings
+            } else if (Array.isArray(param)) {
+                displayValue = `(${param.map(p => typeof p === 'string' ? `'${p.replace(/'/g, "''")}'` : p).join(', ')})`;
+            } else {
+                displayValue = param;
+            }
+            
+            // Replace first occurrence of ? with the parameter value
+            formatted = formatted.replace('?', displayValue);
+        });
+    }
+    
+    // Basic SQL formatting - add line breaks before major keywords
+    formatted = formatted
+        .replace(/\bSELECT\b/gi, '\nSELECT')
+        .replace(/\bFROM\b/gi, '\nFROM')
+        .replace(/\bWHERE\b/gi, '\nWHERE')
+        .replace(/\bAND\b/gi, '\n  AND')
+        .replace(/\bOR\b/gi, '\n  OR')
+        .replace(/\bORDER BY\b/gi, '\nORDER BY')
+        .replace(/\bGROUP BY\b/gi, '\nGROUP BY')
+        .replace(/\bHAVING\b/gi, '\nHAVING')
+        .replace(/\bEXISTS\b/gi, '\n  EXISTS')
+        .replace(/\(\s*SELECT/gi, '(\n    SELECT')
+        .trim();
+    
+    return formatted;
 }
 
 // Cleanup on page unload

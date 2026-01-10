@@ -1,187 +1,107 @@
-# Training Annotation Tool
+# Training Data Pipeline
 
-A CLI tool for annotating NLP prompts with structured JSON schema values for training an NLP model.
+This directory contains the complete pipeline for annotating NLP prompts and preparing training data for the vehicle selection model.
 
-## Overview
-
-This tool helps you create training data by:
-1. Loading prompts from a CSV file
-2. Iterating through the Vehicle Selection V1 JSON schema recursively
-3. Prompting you to select enum values or enter data for each field
-4. Saving annotated JSON back to the CSV file
-
-## CSV Format
-
-The CSV file must have the following columns:
-- `id`: Unique identifier for the row (optional but recommended)
-- `prompt`: The NLP query text
-- `annotated_json`: The annotated JSON (initially empty)
-- `completion_status`: `complete` or `incomplete` (initially `incomplete`)
-
-Example:
-```csv
-id,prompt,annotated_json,completion_status
-1,"I need an SUV for my family of 5, under $30k",,incomplete
-2,"Looking for a sedan with good gas mileage",,incomplete
-```
-
-The tool preserves all columns (including `id`) when saving updates.
-
-## Usage
-
-### Basic Usage
-
-```bash
-cd car-back-end
-python training/annotation_tool.py training/prompts.csv
-```
-
-### With Custom Schema
-
-```bash
-python training/annotation_tool.py training/prompts.csv schemas/vehicle_selection_v1_schema.json
-```
-
-## How It Works
-
-1. **Load CSV**: The tool loads your CSV file and finds the first row with `completion_status != true`
-2. **Display Prompt**: Shows the NLP prompt text
-3. **Traverse Schema**: Recursively walks through the JSON schema from top to bottom
-4. **Field Annotation**: For each field:
-   - Shows field name and type
-   - For enums: Displays numbered list of options
-   - For arrays: Allows multiple selections
-   - Validates input strictly (only accepts valid enum values)
-5. **Save Progress**: After completing all fields, asks:
-   - Continue to next prompt (saves and moves on)
-   - Save and exit (saves and quits)
-
-## Field Types
-
-### Enum Fields
-- Single enum: Select one option by number (1-indexed)
-- Array of enum: Select multiple options (comma-separated numbers), type 'done' when finished
-- All enum fields support "unspecified" option (use "unspecified" instead of null)
-
-### Integer/Number Fields with "unspecified"
-- Fields like `budget.min`, `budget.max`, `year.min`, `year.max`, `mileage.max`, `number_of_owners`
-- Enter an integer/number value, or type 'unspecified'
-- For `kid_count` and `pet_count`: 0 means "no kids/pets", type 'unspecified' for unspecified
-- For `number_of_owners`: Enter 0 or higher, or 'unspecified'
-
-### String Fields
-- Plain string fields (`make`, `model`): Enter text value (no "unspecified" option)
-- String with unspecified (`trim`): Enter text value or 'unspecified'
-
-### Boolean Fields with "unspecified"
-- Fields like `wants_hatch_access`, `wants_fold_flat_seats`, `strict_max`
-- Select 1 for "true", 2 for "false", 3 for "unspecified"
-
-## Resuming Work
-
-If you interrupt the tool (Ctrl+C), it will save your current progress. When you run it again, it will:
-- Skip fields that are already annotated
-- Resume from the first incomplete field
-
-## Example Session
-
-```
-Loading CSV file...
-Loading schema...
-Found 23 fields to annotate
-
-============================================================
-Processing Row 1 (ID: 1)
-============================================================
-
-============================================================
-NLP Prompt:
-============================================================
-I need an SUV for my family of 5, under $30k, with AWD and backup camera
-============================================================
-
-=== Field: query_text ===
-Type: string
-Enter value: I need an SUV for my family of 5, under $30k, with AWD and backup camera
-Entered: I need an SUV for my family of 5, under $30k, with AWD and backup camera
-
-=== Field: vehicle_type.include_body_styles ===
-Type: array of enum
-Select one or more options (comma-separated numbers, or 'done' when finished):
-  1. sedan
-  2. coupe
-  3. hatchback
-  4. wagon
-  5. suv
-  6. crossover
-  7. van
-  8. truck
-Enter selection(s): 5
-Added: suv
-Enter selection(s): done
-Selected: ['suv']
-
-[... continues through all fields ...]
-
-============================================================
-Annotation Complete!
-============================================================
-
-Options:
-  1. Continue to next prompt
-  2. Save and exit
-
-Enter selection (1 or 2): 1
-```
-
-## File Structure
+## Directory Structure
 
 ```
 training/
-├── __init__.py
-├── annotation_tool.py      # Main script
-├── csv_manager.py          # CSV loading/updating
-├── schema_traverser.py     # Recursive schema traversal
-├── field_prompter.py       # User input prompting
-├── prompts.csv             # Sample CSV file
-└── README.md               # This file
+├── tools/                    # Scripts and utilities
+│   ├── annotation/          # Annotation tool and core modules
+│   ├── processing/          # Data conversion and transformation scripts
+│   ├── utilities/           # Utility scripts (import, reset, analyze, view)
+│   └── inference/           # Model inference and testing scripts
+├── data/                    # Data files
+│   ├── active/             # Current working datasets
+│   ├── legacy/             # Older versions and intermediate files
+│   └── inference_results/  # Model inference results
+├── config/                  # Training configuration files
+├── docs/                    # Documentation files
+└── raw_training_text/      # Raw text files for prompt import
 ```
 
-## Validation
+## Quick Start
 
-The tool performs strict validation:
-- **Enum fields**: Only accepts values from the schema's enum list (including "unspecified")
-- **Array enum fields**: Validates each selected value
-- **Invalid input**: Shows error message and re-prompts
-- **Required fields**: Must be filled (cannot skip)
-- **Vehicle type validation**: At least one of `include_body_styles` or `exclude_body_styles` must have actual values (not just "unspecified")
-- **Integer/number fields**: Validates numeric format or "unspecified"
-- **String fields**: Validates based on field type (plain string vs. string with unspecified)
+### 1. Annotate Prompts
 
-## Display of Completed JSON
+```bash
+cd car-back-end/training
+python tools/annotation/annotation_tool.py
+```
 
-After completing all fields for a prompt, the tool displays the completed JSON before prompting to save/quit or continue to the next prompt. This allows you to review the annotation before proceeding.
+This will:
+- Load prompts from `data/active/unannotated_nlp_prompts.csv`
+- Guide you through annotating each prompt
+- Save completed annotations to `data/active/annotated_nlp_prompts.csv`
 
-## Supported Field Types
+### 2. Prepare Training Data
 
-The tool supports all field types from the Vehicle Selection V1 schema:
-- **Enums**: Single selection with "unspecified" option
-- **Array enums**: Multiple selections (body styles, powertrain types, features, use cases)
-- **Integers/Numbers**: With "unspecified" option for fields like budget, year, mileage, number_of_owners
-- **Strings**: Plain strings (make, model) or strings with "unspecified" (trim)
-- **Booleans**: With "unspecified" option (wants_hatch_access, wants_fold_flat_seats, strict_max)
-- **Nested objects**: Automatically traverses nested structures
+```bash
+cd car-back-end/training
+python tools/processing/prepare_training_data_v2.py
+```
 
-## Notes
+This will:
+- Convert annotated CSV to JSONL format with key mapping
+- Split into 80/10/10 train/test/validation sets
+- Output: `data/active/train_mapped_v2.jsonl`, `test_mapped_v2.jsonl`, `validation_mapped_v2.jsonl`
 
-- The tool saves after each complete annotation (not incrementally during annotation)
-- **Completed JSON is displayed** before prompting to save/quit or continue
-- Progress is saved to the CSV file immediately when you choose "Continue" or "Save and exit"
-- If interrupted, partial progress is saved for the current prompt
-- The tool automatically finds the next incomplete prompt in the CSV
-- All columns (including `id`) are preserved when saving updates
-- Completion status uses `complete`/`incomplete` values (also accepts `true`/`false` for compatibility)
-- Enum options are 1-indexed (first option is 1, not 0)
-- For array fields, you can select multiple values by entering comma-separated numbers
+### 3. Train Model
 
+Use the config files in `config/` with your training framework (e.g., Axolotl).
 
+## Workflow Overview
+
+1. **Annotation**: Use `tools/annotation/annotation_tool.py` to annotate prompts
+2. **Conversion**: Use `tools/processing/prepare_training_data_v2.py` to convert to training format
+3. **Training**: Use files in `data/active/` with training configs in `config/`
+4. **Inference**: Use `tools/inference/` scripts to test trained models
+
+## Key Concepts
+
+### Annotation Format
+- **CSV**: Full JSON with full key names (`make`, `model`, `vehicle_type`, etc.)
+- **JSONL**: Shortened keys (`mk`, `md`, `vt`, etc.) with minified JSON
+
+### Key Mapping
+Keys are shortened to reduce token usage. See `docs/key_mapping_schema.md` for complete mapping.
+
+### Template-Free Segments Format
+Training data uses a segments format:
+```json
+{
+  "segments": [
+    {"label": false, "text": "prompt text\n"},
+    {"label": true, "text": "{\"mk\":[...],\"vt\":{...}}<END_JSON>"}
+  ]
+}
+```
+
+## Documentation
+
+- **Annotation Tool**: See `tools/annotation/README.md`
+- **Data Processing**: See `tools/processing/README.md`
+- **Utilities**: See `tools/utilities/README.md`
+- **Inference**: See `tools/inference/README.md`
+- **Active Data**: See `data/active/README.md`
+- **Legacy Data**: See `data/legacy/README.md`
+- **Configuration**: See `config/README.md`
+- **Documentation**: See `docs/README.md`
+
+## Current Status
+
+- **Annotated Prompts**: 367 (target: 600-800)
+- **Training Data**: `train_mapped_v2.jsonl` (293 entries)
+- **Test Data**: `test_mapped_v2.jsonl` (36 entries)
+- **Validation Data**: `validation_mapped_v2.jsonl` (38 entries)
+
+## File Locations
+
+### Active Files (Current Work)
+- Annotations: `data/active/annotated_nlp_prompts.csv`
+- Unannotated: `data/active/unannotated_nlp_prompts.csv`
+- Training sets: `data/active/train_mapped_v2.jsonl`, `test_mapped_v2.jsonl`, `validation_mapped_v2.jsonl`
+
+### Legacy Files (Reference Only)
+- Old training datasets: `data/legacy/`
+- Old source files: `data/legacy/`

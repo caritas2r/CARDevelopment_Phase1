@@ -14,9 +14,9 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 | JSON Schema Path | Database Table | Database Field | Notes |
 |-----------------|----------------|----------------|-------|
 | N/A | `vehicles` | `vehicle_id` | Primary key, generated/assigned separately |
-| N/A | `vehicles` | `make` | Required (NOT NULL) |
-| N/A | `vehicles` | `model` | Required (NOT NULL) |
-| N/A | `vehicles` | `trim` | Optional |
+| `make[]` | `vehicles` | `make` | **Array of strings** → single value. If multiple makes in array, store first or most relevant. ["unspecified"] → NULL. Required (NOT NULL) |
+| `model[]` | `vehicles` | `model` | **Array of strings** → single value. If multiple models in array, store first or most relevant. ["unspecified"] → NULL. Required (NOT NULL) |
+| `trim` | `vehicles` | `trim` | Optional. "unspecified" → NULL |
 
 ### Vehicle Type
 
@@ -64,7 +64,7 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 | JSON Schema Path | Database Table | Database Field | Notes |
 |-----------------|----------------|----------------|-------|
 | `preference_signals.reliability_maintenance_priority` | `vehicles` | `reliability` | Maps priority to reliability level: "low_cost" → "low", "balanced" → "medium", "performance_first" → "high", "unspecified" → NULL |
-| `preference_signals.color` | `vehicles` | `color` | Direct match. "unspecified" → NULL |
+| `preference_signals.color[]` | `vehicles` | `color` | **Array of strings** → single value. If multiple colors in array, store first or most relevant. ["unspecified"] → NULL |
 
 ### Ownership Constraints
 
@@ -77,6 +77,7 @@ This document maps fields from the Vehicle Selection V1 JSON schema to the corre
 | `ownership_constraints.year.min` | `vehicles` | `year` | Used in queries as `year >= year.min`. "unspecified" → not applied |
 | `ownership_constraints.year.max` | `vehicles` | `year` | Used in queries as `year <= year.max`. "unspecified" → not applied |
 | `ownership_constraints.mileage.max` | `vehicles` | `mileage` | Used in queries as `mileage <= mileage.max`. "unspecified" → not applied |
+| `ownership_constraints.mileage.qualitative[]` | N/A | N/A | **Array of strings** used for query logic (qualitative mileage filtering: low, moderate, high, very_low, very_high, does_not_matter). ["unspecified"] → not applied |
 | `ownership_constraints.number_of_owners` | `vehicles` | `number_of_owners` | Direct match. Integer (0 or higher) or "unspecified". "unspecified" → NULL |
 
 ### Location Constraints
@@ -98,6 +99,7 @@ The following JSON schema fields are used for querying/filtering but are not sto
 - `ownership_constraints.budget.strict_max` - Affects query comparison operator
 - `ownership_constraints.year.min` / `year.max` - Used in WHERE clause comparisons
 - `ownership_constraints.mileage.max` - Used in WHERE clause comparisons
+- `ownership_constraints.mileage.qualitative[]` - **Array** used for qualitative mileage filtering (low, moderate, high, very_low, very_high, does_not_matter)
 - `location_constraints.radius_miles` - Used for distance-based filtering
 - `features_amenities.avoid[]` - Used to exclude features in queries
 
@@ -134,7 +136,7 @@ All other fields are nullable to allow for incomplete data.
 
 ## Notes
 
-1. **Array to Single Value**: Some JSON schema fields are arrays (e.g., `include_body_styles[]`), but the database stores a single value. The conversion logic should select the most appropriate value (e.g., first item, most specific, etc.).
+1. **Array to Single Value**: Many JSON schema fields are arrays (e.g., `include_body_styles[]`, `make[]`, `model[]`, `color[]`), but the database stores a single value. The conversion logic should select the most appropriate value (e.g., first item, most specific, etc.). Arrays like `powertrain_type[]`, `use_case_tags[]`, and `must_have[]` use junction tables for many-to-many relationships.
 
 2. **Priority to Descriptive Mapping**: Some JSON schema fields use priority levels ("low", "medium", "high") while the database uses descriptive levels (e.g., "low", "medium", "high", "unknown"). The mapping is direct for these cases.
 

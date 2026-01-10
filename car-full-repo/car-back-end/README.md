@@ -4,6 +4,71 @@ A Flask-based REST API backend with microservices architecture for vehicle selec
 
 ## Setup
 
+### Quick Start (Recommended)
+
+For full inference support, use the launcher script from the repository root:
+```bash
+# From car-full-repo directory
+create-venv.bat  # Windows
+# or
+python start-app.py  # Cross-platform
+```
+
+This will automatically:
+- Create the inference virtual environment
+- Install PyTorch and ML dependencies
+- Set up environment variables for model inference
+- Start the application with full inference capabilities
+
+### Manual Setup
+
+#### Option 1: With Inference Support (Recommended)
+
+1. Create the inference virtual environment:
+```bash
+python -m venv car_inference_env
+```
+
+2. Activate the virtual environment:
+   - Windows: `car_inference_env\Scripts\activate`
+   - macOS/Linux: `source car_inference_env/bin/activate`
+
+3. Install PyTorch (GPU if NVIDIA available, otherwise CPU):
+```bash
+# For GPU (NVIDIA):
+pip install torch --index-url https://download.pytorch.org/whl/cu124
+
+# For CPU:
+pip install torch
+```
+
+4. Install inference dependencies:
+```bash
+pip install -r requirements.inference.txt
+```
+
+5. Set environment variables for model inference:
+```bash
+# Windows:
+set HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+set LORA_ADAPTER_PATH=path\to\car-models\qwen25_3b_base_MAPPED_v2
+set HF_HOME=path\to\repo\hf_cache
+
+# macOS/Linux:
+export HF_BASE_MODEL_ID=Qwen/Qwen2.5-3B
+export LORA_ADAPTER_PATH=path/to/car-models/qwen25_3b_base_MAPPED_v2
+export HF_HOME=path/to/repo/hf_cache
+```
+
+6. Run the Flask application:
+```bash
+python app.py
+```
+
+#### Option 2: Basic Setup (Without Inference)
+
+For API testing without inference capabilities:
+
 1. Create a virtual environment:
 ```bash
 python -m venv venv
@@ -13,7 +78,7 @@ python -m venv venv
    - Windows: `venv\Scripts\activate`
    - macOS/Linux: `source venv/bin/activate`
 
-3. Install dependencies:
+3. Install basic dependencies:
 ```bash
 pip install -r requirements.txt
 ```
@@ -22,6 +87,8 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
+
+**Note:** Without inference dependencies, the `/api/query/v1` endpoint will not work with real NLP inference. Use this setup only for testing API endpoints, health checks, and schema endpoints.
 
 The API will be available at `http://localhost:5000`
 
@@ -47,9 +114,11 @@ The backend follows a microservices architecture with a service controller:
 
 ### Query Processing Services
 - **Query Service**: Orchestrates the natural language query processing pipeline
-- **Mock NLP Trip Service**: Returns sample vehicle data for PoC demonstrations (generates random vehicle on each call)
-- **Inference Service**: Processes natural language queries through inference model (NLP to JSON) - for future ML integration
-- **JSON Input Converter Service**: Converts structured JSON query to SQL - for future query generation
+- **Inference Service**: Processes natural language queries through inference model (NLP to JSON with shortened keys)
+- **Key Mapping Service**: Converts shortened keys (mk, md, vt) to full keys (make, model, vehicle_type)
+- **JSON Input Converter Service**: Converts structured JSON query to SQL queries
+- **Database Query Service**: Executes SQL queries and returns results
+- **Mock NLP Trip Service**: Returns sample vehicle data for PoC demonstrations (optional)
 
 ### Utilities
 - **Schema Validator**: Validates JSON output against Vehicle Selection V1 schema
@@ -82,16 +151,25 @@ car-back-end/
 │   ├── inference_service.py       # NLP to JSON conversion (future)
 │   └── json_input_converter_service.py  # JSON to SQL conversion (future)
 ├── training/                       # Training data annotation pipeline
-│   ├── __init__.py
-│   ├── annotation_tool.py         # Interactive annotation tool
-│   ├── csv_manager.py             # CSV file management
-│   ├── field_prompter.py          # Field input prompting
-│   ├── schema_traverser.py        # Schema traversal logic
-│   ├── reset_csv.py               # CSV reset utility
-│   ├── prompts.csv                # Sample prompts CSV
+│   ├── tools/                      # Training tools and scripts
+│   │   ├── annotation/            # Annotation tool and modules
+│   │   ├── processing/            # Data conversion and SQL conversion scripts
+│   │   ├── utilities/             # Utility scripts (import, reset, analyze)
+│   │   └── inference/             # Model inference scripts
+│   ├── data/                      # Training data files
+│   │   ├── active/                # Current working datasets
+│   │   ├── legacy/                # Older versions
+│   │   └── inference_results/     # Model inference results and SQL queries
+│   ├── config/                    # Training configuration files
+│   ├── docs/                      # Training documentation
 │   └── README.md                  # Training pipeline documentation
 ├── docs/                           # Documentation
-│   └── json_to_db_mapping.md      # JSON schema to database mapping
+│   ├── json_to_db_mapping.md      # JSON schema to database mapping
+│   ├── end_to_end_pipeline.md     # End-to-end pipeline documentation
+│   └── training_and_inference.md  # Training and inference documentation
+├── scripts/                        # Utility scripts
+│   ├── test_pipeline.py           # Pipeline testing script
+│   └── ...                        # Other utility scripts
 ├── src/
 │   ├── __init__.py
 │   └── service_controller.py      # Service controller
