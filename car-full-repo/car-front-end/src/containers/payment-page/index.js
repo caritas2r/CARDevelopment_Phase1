@@ -233,3 +233,4 @@ function escapeHtml(s) {
 window.renderPaymentPage = renderPaymentPage;
 console.log('[PaymentPage] renderPaymentPage function exposed to window');
 
+
