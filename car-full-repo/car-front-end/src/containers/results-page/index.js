@@ -72,13 +72,20 @@ function renderResultsPage() {
                 <!-- Main Results Card -->
                 <div class="cds-results-card">
                     <div class="results-header">
-                        <h2>Query: "${escapeHtml(queryText)}"</h2>
-                        <p class="results-count">
-                            ${paymentCompleted 
-                                ? `Showing all ${resultCount} result${resultCount !== 1 ? 's' : ''} (Unlocked)`
-                                : `Showing ${freeResults.length} of ${resultCount} results`
-                            }
-                        </p>
+                        <div class="results-header-top">
+                            <div>
+                                <h2>Query: "${escapeHtml(queryText)}"</h2>
+                                <p class="results-count">
+                                    ${paymentCompleted 
+                                        ? `Showing all ${resultCount} result${resultCount !== 1 ? 's' : ''} (Unlocked)`
+                                        : `Showing ${freeResults.length} of ${resultCount} results`
+                                    }
+                                </p>
+                            </div>
+                            <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitFeedback()">
+                                ⚠️ Results Not Satisfactory
+                            </button>
+                        </div>
                     </div>
                     
                     <div class="results-container">
@@ -108,6 +115,85 @@ function renderResultsPage() {
     // Expose navigation function to global scope for onclick handler
     window.navigateToPayment = function() {
         window.location.hash = '#/payment';
+    };
+    
+    // Expose feedback function to global scope
+    window.submitFeedback = function() {
+        const feedbackButton = document.getElementById('feedbackButton');
+        if (!feedbackButton) return;
+        
+        // Disable button to prevent double-submission
+        feedbackButton.disabled = true;
+        feedbackButton.textContent = 'Submitting...';
+        
+        // Get the original query data from sessionStorage
+        const resultsData = sessionStorage.getItem('queryResults');
+        if (!resultsData) {
+            alert('Unable to submit feedback: query data not found');
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(resultsData);
+        } catch (e) {
+            alert('Unable to submit feedback: invalid data');
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        // Prompt for reason (optional)
+        const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
+        if (reason === null) {
+            // User cancelled - don't submit
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            return;
+        }
+        
+        // Submit feedback
+        fetch(`${API_BASE_URL}/api/query/feedback`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                query: data.query || '',
+                extracted_fields: data.extracted_fields || {},
+                sql_query: data.sql_query || '',
+                sql_params: data.sql_params || [],
+                reason: reason || ''
+            })
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.success) {
+                feedbackButton.textContent = '✓ Feedback Submitted';
+                feedbackButton.style.backgroundColor = 'var(--cds-support-success)';
+                feedbackButton.style.color = 'white';
+                feedbackButton.style.borderColor = 'var(--cds-support-success)';
+                setTimeout(() => {
+                    feedbackButton.disabled = false;
+                    feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+                    feedbackButton.style.backgroundColor = '';
+                    feedbackButton.style.color = '';
+                    feedbackButton.style.borderColor = '';
+                }, 3000);
+            } else {
+                alert('Failed to submit feedback: ' + (result.error || 'Unknown error'));
+                feedbackButton.disabled = false;
+                feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+            }
+        })
+        .catch(error => {
+            console.error('Feedback submission error:', error);
+            alert('Failed to submit feedback: ' + error.message);
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = '⚠️ Results Not Satisfactory';
+        });
     };
 }
 

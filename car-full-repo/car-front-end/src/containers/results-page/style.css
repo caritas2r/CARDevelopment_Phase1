@@ -185,6 +185,13 @@
     padding-bottom: 1rem;
 }
 
+.results-header-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
 .results-header h2 {
     font-size: 1.25rem;
     font-weight: 400;
@@ -198,6 +205,25 @@
     font-size: 0.875rem;
     color: var(--cds-text-secondary);
     margin: 0;
+}
+
+.feedback-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+
+@media (max-width: 672px) {
+    .results-header-top {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .feedback-button {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
 }
 
 /* Scrollable results container */
