@@ -175,6 +175,34 @@ function setupFormHandlers() {
                 throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
             }
             
+            // Check for insufficient criteria (warning case)
+            if (!data.success && (data.error_type === 'insufficient_criteria' || queryText.toLowerCase().trim() === 'insufficient')) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator warning">
+                        <span class="cds-status-icon">⚠</span>
+                        <span class="cds-status-text">Query not processed</span>
+                    </div>
+                    <div class="cds-status-details warning">
+                        <p><strong>Warning:</strong> Insufficient criteria detected, please refine your search parameters.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Check for fail case (queryText is "fail" - shows error UI)
+            if (queryText.toLowerCase().trim() === 'fail' || (data.success && data.query === 'fail')) {
+                statusDiv.innerHTML = `
+                    <div class="cds-status-indicator error">
+                        <span class="cds-status-icon">✕</span>
+                        <span class="cds-status-text">Error submitting query</span>
+                    </div>
+                    <div class="cds-status-details error">
+                        <p><strong>Error:</strong> Unable to process query.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             if (data.success) {
                 // Store results in sessionStorage for results page
                 sessionStorage.setItem('queryResults', JSON.stringify(data));

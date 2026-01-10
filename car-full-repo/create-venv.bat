@@ -211,11 +211,12 @@ REM Wait for frontend to start
 echo Waiting for frontend to initialize...
 timeout /t 5 /nobreak >nul
 
-REM Open browser to frontend
+REM Open browser to frontend using default browser
 echo;
-echo Opening browser to http://localhost:8000...
+echo Opening default browser to http://localhost:8000...
 echo If the page doesn't load, wait a few more seconds and refresh.
-start http://localhost:8000
+REM Use rundll32 to explicitly open in default browser
+rundll32 url.dll,FileProtocolHandler http://localhost:8000
 
 echo;
 echo ========================================

@@ -1,5 +1,10 @@
 /* Query Page Styles - Carbon Design System v11 */
 
+/* CSS Variables (if not defined globally) */
+:root {
+    --cds-support-warning: #f1c21b;
+}
+
 /* Query card using Carbon tile pattern */
 .cds-query-card {
     grid-column: 4 / 14;
@@ -110,6 +115,28 @@
 
 .cds-query-status .cds-status-details {
     margin-top: 1rem;
+}
+
+/* Warning status indicator (same yellow/orange as loading) */
+.cds-status-indicator.warning {
+    background-color: #fff3cd;
+    border-left: 4px solid var(--cds-support-warning);
+}
+
+.cds-status-indicator.warning .cds-status-text {
+    color: #8c6800;
+}
+
+.cds-status-details.warning {
+    background-color: #fffbf0;
+}
+
+.cds-status-details.warning p {
+    color: #8c6800;
+}
+
+.cds-status-details.warning strong {
+    color: #8c6800;
 }
 
 /* Action buttons in main content */
