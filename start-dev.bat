@@ -133,33 +133,6 @@ if exist "C:\Program Files\nodejs\npm.cmd" (
 )
 echo.
 
-REM Load Stripe API key from env_var file (if it exists)
-REM Format: API_KEY = <your_key_here>
-set "STRIPE_API_KEY="
-set "ENV_VAR_FILE=%SCRIPT_DIR%\car-full-repo\env_var"
-if exist "%ENV_VAR_FILE%" (
-    REM Read API_KEY from env_var file and set as STRIPE_API_KEY
-    for /f "usebackq tokens=1,* delims==" %%a in ("%ENV_VAR_FILE%") do (
-        REM Trim whitespace from variable name and value
-        for /f "tokens=*" %%n in ("%%a") do set "VAR_NAME=%%n"
-        for /f "tokens=*" %%v in ("%%b") do set "VAR_VALUE=%%v"
-        REM Remove any remaining leading/trailing spaces
-        set "VAR_NAME=!VAR_NAME: =!"
-        set "VAR_VALUE=!VAR_VALUE: =!"
-        REM Check if this is API_KEY (case-insensitive)
-        if /i "!VAR_NAME!"=="API_KEY" (
-            set "STRIPE_API_KEY=!VAR_VALUE!"
-        )
-    )
-)
-
-REM Debug: Check if API key was loaded
-if "!STRIPE_API_KEY!"=="" (
-    echo WARNING: STRIPE_API_KEY not found in env_var file - payment processing will be disabled
-) else (
-    echo Stripe API key loaded from env_var file
-)
-
 echo.
 echo Starting Flask backend...
 echo Backend directory: %BACKEND_DIR%
@@ -167,11 +140,10 @@ echo Backend will run on: http://localhost:%BACKEND_PORT%
 echo.
 
 REM Start Flask backend in a new window
-REM Set STRIPE_API_KEY environment variable before running Python
 if "%USE_MOCK%"=="1" (
-    start "Flask Backend (MOCK MODE) - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && set STRIPE_API_KEY=!STRIPE_API_KEY! && python app.py --noinference --port %BACKEND_PORT%"
+    start "Flask Backend (MOCK MODE) - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && python app.py --noinference --port %BACKEND_PORT%"
 ) else (
-    start "Flask Backend - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && set STRIPE_API_KEY=!STRIPE_API_KEY! && python app.py --port %BACKEND_PORT%"
+    start "Flask Backend - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && python app.py --port %BACKEND_PORT%"
 )
 
 REM Wait a moment for backend to start

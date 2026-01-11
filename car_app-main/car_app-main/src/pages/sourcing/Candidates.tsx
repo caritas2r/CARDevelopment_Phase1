@@ -22,8 +22,6 @@ export function SourcingCandidates() {
   const [queryData, setQueryData] = useState<QueryResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
-  const [feedbackText, setFeedbackText] = useState('');
 
   useEffect(() => {
     // Load results from sessionStorage (set by NewRequest)
@@ -48,18 +46,11 @@ export function SourcingCandidates() {
     navigate('/sourcing');
   };
 
-  const handleOpenFeedbackModal = () => {
-    setShowFeedbackModal(true);
-    setFeedbackText('');
-  };
-
-  const handleCloseFeedbackModal = () => {
-    setShowFeedbackModal(false);
-    setFeedbackText('');
-  };
-
   const handleSubmitFeedback = async () => {
     if (!queryData) return;
+    
+    const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
+    if (reason === null) return;
 
     try {
       await submitQueryFeedback({
@@ -67,12 +58,11 @@ export function SourcingCandidates() {
         extracted_fields: queryData.extracted_fields,
         sql_query: queryData.sql_query,
         sql_params: queryData.sql_params,
-        reason: feedbackText.trim() || '',
+        reason: reason || '',
         success: queryData.success,
         result_count: queryData.result_count,
       });
       toast.success('Feedback submitted successfully');
-      handleCloseFeedbackModal();
     } catch (error: any) {
       console.error('Feedback error:', error);
       toast.error(`Failed to submit feedback: ${error.message}`);
@@ -123,7 +113,7 @@ export function SourcingCandidates() {
             </div>
             <div className="flex items-center space-x-3">
               <button
-                onClick={handleOpenFeedbackModal}
+                onClick={handleSubmitFeedback}
                 className="px-4 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-brand-gold hover:text-brand-gold transition-colors"
               >
                 Results Not Satisfactory
@@ -334,40 +324,6 @@ export function SourcingCandidates() {
           })}
         </div>
       </div>
-
-      {/* Feedback Modal */}
-      {showFeedbackModal && (
-        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4">
-          <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold text-white mb-4">Feedback</h2>
-            <p className="text-gray-400 mb-4">
-              Why were the results not satisfactory? (Optional)
-            </p>
-            <textarea
-              value={feedbackText}
-              onChange={(e) => setFeedbackText(e.target.value)}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-600 rounded-md bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-gold focus:border-transparent resize-none"
-              placeholder="Enter your feedback here..."
-              autoFocus
-            />
-            <div className="flex justify-end space-x-3 mt-6">
-              <button
-                onClick={handleCloseFeedbackModal}
-                className="px-4 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSubmitFeedback}
-                className="px-4 py-2 text-sm bg-brand-gold text-black font-semibold rounded-lg hover:opacity-80 transition-all"
-              >
-                Submit
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
