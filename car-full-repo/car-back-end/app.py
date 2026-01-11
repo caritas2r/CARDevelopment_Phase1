@@ -91,8 +91,25 @@ def create_app(use_mock_query_service=False):
 
 def main():
     """Main entry point"""
+    import os
+    
     # Check for --noinference flag
     use_mock = '--noinference' in sys.argv
+    
+    # Get port from command line --port argument or PORT env var, default to 5000
+    port = 5000
+    if '--port' in sys.argv:
+        port_idx = sys.argv.index('--port')
+        if port_idx + 1 < len(sys.argv):
+            try:
+                port = int(sys.argv[port_idx + 1])
+            except (ValueError, IndexError):
+                pass
+    elif 'PORT' in os.environ:
+        try:
+            port = int(os.environ['PORT'])
+        except ValueError:
+            pass
     
     if use_mock:
         print("\n[APP] Starting in MOCK mode (--noinference flag detected)")
@@ -100,7 +117,8 @@ def main():
         print("[APP] MockQueryService will be used instead\n")
     
     app = create_app(use_mock_query_service=use_mock)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(f"\n[APP] Starting Flask server on port {port}\n")
+    app.run(debug=True, host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':
