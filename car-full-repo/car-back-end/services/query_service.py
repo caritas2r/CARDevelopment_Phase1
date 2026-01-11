@@ -137,11 +137,32 @@ class QueryService:
                 # Step 3: Convert JSON to SQL
                 sql_query, sql_params = self.json_converter_service.convert_to_sql(json_with_full_keys)
                 
-                # Step 4: Execute query against database
+                # Step 4: Execute query against database with result limiting
+                MAX_RESULTS = 100  # Maximum results to return to prevent performance/storage issues
                 print(f"[{self.name}] Executing SQL query: {sql_query[:200]}...")  # Log first 200 chars
                 print(f"[{self.name}] SQL parameters: {sql_params}")
-                results = self.database_query_service.execute_query(sql_query, sql_params)
-                print(f"[{self.name}] Query executed successfully. Found {len(results)} results.")
+                
+                # Get total count first (for the full query without LIMIT)
+                # Use connection directly for COUNT query (doesn't need enrichment)
+                conn = self.database_query_service.get_connection()
+                cursor = conn.cursor()
+                try:
+                    count_query = sql_query.replace('SELECT *', 'SELECT COUNT(*)', 1)
+                    params_tuple = tuple(sql_params) if sql_params else ()
+                    cursor.execute(count_query, params_tuple)
+                    count_row = cursor.fetchone()
+                    total_result_count = count_row[0] if count_row else 0
+                finally:
+                    cursor.close()
+                
+                # Execute query with LIMIT
+                limited_sql_query = f"{sql_query} LIMIT {MAX_RESULTS}"
+                results = self.database_query_service.execute_query(limited_sql_query, sql_params)
+                results_truncated = total_result_count > MAX_RESULTS
+                
+                print(f"[{self.name}] Query executed successfully. Found {total_result_count} total results, returning {len(results)} results.")
+                if results_truncated:
+                    print(f"[{self.name}] WARNING: Results truncated - {total_result_count} total results, but only returning first {MAX_RESULTS}")
                 
                 # Step 5: Format and return results
                 response_data = {
@@ -152,6 +173,9 @@ class QueryService:
                     'sql_params': sql_params,
                     'results': results,
                     'result_count': len(results) if results else 0,
+                    'total_result_count': total_result_count,  # Total matches found
+                    'results_truncated': results_truncated,  # Flag indicating if results were limited
+                    'max_results': MAX_RESULTS if results_truncated else None,  # Max limit if truncated
                     'quality_warnings': quality_warnings if quality_warnings else [],
                     'quality_acceptable': is_acceptable
                 }
@@ -163,11 +187,35 @@ class QueryService:
                 
                 return jsonify(response_data), 200
                 
+            except ValueError as e:
+                # Check if this is the "inconclusive search results" error
+                error_message = str(e)
+                if "Inconclusive search results" in error_message or "inconclusive" in error_message.lower():
+                    return jsonify({
+                        'success': False,
+                        'error': error_message,
+                        'error_type': 'insufficient_criteria',
+                        'query': query_text,
+                        'extracted_fields': {},
+                        'sql_query': '',
+                        'sql_params': [],
+                        'results': [],
+                        'result_count': 0
+                    }), 400
+                else:
+                    # Other ValueError cases
+                    return jsonify({
+                        'success': False,
+                        'error': error_message,
+                        'error_type': 'validation_error',
+                        'query': query_text
+                    }), 400
             except Exception as e:
                 return jsonify({
                     'success': False,
                     'error': str(e),
-                    'error_type': 'internal_error'
+                    'error_type': 'internal_error',
+                    'query': query_text
                 }), 500
         
         @app.route('/api/query/feedback', methods=['POST'])
@@ -248,6 +296,9 @@ class QueryService:
                     query_status = 'insufficient'
                 elif data.get('success') is True and data.get('result_count', 0) > 0:
                     # Query processed successfully and found results
+                    query_status = 'pass'
+                elif flagged_query and flagged_annotation:
+                    # Fallback: If we have SQL query and extracted fields but no explicit status, assume it's a successful query
                     query_status = 'pass'
                 # If we still don't know, leave it NULL
                 

@@ -212,7 +212,7 @@ set "BACKEND_CMD=cd /d "%BACKEND_DIR%""
 REM Set STRIPE_API_KEY for both modes (use delayed expansion to get the value)
 set "BACKEND_CMD=!BACKEND_CMD! && set STRIPE_API_KEY=!STRIPE_API_KEY!"
 if "%USE_MOCK%"=="0" (
-    set "BACKEND_CMD=!BACKEND_CMD! && set HF_BASE_MODEL_ID=%HF_BASE_MODEL_ID% && set LORA_ADAPTER_PATH=%LORA_ADAPTER_PATH% && set HF_TOKEN=%HF_TOKEN% && set HF_HOME=%HF_HOME%"
+    set "BACKEND_CMD=!BACKEND_CMD! && set \"HF_BASE_MODEL_ID=!HF_BASE_MODEL_ID!\" && set \"LORA_ADAPTER_PATH=!LORA_ADAPTER_PATH!\" && set \"HF_TOKEN=!HF_TOKEN!\" && set \"HF_HOME=!HF_HOME!\""
 )
 if "%USE_MOCK%"=="1" (
     set "BACKEND_CMD=!BACKEND_CMD! && "%PYTHON_CMD_QUOTED%" app.py --noinference"

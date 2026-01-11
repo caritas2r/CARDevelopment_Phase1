@@ -171,15 +171,11 @@ function setupFormHandlers() {
             
             const data = await response.json();
             
-            if (!response.ok) {
-                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            // Store query text for potential feedback submission
+            // Store query text and data for potential feedback submission (regardless of success/failure)
             sessionStorage.setItem('lastQueryText', queryText);
             sessionStorage.setItem('lastQueryData', JSON.stringify(data));
             
-            // Check for insufficient criteria (warning case)
+            // Check for insufficient criteria (warning case) - check BEFORE checking response.ok
             if (!data.success && (data.error_type === 'insufficient_criteria' || queryText.toLowerCase().trim() === 'insufficient')) {
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator warning">
@@ -217,11 +213,35 @@ function setupFormHandlers() {
                 return;
             }
             
+            // Now check if response was OK, throw error if not (but we've already stored data above)
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             if (data.success) {
                 // Store results in sessionStorage for results page
-                sessionStorage.setItem('queryResults', JSON.stringify(data));
+                // Reset payment status for new query (payment is per-query)
+                data.paymentCompleted = false;
+                // Backend already limits results to 100, so we can store them all
+                try {
+                    sessionStorage.setItem('queryResults', JSON.stringify(data));
+                } catch (e) {
+                    // If still too large (shouldn't happen with 500 limit, but just in case)
+                    console.warn('Results too large for sessionStorage, storing minimal data:', e);
+                    const minimalData = {
+                        query: data.query,
+                        result_count: data.result_count || 0,
+                        total_result_count: data.total_result_count || data.result_count || 0,
+                        results_truncated: data.results_truncated || false,
+                        results: data.results ? data.results.slice(0, 100) : [],
+                        extracted_fields: data.extracted_fields || {},
+                        sql_query: data.sql_query || '',
+                        sql_params: data.sql_params || []
+                    };
+                    sessionStorage.setItem('queryResults', JSON.stringify(minimalData));
+                }
                 
-                // Show success message briefly, then navigate to results page
+                // Show success message with feedback button, then navigate to results page
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator success">
                         <span class="cds-status-icon">✓</span>
@@ -229,6 +249,11 @@ function setupFormHandlers() {
                     </div>
                     <div class="cds-status-details success">
                         <p>Redirecting to results page...</p>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                            ⚠️ Results Not Satisfactory
+                        </button>
                     </div>
                 `;
                 
@@ -243,6 +268,20 @@ function setupFormHandlers() {
             // Store query text for potential feedback submission even on error
             sessionStorage.setItem('lastQueryText', queryText);
             
+            // Check if we already have error data in sessionStorage (from response.json() above)
+            let errorData = sessionStorage.getItem('lastQueryData');
+            if (!errorData) {
+                // Store minimal error data for feedback if we don't have it
+                errorData = JSON.stringify({
+                    success: false,
+                    error: error.message,
+                    extracted_fields: {},
+                    sql_query: '',
+                    sql_params: []
+                });
+                sessionStorage.setItem('lastQueryData', errorData);
+            }
+            
             statusDiv.innerHTML = `
                 <div class="cds-status-indicator error">
                     <span class="cds-status-icon">✕</span>
@@ -250,6 +289,11 @@ function setupFormHandlers() {
                 </div>
                 <div class="cds-status-details error">
                     <p><strong>Error:</strong> ${escapeHtml(error.message)}</p>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                        ⚠️ Results Not Satisfactory
+                    </button>
                 </div>
             `;
         } finally {
@@ -376,7 +420,9 @@ window.submitQueryFeedback = function() {
             extracted_fields: queryData.extracted_fields || {},
             sql_query: queryData.sql_query || '',
             sql_params: queryData.sql_params || [],
-            reason: reason || ''
+            reason: reason || '',
+            success: queryData.success,
+            result_count: queryData.result_count || 0
         })
     })
     .then(response => response.json())

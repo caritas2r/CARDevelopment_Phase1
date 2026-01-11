@@ -357,8 +357,17 @@ function setupPaymentForm() {
                 return result;
             })
             .then(result => {
-                // Payment succeeded
-                sessionStorage.setItem('paymentCompleted', 'true');
+                // Payment succeeded - update the queryResults data with payment status
+                const resultsData = sessionStorage.getItem('queryResults');
+                if (resultsData) {
+                    try {
+                        const queryData = JSON.parse(resultsData);
+                        queryData.paymentCompleted = true;
+                        sessionStorage.setItem('queryResults', JSON.stringify(queryData));
+                    } catch (e) {
+                        console.error('Failed to update payment status in results data:', e);
+                    }
+                }
                 
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator success">

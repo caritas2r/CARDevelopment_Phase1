@@ -74,6 +74,7 @@ def create_app(use_mock_query_service=False):
             key_mapping_service=key_mapping_service,
             json_converter_service=json_converter_service,
             database_query_service=db_query_service,
+            database_connection_service=db_connection_service,  # Needed for feedback endpoint
             mock_nlp_trip_service=None  # Set to None to use real inference service
         )
         controller.register_service(query_service)

@@ -28,13 +28,16 @@ function renderResultsPage() {
     
     const queryText = data.query || 'Your query';
     const results = data.results || [];
-    const resultCount = data.result_count || results.length;
+    // Use total_result_count if available (shows true total, even if truncated)
+    const resultCount = data.total_result_count || data.result_count || results.length;
+    const resultsTruncated = data.results_truncated || false;
+    const maxResults = data.max_results || null;
     const extractedFields = data.extracted_fields || {};
     const sqlQuery = data.sql_query || '';
     const sqlParams = data.sql_params || [];
     
-    // Check if payment has been completed
-    const paymentCompleted = sessionStorage.getItem('paymentCompleted') === 'true';
+    // Check if payment has been completed for THIS query (stored with results data)
+    const paymentCompleted = data.paymentCompleted === true;
     
     // Split results into free (visible) and premium (blurred)
     // If payment completed, show all results; otherwise show first 2 free
@@ -46,6 +49,11 @@ function renderResultsPage() {
             <header class="cds-header">
                 <h1>Search Results</h1>
                 <p>Found ${resultCount} vehicle${resultCount !== 1 ? 's' : ''} matching your query</p>
+                ${resultsTruncated ? `
+                <div class="cds-status-indicator warning" style="margin: 1rem 0; padding: 1rem; background-color: #fff4e5; border: 1px solid #ffb366; border-radius: 4px;">
+                    <p style="margin: 0; color: #8b4500;"><strong>⚠️ Too Many Results:</strong> Your search returned ${resultCount.toLocaleString()} results, but we're showing the first ${maxResults || results.length} for performance. Please refine your search by adding more specific criteria (e.g., year range, price range, body style, features) to see more relevant results.</p>
+                </div>
+                ` : ''}
                 <nav class="cds-nav">
                     <a href="#/" class="cds-button cds-button--secondary">Back to Home</a>
                     <a href="#/query" class="cds-button cds-button--secondary">New Query</a>
@@ -165,7 +173,9 @@ function renderResultsPage() {
                 extracted_fields: data.extracted_fields || {},
                 sql_query: data.sql_query || '',
                 sql_params: data.sql_params || [],
-                reason: reason || ''
+                reason: reason || '',
+                success: data.success,
+                result_count: data.result_count || 0
             })
         })
         .then(response => response.json())
