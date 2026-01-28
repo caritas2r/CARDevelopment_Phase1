@@ -17,7 +17,18 @@ export function SourcingPayment() {
   const [cvv, setCvv] = useState('');
   const [cardName, setCardName] = useState('');
 
+  const [paymentType, setPaymentType] = useState<'single' | 'all' | null>(null);
+  const [vehicleIndex, setVehicleIndex] = useState<number | null>(null);
+
   useEffect(() => {
+    // Get payment type and vehicle index from sessionStorage
+    const type = sessionStorage.getItem('paymentType') as 'single' | 'all' | null;
+    const indexStr = sessionStorage.getItem('paymentVehicleIndex');
+    setPaymentType(type);
+    if (indexStr) {
+      setVehicleIndex(parseInt(indexStr, 10));
+    }
+
     // Get results data to know how many results we're unlocking
     const resultsData = sessionStorage.getItem('queryResults');
     if (resultsData) {
@@ -26,13 +37,23 @@ export function SourcingPayment() {
         const count = data.result_count || 0;
         const results = data.results || [];
         setResultCount(count);
-        // Calculate premium count: if 2 results, 1 premium; if 3+, count after first 2
-        if (results.length === 2) {
-          setPremiumCount(1);
-        } else if (results.length > 2) {
-          setPremiumCount(Math.max(0, results.length - 2));
+        // If no payment type set, default to old behavior (all)
+        if (!type) {
+          // Calculate premium count: if 2 results, 1 premium; if 3+, count after first 2
+          if (results.length === 2) {
+            setPremiumCount(1);
+          } else if (results.length > 2) {
+            setPremiumCount(Math.max(0, results.length - 2));
+          } else {
+            setPremiumCount(0);
+          }
         } else {
-          setPremiumCount(0);
+          // New payment type system
+          if (type === 'single') {
+            setPremiumCount(1);
+          } else {
+            setPremiumCount(count);
+          }
         }
       } catch (e) {
         console.error('Failed to parse results data:', e);
@@ -82,6 +103,9 @@ export function SourcingPayment() {
       setLoading(true);
       toast.loading('Processing payment...', { id: 'payment' });
 
+      // Determine payment amount based on type
+      const amountCents = paymentType === 'single' ? 199 : 999; // $1.99 or $9.99
+
       // Process payment through Stripe API (using test PaymentMethod ID)
       const response = await fetch(`${API_BASE}/api/payment/process`, {
         method: 'POST',
@@ -89,7 +113,7 @@ export function SourcingPayment() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          amount: 999, // $9.99 in cents
+          amount: amountCents,
           currency: 'usd',
           payment_method: 'pm_card_visa', // Stripe test PaymentMethod ID
         }),
@@ -101,21 +125,42 @@ export function SourcingPayment() {
         throw new Error(result.error || 'Payment failed');
       }
 
-      // Payment succeeded - update the queryResults data with payment status
-      const resultsData = sessionStorage.getItem('queryResults');
-      if (resultsData) {
+      // Payment succeeded - update payment state
+      const currentPaidState = sessionStorage.getItem('paidVehicles');
+      let paidVehicles: number[] = [];
+      let allPaid = false;
+
+      if (currentPaidState) {
         try {
-          const queryData: QueryResponse = JSON.parse(resultsData);
-          (queryData as any).paymentCompleted = true;
-          sessionStorage.setItem('queryResults', JSON.stringify(queryData));
+          const parsed = JSON.parse(currentPaidState);
+          if (parsed.all) {
+            allPaid = true;
+          } else if (parsed.vehicles && Array.isArray(parsed.vehicles)) {
+            paidVehicles = parsed.vehicles;
+          }
         } catch (e) {
-          console.error('Failed to update payment status:', e);
+          console.error('Failed to parse paid vehicles state:', e);
         }
       }
 
+      if (paymentType === 'all') {
+        // Mark all vehicles as paid
+        sessionStorage.setItem('paidVehicles', JSON.stringify({ all: true }));
+      } else if (paymentType === 'single' && vehicleIndex !== null) {
+        // Mark single vehicle as paid
+        if (!paidVehicles.includes(vehicleIndex)) {
+          paidVehicles.push(vehicleIndex);
+        }
+        sessionStorage.setItem('paidVehicles', JSON.stringify({ all: false, vehicles: paidVehicles }));
+      }
+
+      // Clean up payment selection from sessionStorage
+      sessionStorage.removeItem('paymentType');
+      sessionStorage.removeItem('paymentVehicleIndex');
+
       toast.success('Payment successful! Redirecting...', { id: 'payment' });
       
-      // Redirect to results page (which will now show all results)
+      // Redirect to results page
       setTimeout(() => {
         navigate('/sourcing/candidates');
       }, 1500);
@@ -127,8 +172,8 @@ export function SourcingPayment() {
     }
   };
 
-  if (premiumCount === 0) {
-    // No premium results to unlock, redirect back
+  if (premiumCount === 0 && !paymentType) {
+    // No premium results to unlock and no payment type, redirect back
     navigate('/sourcing/candidates');
     return null;
   }
@@ -147,9 +192,14 @@ export function SourcingPayment() {
         <div className="bg-gray-900 border border-gray-700 rounded-lg p-8">
           <div className="text-center mb-8">
             <CreditCard className="h-12 w-12 text-brand-gold mx-auto mb-4" />
-            <h1 className="text-3xl font-extrabold text-white mb-2">Unlock Full Results</h1>
+            <h1 className="text-3xl font-extrabold text-white mb-2">
+              {paymentType === 'single' ? 'Unlock Vehicle Details' : 'Unlock Full Results'}
+            </h1>
             <p className="text-gray-400">
-              Complete payment to view all {resultCount} search results
+              {paymentType === 'single' 
+                ? `Complete payment to view details for vehicle #${(vehicleIndex ?? 0) + 1}`
+                : `Complete payment to view all ${resultCount} search results`
+              }
             </p>
           </div>
 
@@ -159,14 +209,21 @@ export function SourcingPayment() {
             <div className="space-y-3">
               <div className="flex justify-between items-center text-sm">
                 <span className="text-gray-400">
-                  Unlock {premiumCount} additional result{premiumCount !== 1 ? 's' : ''}
+                  {paymentType === 'single' 
+                    ? `Unlock vehicle #${(vehicleIndex ?? 0) + 1}`
+                    : `Unlock ${premiumCount} result${premiumCount !== 1 ? 's' : ''}`
+                  }
                 </span>
-                <span className="text-white font-medium">$9.99</span>
+                <span className="text-white font-medium">
+                  ${paymentType === 'single' ? '1.99' : '9.99'}
+                </span>
               </div>
               <div className="border-t border-gray-700 pt-3">
                 <div className="flex justify-between items-center">
                   <span className="text-white font-semibold">Total</span>
-                  <span className="text-brand-gold text-xl font-bold">$9.99</span>
+                  <span className="text-brand-gold text-xl font-bold">
+                    ${paymentType === 'single' ? '1.99' : '9.99'}
+                  </span>
                 </div>
               </div>
             </div>
@@ -250,7 +307,7 @@ export function SourcingPayment() {
               disabled={loading}
               className="w-full py-3 bg-brand-gold text-black font-semibold rounded-lg hover:opacity-80 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Processing...' : 'Pay $9.99'}
+              {loading ? 'Processing...' : `Pay $${paymentType === 'single' ? '1.99' : '9.99'}`}
             </button>
 
             <p className="text-gray-500 text-xs text-center">

@@ -133,12 +133,14 @@ if exist "C:\Program Files\nodejs\npm.cmd" (
 )
 echo.
 
-REM Load Stripe API key from env_var file (if it exists)
-REM Format: API_KEY = <your_key_here>
+REM Load environment variables from env_var file (if it exists)
+REM Format: KEY = value
 set "STRIPE_API_KEY="
+set "HF_BASE_MODEL_ID="
+set "LORA_ADAPTER_PATH="
 set "ENV_VAR_FILE=%SCRIPT_DIR%\car-full-repo\env_var"
 if exist "%ENV_VAR_FILE%" (
-    REM Read API_KEY from env_var file and set as STRIPE_API_KEY
+    REM Read all variables from env_var file
     for /f "usebackq tokens=1,* delims==" %%a in ("%ENV_VAR_FILE%") do (
         REM Trim whitespace from variable name and value
         for /f "tokens=*" %%n in ("%%a") do set "VAR_NAME=%%n"
@@ -146,18 +148,54 @@ if exist "%ENV_VAR_FILE%" (
         REM Remove any remaining leading/trailing spaces
         set "VAR_NAME=!VAR_NAME: =!"
         set "VAR_VALUE=!VAR_VALUE: =!"
-        REM Check if this is API_KEY (case-insensitive)
+        REM Check variable name (case-insensitive) and set accordingly
         if /i "!VAR_NAME!"=="API_KEY" (
             set "STRIPE_API_KEY=!VAR_VALUE!"
+        ) else if /i "!VAR_NAME!"=="HF_BASE_MODEL_ID" (
+            set "HF_BASE_MODEL_ID=!VAR_VALUE!"
+        ) else if /i "!VAR_NAME!"=="LORA_ADAPTER_PATH" (
+            set "LORA_ADAPTER_PATH=!VAR_VALUE!"
         )
     )
 )
 
-REM Debug: Check if API key was loaded
+REM Convert LORA_ADAPTER_PATH to absolute path if it's relative
+if not "!LORA_ADAPTER_PATH!"=="" (
+    REM Check if it's an absolute path (starts with drive letter or \\)
+    echo !LORA_ADAPTER_PATH! | findstr /R "^[A-Z]:\\\|^\\\\" >nul
+    if errorlevel 1 (
+        REM It's a relative path, make it absolute relative to SCRIPT_DIR
+        set "LORA_ADAPTER_PATH=%SCRIPT_DIR%\!LORA_ADAPTER_PATH!"
+    )
+)
+
+REM Debug: Check if variables were loaded
 if "!STRIPE_API_KEY!"=="" (
     echo WARNING: STRIPE_API_KEY not found in env_var file - payment processing will be disabled
 ) else (
     echo Stripe API key loaded from env_var file
+)
+
+if "%USE_MOCK%"=="0" (
+    if "!HF_BASE_MODEL_ID!"=="" (
+        echo ERROR: HF_BASE_MODEL_ID not found in env_var file - required for inference mode
+        pause
+        exit /b 1
+    )
+    if "!LORA_ADAPTER_PATH!"=="" (
+        echo ERROR: LORA_ADAPTER_PATH not found in env_var file - required for inference mode
+        pause
+        exit /b 1
+    )
+    echo HF_BASE_MODEL_ID: !HF_BASE_MODEL_ID!
+    echo LORA_ADAPTER_PATH: !LORA_ADAPTER_PATH!
+    REM Check if adapter path exists
+    if not exist "!LORA_ADAPTER_PATH!" (
+        echo ERROR: LoRA adapter path does not exist: !LORA_ADAPTER_PATH!
+        pause
+        exit /b 1
+    )
+    echo Model configuration loaded successfully
 )
 
 echo.
@@ -167,11 +205,11 @@ echo Backend will run on: http://localhost:%BACKEND_PORT%
 echo.
 
 REM Start Flask backend in a new window
-REM Set STRIPE_API_KEY environment variable before running Python
+REM Set environment variables before running Python
 if "%USE_MOCK%"=="1" (
     start "Flask Backend (MOCK MODE) - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && set STRIPE_API_KEY=!STRIPE_API_KEY! && python app.py --noinference --port %BACKEND_PORT%"
 ) else (
-    start "Flask Backend - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && set STRIPE_API_KEY=!STRIPE_API_KEY! && python app.py --port %BACKEND_PORT%"
+    start "Flask Backend - Port %BACKEND_PORT%" cmd /k "cd /d %BACKEND_DIR% && set PORT=%BACKEND_PORT% && set STRIPE_API_KEY=!STRIPE_API_KEY! && set \"HF_BASE_MODEL_ID=!HF_BASE_MODEL_ID!\" && set \"LORA_ADAPTER_PATH=!LORA_ADAPTER_PATH!\" && python app.py --port %BACKEND_PORT%"
 )
 
 REM Wait a moment for backend to start

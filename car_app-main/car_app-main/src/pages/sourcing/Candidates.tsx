@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { StatusBadge } from '../../components/StatusBadge';
 import { EmptyState } from '../../components/EmptyState';
-import { Search, Star, Plus } from 'lucide-react';
+import { Search, Star, Plus, Handshake } from 'lucide-react';
 import { LoadingSpinner } from '../../components/LoadingSpinner';
 import toast from 'react-hot-toast';
 import { QueryResponse, VehicleResult } from '../../lib/api';
@@ -14,16 +14,71 @@ function formatMileage(mileage?: number): string {
   return `${mileage.toLocaleString()} mi`;
 }
 
-const FREE_RESULTS_COUNT = 2; // First 2 results are free
+interface PaymentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onPaymentSelect: (type: 'single' | 'all') => void;
+  vehicleIndex: number;
+  totalResults: number;
+}
+
+function PaymentModal({ isOpen, onClose, onPaymentSelect, vehicleIndex, totalResults }: PaymentModalProps) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 px-4" onClick={onClose}>
+      <div className="bg-gray-900 border border-gray-700 rounded-lg p-6 max-w-md w-full" onClick={(e) => e.stopPropagation()}>
+        <h2 className="text-xl font-bold text-white mb-4">Unlock Vehicle Details</h2>
+        <p className="text-gray-400 mb-6">
+          Choose how you'd like to unlock the vehicle information:
+        </p>
+        <div className="space-y-3">
+          <button
+            onClick={() => onPaymentSelect('single')}
+            className="w-full p-4 bg-gray-800 border border-gray-600 rounded-lg hover:border-brand-gold hover:bg-gray-700 transition-all text-left"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-white font-semibold">Unlock This Vehicle</div>
+                <div className="text-gray-400 text-sm">View details for vehicle #{vehicleIndex + 1}</div>
+              </div>
+              <div className="text-brand-gold text-lg font-bold">$1.99</div>
+            </div>
+          </button>
+          <button
+            onClick={() => onPaymentSelect('all')}
+            className="w-full p-4 bg-gray-800 border border-gray-600 rounded-lg hover:border-brand-gold hover:bg-gray-700 transition-all text-left"
+          >
+            <div className="flex justify-between items-center">
+              <div>
+                <div className="text-white font-semibold">Unlock All Vehicles</div>
+                <div className="text-gray-400 text-sm">View details for all {totalResults} results</div>
+              </div>
+              <div className="text-brand-gold text-lg font-bold">$9.99</div>
+            </div>
+          </button>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full mt-4 px-4 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-colors"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function SourcingCandidates() {
   const navigate = useNavigate();
   const [results, setResults] = useState<VehicleResult[]>([]);
   const [queryData, setQueryData] = useState<QueryResponse | null>(null);
   const [loading, setLoading] = useState(true);
-  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [paidVehicles, setPaidVehicles] = useState<Set<number>>(new Set());
+  const [allVehiclesPaid, setAllVehiclesPaid] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
+  const [paymentModal, setPaymentModal] = useState<{ isOpen: boolean; vehicleIndex: number }>({ isOpen: false, vehicleIndex: 0 });
 
   useEffect(() => {
     // Load results from sessionStorage (set by NewRequest)
@@ -33,8 +88,16 @@ export function SourcingCandidates() {
         const data: QueryResponse = JSON.parse(stored);
         setQueryData(data);
         setResults(data.results || []);
-        // Check if payment has been completed for this query
-        setPaymentCompleted((data as any).paymentCompleted === true);
+        // Load payment state from sessionStorage
+        const paidState = sessionStorage.getItem('paidVehicles');
+        if (paidState) {
+          const parsed = JSON.parse(paidState);
+          if (parsed.all) {
+            setAllVehiclesPaid(true);
+          } else if (parsed.vehicles && Array.isArray(parsed.vehicles)) {
+            setPaidVehicles(new Set(parsed.vehicles));
+          }
+        }
       } catch (e) {
         console.error('Failed to parse stored results:', e);
         toast.error('Failed to load results');
@@ -42,6 +105,24 @@ export function SourcingCandidates() {
     }
     setLoading(false);
   }, []);
+
+  const handleVehicleClick = (index: number) => {
+    // If already paid, navigate to detail page
+    if (allVehiclesPaid || paidVehicles.has(index)) {
+      navigate(`/sourcing/vehicle/${index}`);
+      return;
+    }
+    // Otherwise open payment modal
+    setPaymentModal({ isOpen: true, vehicleIndex: index });
+  };
+
+  const handlePaymentSelect = async (type: 'single' | 'all') => {
+    setPaymentModal({ isOpen: false, vehicleIndex: 0 });
+    // Navigate to payment page with selection
+    sessionStorage.setItem('paymentType', type);
+    sessionStorage.setItem('paymentVehicleIndex', paymentModal.vehicleIndex.toString());
+    navigate('/sourcing/payment');
+  };
 
   const handleNewSearch = () => {
     sessionStorage.removeItem('queryResults');
@@ -156,18 +237,9 @@ export function SourcingCandidates() {
         {/* Results Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {results.map((vehicle, index) => {
-            // Determine if this result should be blurred
-            // Logic: if 0-1 results, nothing blurred
-            //        if 2 results, blur second (index 1)
-            //        if 3+ results, blur after first 2 (index >= 2)
-            let shouldBlur = false;
-            if (!paymentCompleted && results.length > 1) {
-              if (results.length === 2) {
-                shouldBlur = index === 1; // Blur second card if only 2 results
-              } else if (results.length > 2) {
-                shouldBlur = index >= FREE_RESULTS_COUNT; // Blur after first 2
-              }
-            }
+            // Check if this specific vehicle has been paid for
+            const isPaid = allVehiclesPaid || paidVehicles.has(index);
+            const isLocationBlurred = !isPaid;
             // Extract price - handle both price_cents (in cents) and price (in dollars)
             const priceCents = vehicle.price_cents as number | undefined;
             const priceDollars = vehicle.price as number | undefined;
@@ -192,21 +264,9 @@ export function SourcingCandidates() {
             return (
               <div 
                 key={index} 
-                onClick={shouldBlur ? () => navigate('/sourcing/payment') : undefined}
-                className={`bg-gray-900 border border-gray-700 rounded-lg overflow-hidden transition-all group relative ${
-                  shouldBlur 
-                    ? 'opacity-60 cursor-pointer hover:opacity-80' 
-                    : 'hover:border-brand-gold'
-                }`}
-                style={shouldBlur ? { filter: 'blur(8px)', userSelect: 'none' } : {}}
+                onClick={() => handleVehicleClick(index)}
+                className={`bg-gray-900 border border-gray-700 rounded-lg overflow-hidden transition-all group relative cursor-pointer hover:border-brand-gold`}
               >
-                {shouldBlur && (
-                  <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/40 rounded-lg">
-                    <div className="bg-brand-gold text-black px-4 py-2 rounded-lg font-semibold text-sm">
-                      Click to unlock
-                    </div>
-                  </div>
-                )}
                 {/* Card Header */}
                 <div className="p-5 border-b border-gray-700">
                   <div className="flex items-start justify-between mb-3">
@@ -228,8 +288,23 @@ export function SourcingCandidates() {
 
                 {/* Price - Prominent */}
                 <div className="px-5 py-4 bg-gray-800/50">
-                  <div className="text-2xl font-bold text-brand-gold">
-                    {formatVehiclePrice()}
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold text-brand-gold">
+                      {formatVehiclePrice()}
+                    </div>
+                    {isPaid && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          // TODO: Implement haggle functionality
+                          toast.success('Vehicle sent to sales team to negotiate on your behalf!');
+                        }}
+                        className="flex items-center space-x-2 px-3 py-1.5 bg-brand-gold text-black text-sm font-semibold rounded-lg hover:opacity-80 transition-all"
+                      >
+                        <Handshake className="h-4 w-4" />
+                        <span>Haggle for me!</span>
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -277,9 +352,33 @@ export function SourcingCandidates() {
                     {vehicle.city && (
                       <div className="flex justify-between text-sm">
                         <span className="text-gray-400">Location:</span>
-                        <span className="text-white">{vehicle.city}</span>
+                        <span 
+                          className={`text-white ${isLocationBlurred ? 'blur-sm select-none' : ''}`}
+                          style={isLocationBlurred ? { filter: 'blur(4px)' } : {}}
+                        >
+                          {vehicle.city}{vehicle.state_region ? `, ${vehicle.state_region}` : ''}
+                          {vehicle.zip_code ? ` ${vehicle.zip_code}` : ''}
+                        </span>
                       </div>
                     )}
+                    {/* Vehicle Link */}
+                    <div className="flex justify-between text-sm pt-2 border-t border-gray-700">
+                      <span className="text-gray-400">Vehicle Link:</span>
+                      {isPaid ? (
+                        <a
+                          href={`/sourcing/vehicle/${index}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/sourcing/vehicle/${index}`);
+                          }}
+                          className="text-brand-gold hover:underline"
+                        >
+                          See This Vehicle
+                        </a>
+                      ) : (
+                        <span className="text-gray-500">See This Vehicle</span>
+                      )}
+                    </div>
                   </div>
 
                   {/* Features - Compact Tags */}
@@ -334,6 +433,15 @@ export function SourcingCandidates() {
           })}
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={paymentModal.isOpen}
+        onClose={() => setPaymentModal({ isOpen: false, vehicleIndex: 0 })}
+        onPaymentSelect={handlePaymentSelect}
+        vehicleIndex={paymentModal.vehicleIndex}
+        totalResults={results.length}
+      />
 
       {/* Feedback Modal */}
       {showFeedbackModal && (
