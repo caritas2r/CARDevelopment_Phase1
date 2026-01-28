@@ -1,24 +1,24 @@
-# End-to-End Pipeline: Natural Language Query to SQL Execution
+# End-to-End Pipeline: Complete Application Flow
 
-This document traces the complete flow from when a user submits a natural language query on the frontend through to SQL query execution and results returned.
+This document describes the complete flow from when a user submits a natural language query through the frontend, the backend processing pipeline, results display, payment processing, and feedback submission.
 
-## Pipeline Overview
+## Complete Application Flow Overview
 
 ```
-Frontend → Flask API → QueryService → InferenceService → KeyMappingService → JsonInputConverterService → DatabaseQueryService → Database → Results
+User Query → Frontend Query Page → Backend API → Inference Pipeline → Database Query → Results → Frontend Results Page → Payment (Optional) → Feedback (Optional)
 ```
 
-## Step-by-Step Flow
+## Step-by-Step Complete Flow
 
-### 1. Frontend Submission
+### 1. User Query Submission (Frontend Query Page)
+
 **File**: `car-front-end/src/containers/query-page/index.js`
-
-**Location**: Lines 138-170
 
 **What Happens**:
 - User types natural language query in textarea (e.g., "I want a Toyota Venza Hybrid, under $35k, with cloth seats but premium audio")
 - User clicks "Submit Query" button or presses Enter
 - Frontend validates input is not empty
+- Frontend displays loading indicator: "Processing query..."
 - Frontend makes POST request to backend:
 
 ```javascript
@@ -40,259 +40,81 @@ const response = await fetch(`${API_BASE_URL}/api/query/v1`, {
 
 ---
 
-### 2. Flask API Route Registration
-**File**: `car-back-end/app.py`
+### 2. Backend Query Processing Pipeline
 
-**Location**: Lines 15-59
-
-**What Happens**:
-- Flask app is created via `create_app()`
-- All services are instantiated and registered:
-  - `InferenceService` - Converts NLP to JSON
-  - `KeyMappingService` - Expands shortened keys
-  - `JsonInputConverterService` - Converts JSON to SQL
-  - `DatabaseQueryService` - Executes SQL queries
-  - `QueryService` - Orchestrates the pipeline
-- Services are initialized
-- Flask app returns with all routes registered
-
-**Key Service Dependencies**:
-```python
-query_service = QueryService(
-    inference_service=inference_service,
-    key_mapping_service=key_mapping_service,
-    json_converter_service=json_converter_service,
-    database_query_service=db_query_service,
-    mock_nlp_trip_service=mock_nlp_trip_service
-)
-```
-
----
-
-### 3. QueryService Endpoint Handler
 **File**: `car-back-end/services/query_service.py`
 
-**Location**: Lines 36-125
+The backend receives the query and processes it through the following pipeline:
 
-**What Happens**:
-- Flask route `/api/query/v1` receives POST request
+#### 2.1 Query Validation
 - Validates request body contains `query` field
 - Validates query is non-empty string
-- **Note**: Currently has PoC mode that returns mock data if `mock_nlp_trip_service` is enabled
-- If PoC mode is disabled, proceeds to full pipeline:
 
-**Pipeline Steps** (Lines 87-112):
-```python
-# Step 1: Process through inference service (NLP -> JSON with shortened keys)
-json_with_short_keys = self.inference_service.process_query(query_text)
+#### 2.2 Mock Mode vs Full Pipeline
 
-# Step 2: Expand shortened keys to full keys (mk -> make, md -> model, etc.)
-json_with_full_keys = self.key_mapping_service.expand_shortened_keys(json_with_short_keys)
+**Mock Mode** (when `--noinference` flag is used):
+- Uses `MockQueryService` which accepts only: "pass", "fail", or "insufficient"
+- Returns predefined responses for testing without GPU/model dependencies
 
-# Step 3: Convert JSON to SQL
-sql_query, sql_params = self.json_converter_service.convert_to_sql(json_with_full_keys)
+**Full Pipeline Mode**:
 
-# Step 4: Execute query
-results = self.database_query_service.execute_query(sql_query, sql_params)
-
-# Step 5: Format and return results
-return jsonify({
-    'success': True,
-    'query': query_text,
-    'results': results,
-    'result_count': len(results) if results else 0
-}), 200
-```
-
----
-
-### 4. InferenceService: NLP → JSON (Shortened Keys)
+**Step 1: Inference Service** - NLP → JSON (Shortened Keys)
 **File**: `car-back-end/services/inference_service.py`
+- Processes natural language query through trained model (Qwen2.5-3B with LoRA adapters)
+- Tokenizes input text
+- Runs inference through model
+- Model generates JSON with shortened keys (mk, md, vt, etc.)
+- Parses JSON from model output (stops at `<END_JSON>` marker)
+- Returns structured JSON dictionary
 
-**Location**: Lines 32-99
-
-**What Happens**:
-- `process_query(query_text)` is called with natural language string
-- **Current Status**: Method is `NotImplementedError` - needs to be implemented
-- **Expected Behavior**: 
-  - Load trained model (e.g., Qwen2.5-3B with LoRA adapters)
-  - Tokenize input text
-  - Run inference through model
-  - Model generates JSON with shortened keys (mk, md, vt, etc.)
-  - Parse JSON from model output (stops at `<END_JSON>` marker)
-  - Return structured JSON dictionary
-
-**Example Input**:
-```
-"I want a Toyota Venza Hybrid, under $35k, with cloth seats but premium audio"
-```
-
-**Example Output** (with shortened keys):
-```json
-{
-    "mk": ["Toyota"],
-    "md": ["Venza"],
-    "tr": "unspecified",
-    "vt": {"inc": ["unspecified"], "exc": ["unspecified"]},
-    "cp": {"seat_min": "unspecified", "kids": "unspecified", "pets": "unspecified", "cargo_pri": "unspecified", "cargo_fx": {"hatch": "unspecified", "foldflat": "unspecified"}},
-    "iu": {"tags": ["unspecified"]},
-    "pd": {"tx": "unspecified", "dt": "unspecified", "pt": ["hybrid", "plug_in_hybrid", "mild_hybrid"], "fe_pri": "unspecified"},
-    "fa": {"must": ["cloth_seats"], "nice": ["premium_audio"], "avoid": ["unspecified"]},
-    "oc": {"bud": {"cur": 840, "min": "unspecified", "max": 35000, "max_strict": "true"}, "yr": {"min": "unspecified", "max": "unspecified"}, "mi": {"max": "unspecified", "qual": ["unspecified"]}, "owners": "unspecified"},
-    "ps": {"rel_pri": "unspecified", "clr": ["unspecified"]},
-    "lc": {"cty": "unspecified", "st": "unspecified", "rad": "unspecified"}
-}
-```
-
----
-
-### 5. KeyMappingService: Expand Shortened Keys
+**Step 2: Key Mapping Service** - Expand Shortened Keys
 **File**: `car-back-end/services/key_mapping_service.py`
-
-**Location**: Lines 124-142
-
-**What Happens**:
-- `expand_shortened_keys(json_with_short_keys)` is called
-- Recursively traverses JSON structure
-- Maps shortened keys to full keys using `SHORT_TO_FULL_MAPPING`:
+- Expands shortened keys to full keys:
   - `mk` → `make`
   - `md` → `model`
   - `vt` → `vehicle_type`
   - `oc` → `ownership_constraints`
-  - `bud` → `budget`
   - etc.
 - Returns JSON with full keys
 
-**Example Input** (shortened keys):
-```json
-{
-    "mk": ["Toyota"],
-    "oc": {"bud": {"max": 35000}}
-}
-```
-
-**Example Output** (full keys):
-```json
-{
-    "make": ["Toyota"],
-    "ownership_constraints": {"budget": {"max": 35000}}
-}
-```
-
----
-
-### 6. JsonInputConverterService: JSON → SQL
+**Step 3: JSON Input Converter Service** - JSON → SQL
 **File**: `car-back-end/services/json_input_converter_service.py`
-
-**Location**: Lines 270-302
-
-**What Happens**:
-- `convert_to_sql(json_with_full_keys)` is called
-- Uses declarative mappings (`INCLUSION_MAPPINGS` and `EXCLUSION_MAPPINGS`) to build SQL
-- Processes JSON structure to extract:
-  - Identity fields (make, model, trim, year)
-  - Vehicle type constraints (body_style)
-  - Capacity/practicality (seating, cargo)
-  - Use case tags (via junction table)
-  - Powertrain (transmission, drivetrain, powertrain_type)
-  - Features (via junction table)
-  - Ownership constraints (budget, mileage, owners)
-  - Location constraints
+- Converts structured JSON to SQL query
+- Processes all constraints (make, model, price, features, etc.)
 - Builds WHERE clause with appropriate operators (IN, =, <=, >=, EXISTS)
-- Handles junction tables for many-to-many relationships (features, use_case_tags, powertrain_types)
+- Handles junction tables for many-to-many relationships
 - Returns SQL query string and parameter list
 
-**Example Input** (full keys):
-```json
-{
-    "make": ["Toyota"],
-    "model": ["Venza"],
-    "powertrain_drivability": {
-        "powertrain_type": ["hybrid", "plug_in_hybrid", "mild_hybrid"]
-    },
-    "features_amenities": {
-        "must_have": ["cloth_seats"]
-    },
-    "ownership_constraints": {
-        "budget": {
-            "max": 35000,
-            "strict_max": "true"
-        }
-    }
-}
-```
-
-**Example Output**:
-```python
-sql_query = """
-SELECT * FROM vehicles 
-WHERE make IN (?) 
-AND model IN (?) 
-AND EXISTS (
-    SELECT 1 FROM vehicle_powertrain_types jt 
-    WHERE jt.vehicle_id = vehicles.vehicle_id 
-    AND jt.powertrain_type IN (?,?,?)
-) 
-AND EXISTS (
-    SELECT 1 FROM vehicle_features jt 
-    WHERE jt.vehicle_id = vehicles.vehicle_id 
-    AND jt.feature_tag IN (?)
-) 
-AND price <= ?
-"""
-
-sql_params = ["Toyota", "Venza", "hybrid", "plug_in_hybrid", "mild_hybrid", "cloth_seats", 35000]
-```
-
----
-
-### 7. DatabaseQueryService: Execute SQL
+**Step 4: Database Query Service** - Execute SQL
 **File**: `car-back-end/services/database_query_service.py`
+- Executes parameterized SQL query
+- Fetches results from database
+- Converts rows to list of dictionaries
+- Returns vehicle records
 
-**Location**: Lines 47-80
-
-**What Happens**:
-- `execute_query(sql_query, sql_params)` is called
-- Gets database connection from `DatabaseConnectionService`
-- Creates cursor
-- Executes parameterized SQL query with params (prevents SQL injection)
-- Fetches all results
-- Converts rows to list of dictionaries (column names as keys)
-- Returns results list
-- Closes cursor
-
-**Example Execution**:
-```python
-cursor.execute(sql_query, sql_params)
-# sql_query: "SELECT * FROM vehicles WHERE make IN (?) AND price <= ?"
-# sql_params: ["Toyota", 35000]
-
-rows = cursor.fetchall()
-# Returns: [(1, "Toyota", "Venza", 2023, 32000, ...), ...]
-
-# Convert to dictionaries
-results = [
-    {"vehicle_id": 1, "make": "Toyota", "model": "Venza", "year": 2023, "price": 32000, ...},
-    ...
-]
-```
+**Step 5: Output Quality Service** - Quality Checks
+**File**: `car-back-end/services/output_quality_service.py`
+- Validates output quality
+- Checks for empty/malformed JSON
+- Detects contradictory constraints
+- Returns quality warnings (non-blocking)
 
 ---
 
-### 8. Results Returned to Frontend
+### 3. Backend Response to Frontend
+
 **File**: `car-back-end/services/query_service.py`
 
-**Location**: Lines 107-112
+The backend formats and returns a JSON response:
 
-**What Happens**:
-- QueryService formats response as JSON
-- Returns HTTP 200 with results
-
-**Response Format**:
+**Success Response** (with results):
 ```json
 {
     "success": true,
     "query": "I want a Toyota Venza Hybrid, under $35k, with cloth seats but premium audio",
+    "extracted_fields": {...},
+    "sql_query": "SELECT * FROM vehicles WHERE make IN (?) AND price <= ? ...",
+    "sql_params": ["Toyota", 35000, ...],
     "results": [
         {
             "vehicle_id": 1,
@@ -301,58 +123,373 @@ results = [
             "year": 2023,
             "price": 32000,
             "body_style": "crossover",
-            "transmission": "cvt",
-            "drivetrain": "AWD",
             ...
         },
         ...
     ],
-    "result_count": 5
+    "result_count": 5,
+    "quality_warnings": [],
+    "quality_acceptable": true
 }
 ```
 
-**Frontend Display** (Lines 178-219):
-- Frontend receives response
-- Displays success status
-- Renders vehicle results with details:
+**Insufficient Criteria Response**:
+```json
+{
+    "success": false,
+    "query": "insufficient",
+    "error": "Too many results found that match your criteria. Please refine your search...",
+    "error_type": "insufficient_criteria",
+    "extracted_fields": {},
+    "sql_query": "",
+    "results": [],
+    "result_count": 0
+}
+```
+
+**Failure Response** (query processing error):
+```json
+{
+    "success": false,
+    "query": "invalid query text",
+    "error": "Unable to process query.",
+    "error_type": "processing_error",
+    "extracted_fields": {},
+    "sql_query": "",
+    "results": [],
+    "result_count": 0
+}
+```
+
+---
+
+### 4. Frontend Response Handling (Query Page)
+
+**File**: `car-front-end/src/containers/query-page/index.js`
+
+The frontend handles three possible response scenarios:
+
+#### 4.1 Success Response (Results Found)
+- Stores query results in `sessionStorage`:
+  - `queryResults`: Full response data
+  - `lastQueryText`: Original query text
+  - `lastQueryData`: Response data (for feedback)
+- Redirects to results page: `window.location.hash = '#/results'`
+
+#### 4.2 Insufficient Criteria Response (Warning)
+- Displays warning UI with yellow/orange styling:
+  - Status: "Query not processed"
+  - Message: "Warning: Insufficient criteria detected, please refine your search parameters."
+- Shows "Results Not Satisfactory" button
+- Stores query data in `sessionStorage` for potential feedback submission
+- User can click button to submit feedback
+
+#### 4.3 Failure Response (Error)
+- Displays error UI with red styling:
+  - Status: "Error submitting query"
+  - Message: "Error: Unable to process query."
+- Shows "Results Not Satisfactory" button
+- Stores query data in `sessionStorage` for potential feedback submission
+- User can click button to submit feedback
+
+---
+
+### 5. Results Page Display
+
+**File**: `car-front-end/src/containers/results-page/index.js`
+
+**What Happens**:
+- Retrieves results from `sessionStorage`
+- Checks if payment has been completed (`paymentCompleted` flag)
+- Splits results into:
+  - **Free Results**: First 2 vehicles (fully visible)
+  - **Premium Results**: Remaining vehicles (blurred with paywall overlay)
+
+**Display Features**:
+- Shows query text and result count
+- Displays extracted fields and generated SQL in sidebar
+- Renders vehicle cards with:
   - Make, Model, Year
   - Price, Mileage
   - Body Style, Transmission, Drivetrain
   - Powertrain Types
-  - Seating Capacity
-  - Color
-  - Features
-  - Use Case Tags
+  - Features and Use Case Tags
+  - Location information
+- Shows "Results Not Satisfactory" button
+- If premium results exist, shows blurred overlay with payment prompt
+
+**Paywall Functionality**:
+- If `paymentCompleted === false` and there are premium results:
+  - First 2 results are fully visible
+  - Remaining results are blurred
+  - Overlay message: "Unlock all results for $9.99"
+  - Clicking overlay navigates to payment page
 
 ---
 
-## Current Implementation Status
+### 6. Payment Processing Flow
 
-### ✅ Implemented
-- Frontend query submission
-- Flask API route registration
-- QueryService orchestration
-- KeyMappingService (key expansion)
-- JsonInputConverterService (JSON to SQL conversion)
-- DatabaseQueryService (SQL execution)
-- Results formatting and return
+**File**: `car-front-end/src/containers/payment-page/index.js`  
+**Backend File**: `car-back-end/services/payment_service.py`
 
-### ⚠️ Needs Full Implementation
-- **InferenceService.process_query()** - Currently has skeleton/mock implementation
-  - **Current Status**: Returns mock JSON with basic keyword extraction for testing
-  - **Needs Full Implementation**:
-    1. Load trained model (Qwen2.5-3B with LoRA adapters) in `initialize()`
-    2. Cache model in memory for fast inference
-    3. Tokenize input text
-    4. Run inference through model
-    5. Handle stopping criteria (`<END_JSON>` marker)
-    6. Parse JSON from model output
-    7. Validate JSON structure
-    8. Return structured JSON with shortened keys
-  - **Mock Implementation**: Currently uses `_mock_process_query()` which extracts basic keywords (budget, vehicle type, drivetrain, use cases) for pipeline testing
+#### 6.1 Payment Page Display
+- Shows payment form with fields:
+  - Card Number (formatted with spaces)
+  - Expiry Date (MM/YY format)
+  - CVV
+  - Cardholder Name
+- Displays amount: $9.99
+- Shows note: "Secure payment processing via Stripe (sandbox/test mode)"
 
-### 🔄 Optional (PoC Mode)
-- MockNlpTripService - Returns sample vehicle for testing without inference
+#### 6.2 Payment Submission
+- User fills in payment form (validation for UX only - actual card data not sent)
+- User clicks "Pay $9.99" button
+- Frontend displays debug info showing:
+  - Payment Method ID: `pm_card_visa` (Stripe test PaymentMethod)
+  - Amount: $9.99 (999 cents)
+  - Currency: USD
+- Frontend makes POST request to backend:
+
+```javascript
+fetch(`${API_BASE_URL}/api/payment/process`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        amount: 999,
+        currency: 'usd',
+        payment_method: 'pm_card_visa'
+    })
+})
+```
+
+#### 6.3 Backend Payment Processing
+- `PaymentService` receives request
+- Validates `STRIPE_API_KEY` is configured (loaded from `env_var` file)
+- Creates Stripe `PaymentIntent` with:
+  - Amount: 999 cents ($9.99)
+  - Currency: USD
+  - Payment Method: `pm_card_visa` (test PaymentMethod)
+  - Confirmation: automatic
+- Stripe processes payment (sandbox/test mode)
+- Returns success or error response
+
+#### 6.4 Payment Success Response
+```json
+{
+    "success": true,
+    "message": "Payment processed successfully",
+    "payment_intent_id": "pi_xxx",
+    "amount": 999,
+    "currency": "usd"
+}
+```
+
+#### 6.5 Frontend Payment Success Handling
+- Sets `sessionStorage.setItem('paymentCompleted', 'true')`
+- Displays success message: "Payment successful! Redirecting..."
+- Redirects to results page: `window.location.hash = '#/results'`
+
+#### 6.6 Results Page After Payment
+- Checks `paymentCompleted === true`
+- Shows all results (no blur, no paywall)
+- Displays: "Showing all X results (Unlocked)"
+
+---
+
+### 7. Feedback Submission Flow
+
+Users can submit feedback when results are unsatisfactory through the "Results Not Satisfactory" button.
+
+#### 7.1 Feedback Button Locations
+- **Query Page**: Available when query fails or is insufficient
+- **Results Page**: Always available after results are displayed
+
+#### 7.2 Feedback Submission Process
+
+**Frontend** (`query-page/index.js` or `results-page/index.js`):
+1. User clicks "Results Not Satisfactory" button
+2. Frontend prompts user for optional reason
+3. Retrieves data from `sessionStorage`:
+   - `lastQueryText`: Original query text
+   - `lastQueryData`: Full response data
+4. Makes POST request to backend:
+
+```javascript
+fetch(`${API_BASE_URL}/api/query/feedback`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+        query: queryText,
+        extracted_fields: queryData.extracted_fields || {},
+        sql_query: queryData.sql_query || '',
+        reason: reason || ''
+    })
+})
+```
+
+#### 7.3 Backend Feedback Processing
+
+**File**: `car-back-end/services/query_service.py`
+
+**What Happens**:
+1. Receives feedback data
+2. Determines `query_status`:
+   - `'pass'`: If prompt is "pass" or `success: true` with `result_count > 0`
+   - `'fail'`: If prompt is "fail" or `success: false`
+   - `'insufficient'`: If prompt is "insufficient" or `success: true` with `result_count === 0`
+3. Stores feedback in `flagged_prompts` database table:
+   - `prompt_text`: Original query
+   - `flagged_annotation`: JSON string of extracted fields
+   - `flagged_query`: Generated SQL query
+   - `flag_reason`: User-provided reason (optional)
+   - `query_status`: Status ('pass', 'fail', or 'insufficient')
+4. Returns success response with `flagged_id`
+
+**Database Schema**:
+```sql
+CREATE TABLE flagged_prompts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    prompt_text TEXT NOT NULL,
+    flagged_annotation TEXT,
+    flagged_query TEXT,
+    flag_reason TEXT,
+    query_status TEXT
+);
+```
+
+#### 7.4 Feedback Success Response
+```json
+{
+    "success": true,
+    "message": "Feedback stored successfully",
+    "flagged_id": 123
+}
+```
+
+#### 7.5 Frontend Feedback Success Handling
+- Updates button text to "Feedback Submitted"
+- Disables button to prevent double-submission
+- Shows confirmation message
+
+---
+
+## Complete Data Flow Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         USER INTERACTION                         │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    FRONTEND QUERY PAGE                           │
+│  - User enters query                                             │
+│  - Submits to backend                                            │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ POST /api/query/v1
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    BACKEND QUERY SERVICE                         │
+│  1. InferenceService: NLP → JSON (shortened keys)               │
+│  2. KeyMappingService: Expand keys                               │
+│  3. JsonInputConverterService: JSON → SQL                       │
+│  4. DatabaseQueryService: Execute SQL                            │
+│  5. OutputQualityService: Quality checks                         │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ JSON Response
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                  FRONTEND RESPONSE HANDLING                      │
+│  - Success: Store results → Navigate to results page            │
+│  - Insufficient: Show warning + feedback button                 │
+│  - Failure: Show error + feedback button                        │
+└────────────────────────┬────────────────────────────────────────┘
+                         │
+         ┌───────────────┴───────────────┐
+         │                               │
+         ▼                               ▼
+┌──────────────────────┐      ┌──────────────────────┐
+│   RESULTS PAGE       │      │   FEEDBACK SUBMIT    │
+│  - Display results   │      │   POST /api/query/   │
+│  - Paywall (if any)  │      │   feedback           │
+│  - Feedback button   │      │   → flagged_prompts  │
+└──────────┬───────────┘      └──────────────────────┘
+           │
+           │ Click paywall
+           ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    FRONTEND PAYMENT PAGE                         │
+│  - Payment form (UX only - not sent)                            │
+│  - Submit payment                                                │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ POST /api/payment/process
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    BACKEND PAYMENT SERVICE                       │
+│  - Stripe PaymentIntent.create()                                │
+│  - Process with pm_card_visa (test)                             │
+└────────────────────────┬────────────────────────────────────────┘
+                         │ Success Response
+                         ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              RESULTS PAGE (AFTER PAYMENT)                        │
+│  - All results visible (unlocked)                                │
+│  - Payment completed flag set                                    │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## Query Status Determination
+
+The system determines query status based on the response:
+
+1. **Pass** (`query_status: 'pass'`):
+   - Query processed successfully AND results found (`success: true` AND `result_count > 0`)
+   - Example: User searches for "Toyota Camry" and finds matching vehicles
+
+2. **Fail** (`query_status: 'fail'`):
+   - Query failed to process (`success: false`)
+   - Example: Query parsing error, inference error, or SQL execution error
+
+3. **Insufficient** (`query_status: 'insufficient'`):
+   - Query processed successfully BUT no results found (`success: true` AND `result_count === 0`)
+   - Example: User searches for "McLaren P1" but no such vehicle exists in database
+
+---
+
+## Mock Mode Behavior
+
+When running with `--noinference` flag (no GPU/model dependencies):
+
+**Mock Query Service** accepts only three exact string values:
+- `"pass"` - Returns 1-10 random fake vehicle results
+- `"fail"` - Returns empty results (triggers failure UI)
+- `"insufficient"` - Returns error response (triggers insufficient warning UI)
+
+All mock responses use realistic data from Vehicle Selection V1 schema enums.
+
+---
+
+## Environment Configuration
+
+### Stripe Payment Configuration
+
+**File**: `env_var` (in repository root)
+```
+API_KEY = sk_test_xxx
+```
+
+The `create-venv.bat` script:
+1. Reads `API_KEY` from `env_var` file
+2. Sets `STRIPE_API_KEY` environment variable
+3. Passes to backend process
+
+If `STRIPE_API_KEY` is not configured, payment processing returns a 503 error.
 
 ---
 
@@ -360,36 +497,65 @@ results = [
 
 The pipeline includes error handling at multiple levels:
 
-1. **Frontend**: Validates empty queries, handles network errors
-2. **QueryService**: Validates request format, catches exceptions
-3. **InferenceService**: Should validate input, handle model errors
-4. **JsonInputConverterService**: Validates JSON structure, raises `ValueError` if no conditions
-5. **DatabaseQueryService**: Catches SQL execution errors, raises exceptions
+1. **Frontend Query Page**:
+   - Validates empty queries
+   - Handles network errors
+   - Displays appropriate UI for success/warning/error states
+
+2. **Backend Query Service**:
+   - Validates request format
+   - Catches exceptions at each pipeline step
+   - Returns structured error responses
+
+3. **Backend Payment Service**:
+   - Validates API key configuration
+   - Handles Stripe API errors (card errors, rate limits, etc.)
+   - Returns appropriate HTTP status codes
+
+4. **Database Operations**:
+   - Handles SQL execution errors
+   - Manages connection errors
+   - Validates schema on startup
 
 ---
 
-## Data Flow Summary
+## Current Implementation Status
 
-```
-User Input (String)
-    ↓
-InferenceService.process_query()
-    → JSON with Shortened Keys (mk, md, vt, etc.)
-    ↓
-KeyMappingService.expand_shortened_keys()
-    → JSON with Full Keys (make, model, vehicle_type, etc.)
-    ↓
-JsonInputConverterService.convert_to_sql()
-    → SQL Query String + Parameters
-    ↓
-DatabaseQueryService.execute_query()
-    → List of Dictionaries (vehicle records)
-    ↓
-QueryService formats response
-    → JSON Response
-    ↓
-Frontend displays results
-```
+### ✅ Fully Implemented
+- Frontend query submission with status handling
+- Frontend results page with paywall
+- Frontend payment page with Stripe integration
+- Frontend feedback submission (query page and results page)
+- Backend query processing pipeline
+- Backend payment processing with Stripe
+- Backend feedback storage in database
+- Query status determination (pass/fail/insufficient)
+- Mock mode for testing without GPU
+- Database schema validation and migration
+
+### 🔄 Partial Implementation
+- **InferenceService**: Currently uses mock implementation; full model inference needs to be implemented
+
+---
+
+## Key Files Reference
+
+**Frontend**:
+- `car-front-end/src/containers/query-page/index.js` - Query submission and response handling
+- `car-front-end/src/containers/results-page/index.js` - Results display with paywall
+- `car-front-end/src/containers/payment-page/index.js` - Payment processing
+- `car-front-end/app.js` - Routing between pages
+
+**Backend**:
+- `car-back-end/services/query_service.py` - Query orchestration and feedback endpoint
+- `car-back-end/services/inference_service.py` - NLP to JSON conversion
+- `car-back-end/services/payment_service.py` - Stripe payment processing
+- `car-back-end/utils/db_bootstrap.py` - Database schema (includes `flagged_prompts` table)
+- `car-back-end/app.py` - Flask app initialization and service registration
+
+**Configuration**:
+- `env_var` - Stripe API key configuration
+- `create-venv.bat` - Application launcher with environment setup
 
 ---
 
@@ -397,21 +563,16 @@ Frontend displays results
 
 To complete the pipeline:
 
-1. **Implement InferenceService.process_query()**:
-   - Load model from checkpoint
-   - Implement tokenization
-   - Implement inference with stopping criteria (`<END_JSON>`)
+1. **Implement Full Inference Service**:
+   - Load trained model (Qwen2.5-3B with LoRA adapters)
+   - Implement tokenization and inference
+   - Handle stopping criteria (`<END_JSON>` marker)
    - Parse and validate JSON output
-   - Handle errors gracefully
 
-2. **Test End-to-End**:
-   - Test with real queries
-   - Verify SQL generation accuracy
-   - Verify database query results
-   - Test error cases
-
-3. **Performance Optimization**:
-   - Model loading (cache model in memory)
-   - Query optimization
-   - Response caching (if applicable)
-
+2. **Production Considerations**:
+   - Replace Stripe test PaymentMethod with real payment flow
+   - Add payment webhooks for confirmation
+   - Implement payment receipt generation
+   - Add user authentication/authorization
+   - Implement rate limiting
+   - Add logging and monitoring

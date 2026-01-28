@@ -12,6 +12,7 @@ from services.key_mapping_service import KeyMappingService
 from services.query_service import QueryService
 from services.mock_nlp_trip_service import MockNlpTripService
 from services.mock_query_service import MockQueryService
+from services.payment_service import PaymentService
 
 
 def create_app(use_mock_query_service=False):
@@ -40,8 +41,12 @@ def create_app(use_mock_query_service=False):
         mock_query_service = MockQueryService()
         controller.register_service(mock_query_service)
         
+        # Even in mock mode, we want database for feedback storage
+        db_connection_service = DatabaseConnectionService()
+        controller.register_service(db_connection_service)
+        
         # QueryService with mock_query_service parameter
-        query_service = QueryService(mock_query_service=mock_query_service)
+        query_service = QueryService(mock_query_service=mock_query_service, database_connection_service=db_connection_service)
         controller.register_service(query_service)
     else:
         # Normal mode: Use full inference pipeline
@@ -69,9 +74,14 @@ def create_app(use_mock_query_service=False):
             key_mapping_service=key_mapping_service,
             json_converter_service=json_converter_service,
             database_query_service=db_query_service,
+            database_connection_service=db_connection_service,  # Needed for feedback endpoint
             mock_nlp_trip_service=None  # Set to None to use real inference service
         )
         controller.register_service(query_service)
+    
+    # Register payment service (available in both mock and normal modes)
+    payment_service = PaymentService()
+    controller.register_service(payment_service)
     
     # Initialize all services
     controller.initialize_all_services()
@@ -81,8 +91,25 @@ def create_app(use_mock_query_service=False):
 
 def main():
     """Main entry point"""
+    import os
+    
     # Check for --noinference flag
     use_mock = '--noinference' in sys.argv
+    
+    # Get port from command line --port argument or PORT env var, default to 5000
+    port = 5000
+    if '--port' in sys.argv:
+        port_idx = sys.argv.index('--port')
+        if port_idx + 1 < len(sys.argv):
+            try:
+                port = int(sys.argv[port_idx + 1])
+            except (ValueError, IndexError):
+                pass
+    elif 'PORT' in os.environ:
+        try:
+            port = int(os.environ['PORT'])
+        except ValueError:
+            pass
     
     if use_mock:
         print("\n[APP] Starting in MOCK mode (--noinference flag detected)")
@@ -90,7 +117,8 @@ def main():
         print("[APP] MockQueryService will be used instead\n")
     
     app = create_app(use_mock_query_service=use_mock)
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    print(f"\n[APP] Starting Flask server on port {port}\n")
+    app.run(debug=True, host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':

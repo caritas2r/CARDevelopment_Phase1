@@ -2,6 +2,10 @@
 
 A full-stack application with a Python Flask backend and a lightweight frontend for managing car data.
 
+**Note**: This directory is part of the larger `CARDevelopment_Phase1` repository. The current frontend is located at `../car_app-main/car_app-main/` (React/TypeScript). The frontend in this directory (`car-front-end/`) is deprecated and not in use.
+
+For the main project documentation, see `../README.md`.
+
 ## Project Structure
 
 ```
@@ -44,15 +48,11 @@ car-full-repo/
 │   │   ├── annotated_nlp_prompts.csv    # Completed annotations (output)
 │   │   ├── prompts.csv              # Sample prompts CSV (for direct mode)
 │   │   └── README.md                # Training pipeline documentation
-│   ├── scripts/                     # Utility scripts
-│   │   ├── test_pipeline.py         # Pipeline testing script
-│   │   └── ...                      # Other utility scripts
 │   └── utils/                       # Utility scripts
 │       ├── __init__.py
 │       ├── database_setup_script.py # Database setup script
 │       ├── db_bootstrap.py          # Database schema bootstrap (PoC pattern)
 │       ├── DB_BOOTSTRAP_README.md   # Database bootstrap documentation
-│       ├── inspect_database.py      # Database inspection utility
 │       └── schema_validator.py      # Schema validation utility
 │   ├── docs/                        # Documentation
 │   │   ├── json_to_db_mapping.md    # JSON schema to database mapping
@@ -67,16 +67,24 @@ car-full-repo/
     ├── dev-server.js                # Node.js dev server (no cache)
     ├── dev-server.py                # Python dev server (no cache)
     └── src/                         # Source code
-        └── containers/              # Page containers
-            ├── home-page/           # Home page container
-            │   ├── index.js         # Home page logic
-            │   └── style.css        # Home page styles
-            ├── query-page/          # Query page container
-            │   ├── index.js         # Query page logic
-            │   └── style.css        # Query page styles
-            └── db-schema-page/      # Database schema page
-                ├── index.js         # Schema page logic
-                └── style.css        # Schema page styles
+        ├── containers/              # Page containers
+        │   ├── home-page/           # Home page container
+        │   │   ├── index.js         # Home page logic
+        │   │   └── style.css        # Home page styles
+        │   ├── query-page/          # Query page container
+        │   │   ├── index.js         # Query page logic
+        │   │   └── style.css        # Query page styles
+        │   ├── results-page/        # Results page container
+        │   │   ├── index.js         # Results page logic
+        │   │   └── style.css        # Results page styles
+        │   ├── payment-page/        # Payment page container
+        │   │   ├── index.js         # Payment page logic
+        │   │   └── style.css        # Payment page styles
+        │   └── db-schema-page/      # Database schema page
+        │       ├── index.js         # Schema page logic
+        │       └── style.css         # Schema page styles
+        └── utils/                   # Utility functions
+            └── helpers.js           # Shared helper functions
 ```
 
 ## Quick Start
@@ -97,11 +105,9 @@ This script will automatically:
 - Start the frontend server on port 8000
 - Open your browser to the frontend
 
-**Alternative Scripts:**
-- **PowerShell:** `.\start-app.ps1` (also sets up inference environment)
-- **Cross-platform Python:** `python start-app.py` (also sets up inference environment)
-
-**Note:** `start-app.bat` is legacy/redundant - use `create-venv.bat` instead.
+**Mock Mode (No Inference):**
+- Use `create-venv.bat --noinference` to run without GPU/model dependencies
+- See `README-NOINFERENCE.md` for details
 
 ### Option 2: Manual Setup (Without Launcher Scripts)
 
@@ -198,10 +204,17 @@ cd car-front-end
 - `GET /` - Health check
 - `GET /api/health` - API health check (frontend connection test)
 - `GET /api/db/health` - Database health check
+- `GET /api/db/schema` - Get database schema information
 - `GET /api/schema/v1` - Get Vehicle Selection V1 JSON schema
 - `POST /api/query/v1` - Process natural language vehicle queries
   - Request body: `{ "query": "natural language text" }`
-  - Returns: Vehicle data matching the query (PoC: returns sample vehicle)
+  - Returns: Vehicle data matching the query
+- `POST /api/query/feedback` - Submit feedback for unsatisfactory queries
+  - Request body: `{ "query": "...", "extracted_fields": {...}, "sql_query": "...", "reason": "..." }`
+  - Stores feedback in `flagged_prompts` table
+- `POST /api/payment/process` - Process payment via Stripe
+  - Request body: `{ "amount": 999, "currency": "usd", "payment_method": "pm_card_visa" }`
+  - Returns: Payment processing result
 
 ## Technology Stack
 
@@ -234,10 +247,12 @@ cd car-front-end
 ### Frontend
 - Container-based frontend architecture
 - IBM Carbon Design System v11 styling
-- Hash-based routing
+- Hash-based routing (`#/`, `#/query`, `#/results`, `#/payment`, `#/db-schema`)
 - Query submission interface with rotating placeholders
-- Vehicle result display
+- Vehicle result display with paywall functionality
+- Payment processing integration with Stripe (test mode)
 - Database schema viewer
+- Query feedback system for unsatisfactory results
 - Responsive design
 
 ### Training Pipeline
@@ -283,11 +298,13 @@ The backend follows a microservices architecture:
 
 ### Frontend
 The frontend uses a container-based architecture:
-- **app.js**: Entry point that handles hash-based routing (`#/`, `#/query`, `#/schema`)
-- **Containers**: Page-level components (home-page, query-page, db-schema-page)
+- **app.js**: Entry point that handles hash-based routing (`#/`, `#/query`, `#/results`, `#/payment`, `#/db-schema`)
+- **Containers**: Page-level components (home-page, query-page, results-page, payment-page, db-schema-page)
 - Each container has its own logic (`index.js`) and styles (`style.css`)
+- **Utils**: Shared utility functions in `src/utils/helpers.js`
 - IBM Carbon Design System v11 for consistent styling
 - Dynamic placeholder text rotation on query page
+- Session storage for query results and payment state
 
 ## Database
 
@@ -301,6 +318,7 @@ The application uses SQLite for local development:
   - `vehicle_use_case_tags`: Junction table for use case tags (many-to-many)
   - `vehicle_powertrain_types`: Junction table for powertrain types (many-to-many)
   - `search_requests`: Stores processed queries for analytics
+- `flagged_prompts`: Stores user feedback for unsatisfactory queries
 - Connection service manages a single persistent database connection
 - Query service handles all database operations
 - See `car-back-end/utils/DB_BOOTSTRAP_README.md` for detailed database schema documentation

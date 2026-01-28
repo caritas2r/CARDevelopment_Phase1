@@ -35,26 +35,10 @@ The script will:
 - **Best for:** Windows users who want full inference support (recommended)
 - **Features:** Sets up venv, installs PyTorch and ML dependencies, starts application with inference model
 
-### Windows - PowerShell Script (Alternative)
-- **File:** `start-app.ps1`
-- **Usage:** Right-click → "Run with PowerShell"
-- **Note:** If you get an execution policy error, run:
-  ```powershell
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-  ```
-- **Note:** This script also sets up the inference environment and starts both servers
-
-### Cross-platform - Python Script (Alternative)
-- **File:** `start-app.py`
-- **Usage:** 
-  - Windows: Double-click (if Python is associated with .py files)
-  - Or run: `python start-app.py`
-- **Best for:** Cross-platform compatibility
-- **Note:** This script also sets up the inference environment and starts both servers
-
-### Legacy Script (Not Recommended)
-- **File:** `start-app.bat`
-- **Status:** Redundant/nonfunctional - use `create-venv.bat` instead
+### Mock Mode (No Inference)
+- **Usage:** `create-venv.bat --noinference`
+- **Best for:** Testing frontend without GPU/model dependencies
+- **See:** `README-NOINFERENCE.md` for details
 
 ## Manual Start (If Scripts Don't Work)
 

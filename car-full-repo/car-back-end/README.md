@@ -10,8 +10,6 @@ For full inference support, use the launcher script from the repository root:
 ```bash
 # From car-full-repo directory
 create-venv.bat  # Windows
-# or
-python start-app.py  # Cross-platform
 ```
 
 This will automatically:
@@ -100,7 +98,13 @@ The API will be available at `http://localhost:5000`
 - `GET /api/schema/v1` - Get Vehicle Selection V1 JSON schema
 - `POST /api/query/v1` - Process natural language vehicle queries
   - Request body: `{ "query": "natural language text" }`
-  - Returns: Vehicle data matching the query (PoC: returns sample vehicle with random data)
+  - Returns: Vehicle data matching the query
+- `POST /api/query/feedback` - Submit feedback for unsatisfactory queries
+  - Request body: `{ "query": "...", "extracted_fields": {...}, "sql_query": "...", "reason": "..." }`
+  - Stores feedback in `flagged_prompts` table
+- `POST /api/payment/process` - Process payment via Stripe
+  - Request body: `{ "amount": 999, "currency": "usd", "payment_method": "pm_card_visa" }`
+  - Returns: Payment processing result
 
 ## Architecture
 
@@ -124,7 +128,6 @@ The backend follows a microservices architecture with a service controller:
 - **Schema Validator**: Validates JSON output against Vehicle Selection V1 schema
 - **Database Setup Script**: Handles database initialization
 - **Database Bootstrap**: Creates database schema using PoC pattern (idempotent, safe to run on every startup)
-- **Database Inspector**: Utility script to inspect database structure and contents
 
 ## Project Structure
 
@@ -167,9 +170,6 @@ car-back-end/
 │   ├── json_to_db_mapping.md      # JSON schema to database mapping
 │   ├── end_to_end_pipeline.md     # End-to-end pipeline documentation
 │   └── training_and_inference.md  # Training and inference documentation
-├── scripts/                        # Utility scripts
-│   ├── test_pipeline.py           # Pipeline testing script
-│   └── ...                        # Other utility scripts
 ├── src/
 │   ├── __init__.py
 │   └── service_controller.py      # Service controller
@@ -224,7 +224,6 @@ The application uses SQLite for local development:
 - Connection service manages a single persistent database connection
 - See `utils/DB_BOOTSTRAP_README.md` for detailed database schema documentation
 - See `docs/json_to_db_mapping.md` for JSON schema to database field mappings
-- Use `python utils/inspect_database.py` to inspect the database structure
 
 ## Dependencies
 
@@ -232,3 +231,4 @@ The application uses SQLite for local development:
 - flask-cors 4.0.0 - CORS support
 - python-dotenv 1.0.0 - Environment variable management
 - jsonschema 4.20.0 - JSON schema validation
+- stripe 14.1.0 - Payment processing

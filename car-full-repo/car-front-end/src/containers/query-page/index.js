@@ -171,11 +171,11 @@ function setupFormHandlers() {
             
             const data = await response.json();
             
-            if (!response.ok) {
-                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
-            }
+            // Store query text and data for potential feedback submission (regardless of success/failure)
+            sessionStorage.setItem('lastQueryText', queryText);
+            sessionStorage.setItem('lastQueryData', JSON.stringify(data));
             
-            // Check for insufficient criteria (warning case)
+            // Check for insufficient criteria (warning case) - check BEFORE checking response.ok
             if (!data.success && (data.error_type === 'insufficient_criteria' || queryText.toLowerCase().trim() === 'insufficient')) {
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator warning">
@@ -184,6 +184,11 @@ function setupFormHandlers() {
                     </div>
                     <div class="cds-status-details warning">
                         <p><strong>Warning:</strong> Insufficient criteria detected, please refine your search parameters.</p>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                             Results Not Satisfactory
+                        </button>
                     </div>
                 `;
                 return;
@@ -199,15 +204,44 @@ function setupFormHandlers() {
                     <div class="cds-status-details error">
                         <p><strong>Error:</strong> Unable to process query.</p>
                     </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                             Results Not Satisfactory
+                        </button>
+                    </div>
                 `;
                 return;
             }
             
+            // Now check if response was OK, throw error if not (but we've already stored data above)
+            if (!response.ok) {
+                throw new Error(data.error || `HTTP ${response.status}: ${response.statusText}`);
+            }
+            
             if (data.success) {
                 // Store results in sessionStorage for results page
-                sessionStorage.setItem('queryResults', JSON.stringify(data));
+                // Reset payment status for new query (payment is per-query)
+                data.paymentCompleted = false;
+                // Backend already limits results to 100, so we can store them all
+                try {
+                    sessionStorage.setItem('queryResults', JSON.stringify(data));
+                } catch (e) {
+                    // If still too large (shouldn't happen with 500 limit, but just in case)
+                    console.warn('Results too large for sessionStorage, storing minimal data:', e);
+                    const minimalData = {
+                        query: data.query,
+                        result_count: data.result_count || 0,
+                        total_result_count: data.total_result_count || data.result_count || 0,
+                        results_truncated: data.results_truncated || false,
+                        results: data.results ? data.results.slice(0, 100) : [],
+                        extracted_fields: data.extracted_fields || {},
+                        sql_query: data.sql_query || '',
+                        sql_params: data.sql_params || []
+                    };
+                    sessionStorage.setItem('queryResults', JSON.stringify(minimalData));
+                }
                 
-                // Show success message briefly, then navigate to results page
+                // Show success message with feedback button, then navigate to results page
                 statusDiv.innerHTML = `
                     <div class="cds-status-indicator success">
                         <span class="cds-status-icon">✓</span>
@@ -215,6 +249,11 @@ function setupFormHandlers() {
                     </div>
                     <div class="cds-status-details success">
                         <p>Redirecting to results page...</p>
+                    </div>
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                            ⚠️ Results Not Satisfactory
+                        </button>
                     </div>
                 `;
                 
@@ -226,6 +265,23 @@ function setupFormHandlers() {
                 throw new Error(data.error || 'Query failed');
             }
         } catch (error) {
+            // Store query text for potential feedback submission even on error
+            sessionStorage.setItem('lastQueryText', queryText);
+            
+            // Check if we already have error data in sessionStorage (from response.json() above)
+            let errorData = sessionStorage.getItem('lastQueryData');
+            if (!errorData) {
+                // Store minimal error data for feedback if we don't have it
+                errorData = JSON.stringify({
+                    success: false,
+                    error: error.message,
+                    extracted_fields: {},
+                    sql_query: '',
+                    sql_params: []
+                });
+                sessionStorage.setItem('lastQueryData', errorData);
+            }
+            
             statusDiv.innerHTML = `
                 <div class="cds-status-indicator error">
                     <span class="cds-status-icon">✕</span>
@@ -233,6 +289,11 @@ function setupFormHandlers() {
                 </div>
                 <div class="cds-status-details error">
                     <p><strong>Error:</strong> ${escapeHtml(error.message)}</p>
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <button id="feedbackButton" class="cds-button cds-button--secondary feedback-button" onclick="submitQueryFeedback()">
+                        ⚠️ Results Not Satisfactory
+                    </button>
                 </div>
             `;
         } finally {
@@ -309,6 +370,88 @@ window.addEventListener('beforeunload', () => {
         clearInterval(placeholderInterval);
     }
 });
+
+// Feedback submission function for query page (fail/insufficient cases)
+window.submitQueryFeedback = function() {
+    const feedbackButton = document.getElementById('feedbackButton');
+    if (!feedbackButton) return;
+    
+    // Disable button to prevent double-submission
+    feedbackButton.disabled = true;
+    feedbackButton.textContent = 'Submitting...';
+    
+    // Get the query text and data from sessionStorage
+    const queryText = sessionStorage.getItem('lastQueryText') || '';
+    const queryDataStr = sessionStorage.getItem('lastQueryData');
+    
+    if (!queryText) {
+        alert('Unable to submit feedback: query data not found');
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+        return;
+    }
+    
+    let queryData = {};
+    if (queryDataStr) {
+        try {
+            queryData = JSON.parse(queryDataStr);
+        } catch (e) {
+            console.warn('Could not parse query data:', e);
+        }
+    }
+    
+    // Prompt for reason (optional)
+    const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
+    if (reason === null) {
+        // User cancelled - don't submit
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+        return;
+    }
+    
+    // Submit feedback
+    fetch(`${API_BASE_URL}/api/query/feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            query: queryText,
+            extracted_fields: queryData.extracted_fields || {},
+            sql_query: queryData.sql_query || '',
+            sql_params: queryData.sql_params || [],
+            reason: reason || '',
+            success: queryData.success,
+            result_count: queryData.result_count || 0
+        })
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            feedbackButton.textContent = '✓ Feedback Submitted';
+            feedbackButton.style.backgroundColor = 'var(--cds-support-success)';
+            feedbackButton.style.color = 'white';
+            feedbackButton.style.borderColor = 'var(--cds-support-success)';
+            setTimeout(() => {
+                feedbackButton.disabled = false;
+                feedbackButton.textContent = ' Results Not Satisfactory';
+                feedbackButton.style.backgroundColor = '';
+                feedbackButton.style.color = '';
+                feedbackButton.style.borderColor = '';
+            }, 3000);
+        } else {
+            alert('Failed to submit feedback: ' + (result.error || 'Unknown error'));
+            feedbackButton.disabled = false;
+            feedbackButton.textContent = ' Results Not Satisfactory';
+        }
+    })
+    .catch(error => {
+        console.error('Feedback submission error:', error);
+        alert('Failed to submit feedback: ' + error.message);
+        feedbackButton.disabled = false;
+        feedbackButton.textContent = ' Results Not Satisfactory';
+    });
+};
 
 // Expose renderQueryPage for routing
 window.renderQueryPage = renderQueryPage;

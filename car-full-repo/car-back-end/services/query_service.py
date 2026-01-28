@@ -8,7 +8,7 @@ from services.output_quality_service import OutputQualityService
 class QueryService:
     """Service responsible for orchestrating the query processing pipeline"""
     
-    def __init__(self, inference_service=None, key_mapping_service=None, json_converter_service=None, database_query_service=None, mock_nlp_trip_service=None, mock_query_service=None):
+    def __init__(self, inference_service=None, key_mapping_service=None, json_converter_service=None, database_query_service=None, mock_nlp_trip_service=None, mock_query_service=None, database_connection_service=None):
         """
         Initialize the query service
         
@@ -37,6 +37,7 @@ class QueryService:
         self.database_query_service = database_query_service
         self.mock_nlp_trip_service = mock_nlp_trip_service
         self.mock_query_service = mock_query_service
+        self.database_connection_service = database_connection_service
         
         # Only initialize quality service if not in mock mode
         if mock_query_service is None:
@@ -136,11 +137,32 @@ class QueryService:
                 # Step 3: Convert JSON to SQL
                 sql_query, sql_params = self.json_converter_service.convert_to_sql(json_with_full_keys)
                 
-                # Step 4: Execute query against database
+                # Step 4: Execute query against database with result limiting
+                MAX_RESULTS = 100  # Maximum results to return to prevent performance/storage issues
                 print(f"[{self.name}] Executing SQL query: {sql_query[:200]}...")  # Log first 200 chars
                 print(f"[{self.name}] SQL parameters: {sql_params}")
-                results = self.database_query_service.execute_query(sql_query, sql_params)
-                print(f"[{self.name}] Query executed successfully. Found {len(results)} results.")
+                
+                # Get total count first (for the full query without LIMIT)
+                # Use connection directly for COUNT query (doesn't need enrichment)
+                conn = self.database_query_service.get_connection()
+                cursor = conn.cursor()
+                try:
+                    count_query = sql_query.replace('SELECT *', 'SELECT COUNT(*)', 1)
+                    params_tuple = tuple(sql_params) if sql_params else ()
+                    cursor.execute(count_query, params_tuple)
+                    count_row = cursor.fetchone()
+                    total_result_count = count_row[0] if count_row else 0
+                finally:
+                    cursor.close()
+                
+                # Execute query with LIMIT
+                limited_sql_query = f"{sql_query} LIMIT {MAX_RESULTS}"
+                results = self.database_query_service.execute_query(limited_sql_query, sql_params)
+                results_truncated = total_result_count > MAX_RESULTS
+                
+                print(f"[{self.name}] Query executed successfully. Found {total_result_count} total results, returning {len(results)} results.")
+                if results_truncated:
+                    print(f"[{self.name}] WARNING: Results truncated - {total_result_count} total results, but only returning first {MAX_RESULTS}")
                 
                 # Step 5: Format and return results
                 response_data = {
@@ -151,6 +173,9 @@ class QueryService:
                     'sql_params': sql_params,
                     'results': results,
                     'result_count': len(results) if results else 0,
+                    'total_result_count': total_result_count,  # Total matches found
+                    'results_truncated': results_truncated,  # Flag indicating if results were limited
+                    'max_results': MAX_RESULTS if results_truncated else None,  # Max limit if truncated
                     'quality_warnings': quality_warnings if quality_warnings else [],
                     'quality_acceptable': is_acceptable
                 }
@@ -162,11 +187,35 @@ class QueryService:
                 
                 return jsonify(response_data), 200
                 
+            except ValueError as e:
+                # Check if this is the "inconclusive search results" error
+                error_message = str(e)
+                if "Inconclusive search results" in error_message or "inconclusive" in error_message.lower():
+                    return jsonify({
+                        'success': False,
+                        'error': error_message,
+                        'error_type': 'insufficient_criteria',
+                        'query': query_text,
+                        'extracted_fields': {},
+                        'sql_query': '',
+                        'sql_params': [],
+                        'results': [],
+                        'result_count': 0
+                    }), 400
+                else:
+                    # Other ValueError cases
+                    return jsonify({
+                        'success': False,
+                        'error': error_message,
+                        'error_type': 'validation_error',
+                        'query': query_text
+                    }), 400
             except Exception as e:
                 return jsonify({
                     'success': False,
                     'error': str(e),
-                    'error_type': 'internal_error'
+                    'error_type': 'internal_error',
+                    'query': query_text
                 }), 500
         
         @app.route('/api/query/feedback', methods=['POST'])
@@ -195,48 +244,83 @@ class QueryService:
                         'error_type': 'validation'
                     }), 400
                 
-                # Store the feedback query
-                # For now, we'll save to a CSV file similar to the training data structure
-                import csv
-                import os
-                from datetime import datetime
-                from pathlib import Path
+                # Store the feedback query in the database
+                import json
                 
-                # Create feedback directory if it doesn't exist
-                feedback_dir = Path(__file__).parent.parent / 'training' / 'data' / 'feedback'
-                feedback_dir.mkdir(parents=True, exist_ok=True)
+                if not self.database_connection_service:
+                    return jsonify({
+                        'success': False,
+                        'error': 'Database connection service not available',
+                        'error_type': 'service_unavailable'
+                    }), 503
                 
-                feedback_file = feedback_dir / 'unsatisfactory_queries.csv'
+                # Get database connection
+                conn = self.database_connection_service.get_connection()
                 
-                # Check if file exists to write header
-                file_exists = feedback_file.exists()
+                # Prepare data for insertion
+                prompt_text = data.get('query', '')
                 
-                with open(feedback_file, 'a', newline='', encoding='utf-8') as f:
-                    writer = csv.writer(f)
-                    
-                    # Write header if new file
-                    if not file_exists:
-                        writer.writerow([
-                            'timestamp', 'query', 'extracted_fields', 'sql_query', 
-                            'sql_params', 'reason'
-                        ])
-                    
-                    # Write feedback data
-                    import json
-                    writer.writerow([
-                        datetime.now().isoformat(),
-                        data.get('query', ''),
-                        json.dumps(data.get('extracted_fields', {})),
-                        data.get('sql_query', ''),
-                        json.dumps(data.get('sql_params', [])),
-                        data.get('reason', '')
-                    ])
+                # Handle extracted_fields - save even if empty dict (use None only if missing)
+                extracted_fields = data.get('extracted_fields')
+                if extracted_fields is not None:
+                    flagged_annotation = json.dumps(extracted_fields) if extracted_fields else None
+                else:
+                    flagged_annotation = None
                 
-                print(f"[{self.name}] Stored unsatisfactory query feedback")
+                # Handle sql_query - save empty string if present, use None only if missing
+                flagged_query = data.get('sql_query')
+                if flagged_query == '':  # Empty string is a valid value to save
+                    flagged_query = ''
+                elif not flagged_query:  # None or missing
+                    flagged_query = None
+                
+                # Handle flag_reason - save empty string if present, use None only if missing
+                flag_reason = data.get('reason')
+                if flag_reason == '':  # Empty string is a valid value to save
+                    flag_reason = ''
+                elif not flag_reason:  # None or missing
+                    flag_reason = None
+                
+                # Determine query_status based on prompt_text or response data
+                # Check if it's a mock query (pass/fail/insufficient) or derive from response
+                query_status = None
+                prompt_lower = prompt_text.lower().strip()
+                if prompt_lower in ['pass', 'fail', 'insufficient']:
+                    # Mock mode: use the literal prompt text as status
+                    query_status = prompt_lower
+                elif data.get('success') is False:
+                    # Query failed to process (parsing error, inference error, etc.)
+                    query_status = 'fail'
+                elif data.get('success') is True and data.get('result_count', 0) == 0:
+                    # Query processed successfully but found no results (e.g., searching for McLaren P1 that doesn't exist)
+                    query_status = 'insufficient'
+                elif data.get('success') is True and data.get('result_count', 0) > 0:
+                    # Query processed successfully and found results
+                    query_status = 'pass'
+                elif flagged_query and flagged_annotation:
+                    # Fallback: If we have SQL query and extracted fields but no explicit status, assume it's a successful query
+                    query_status = 'pass'
+                # If we still don't know, leave it NULL
+                
+                # Insert into flagged_prompts table
+                cursor = conn.cursor()
+                cursor.execute("""
+                    INSERT INTO flagged_prompts (prompt_text, flagged_annotation, flagged_query, flag_reason, query_status)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (prompt_text, flagged_annotation, flagged_query, flag_reason, query_status))
+                
+                # Get the inserted ID
+                flagged_id = cursor.lastrowid
+                
+                # Commit the transaction
+                conn.commit()
+                
+                print(f"[{self.name}] Stored flagged prompt in database with ID: {flagged_id}")
                 
                 return jsonify({
                     'success': True,
-                    'message': 'Feedback stored successfully'
+                    'message': 'Feedback stored successfully',
+                    'flagged_id': flagged_id
                 }), 200
                 
             except Exception as e:
