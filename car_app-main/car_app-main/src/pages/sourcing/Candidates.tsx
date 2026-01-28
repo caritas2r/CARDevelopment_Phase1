@@ -74,15 +74,11 @@ export function SourcingCandidates() {
   const [results, setResults] = useState<VehicleResult[]>([]);
   const [queryData, setQueryData] = useState<QueryResponse | null>(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
-  const [paymentCompleted, setPaymentCompleted] = useState(false);
-=======
   const [paidVehicles, setPaidVehicles] = useState<Set<number>>(new Set());
   const [allVehiclesPaid, setAllVehiclesPaid] = useState(false);
   const [showFeedbackModal, setShowFeedbackModal] = useState(false);
   const [feedbackText, setFeedbackText] = useState('');
   const [paymentModal, setPaymentModal] = useState<{ isOpen: boolean; vehicleIndex: number }>({ isOpen: false, vehicleIndex: 0 });
->>>>>>> 534d016ea3a474de745531cb478fe187127fda63
 
   useEffect(() => {
     // Load results from sessionStorage (set by NewRequest)
@@ -133,27 +129,8 @@ export function SourcingCandidates() {
     navigate('/sourcing');
   };
 
-  const handleSubmitFeedback = async () => {
-    if (!queryData) return;
-    
-    const reason = prompt('Why were the results not satisfactory? (Optional - press Cancel to skip)');
-    if (reason === null) return;
-
-    try {
-      await submitQueryFeedback({
-        query: queryData.query || '',
-        extracted_fields: queryData.extracted_fields,
-        sql_query: queryData.sql_query,
-        sql_params: queryData.sql_params,
-        reason: reason || '',
-        success: queryData.success,
-        result_count: queryData.result_count,
-      });
-      toast.success('Feedback submitted successfully');
-    } catch (error: any) {
-      console.error('Feedback error:', error);
-      toast.error(`Failed to submit feedback: ${error.message}`);
-    }
+  const handleSubmitFeedback = () => {
+    setShowFeedbackModal(true);
   };
 
   if (loading) {
@@ -429,8 +406,6 @@ export function SourcingCandidates() {
           })}
         </div>
       </div>
-<<<<<<< HEAD
-=======
 
       {/* Payment Modal */}
       <PaymentModal
@@ -459,13 +434,32 @@ export function SourcingCandidates() {
             />
             <div className="flex justify-end space-x-3 mt-6">
               <button
-                onClick={handleCloseFeedbackModal}
+                onClick={() => setShowFeedbackModal(false)}
                 className="px-4 py-2 text-sm border border-gray-600 text-gray-300 rounded-lg hover:border-gray-500 hover:text-white transition-colors"
               >
                 Cancel
               </button>
               <button
-                onClick={handleSubmitFeedback}
+                onClick={async () => {
+                  if (!queryData) return;
+                  try {
+                    await submitQueryFeedback({
+                      query: queryData.query || '',
+                      extracted_fields: queryData.extracted_fields,
+                      sql_query: queryData.sql_query,
+                      sql_params: queryData.sql_params,
+                      reason: feedbackText || '',
+                      success: queryData.success,
+                      result_count: queryData.result_count,
+                    });
+                    toast.success('Feedback submitted successfully');
+                    setShowFeedbackModal(false);
+                    setFeedbackText('');
+                  } catch (error: any) {
+                    console.error('Feedback error:', error);
+                    toast.error(`Failed to submit feedback: ${error.message}`);
+                  }
+                }}
                 className="px-4 py-2 text-sm bg-brand-gold text-black font-semibold rounded-lg hover:opacity-80 transition-all"
               >
                 Submit
@@ -474,7 +468,6 @@ export function SourcingCandidates() {
           </div>
         </div>
       )}
->>>>>>> 534d016ea3a474de745531cb478fe187127fda63
     </div>
   );
 }
