@@ -1,0 +1,55 @@
+# Root .gitignore for CAR Development Phase 1
+
+# Frontend
+car_app-main/car_app-main/node_modules/
+car_app-main/car_app-main/dist/
+car_app-main/car_app-main/.env
+car_app-main/car_app-main/.env.local
+
+# Temporary/incorrect frontend directory (if it exists)
+frontend/
+frontend/node_modules/
+frontend/dist/
+
+# Backend
+car-full-repo/car-back-end/__pycache__/
+car-full-repo/car-back-end/**/__pycache__/
+car-full-repo/car-back-end/*.pyc
+car-full-repo/car-back-end/*.pyo
+car-full-repo/car-back-end/*.pyd
+car-full-repo/car-back-end/.Python
+car-full-repo/car-back-end/car_inference_env/
+car-full-repo/car-back-end/venv/
+car-full-repo/car-back-end/env/
+car-full-repo/car-back-end/ENV/
+car-full-repo/car-back-end/.venv
+car-full-repo/car-back-end/data/*.db
+car-full-repo/car-back-end/data/*.sqlite
+car-full-repo/car-back-end/data/*.sqlite3
+car-full-repo/car-back-end/.env
+car-full-repo/car-back-end/.env.local
+
+# Model files and cache
+car-full-repo/car-models/
+car-full-repo/hf_cache/
+
+# Environment variables
+car-full-repo/env_var
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# OS
+Thumbs.db
+.DS_Store

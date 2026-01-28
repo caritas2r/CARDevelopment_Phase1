@@ -2,6 +2,10 @@
 
 A full-stack application with a Python Flask backend and a lightweight frontend for managing car data.
 
+**Note**: This directory is part of the larger `CARDevelopment_Phase1` repository. The current frontend is located at `../car_app-main/car_app-main/` (React/TypeScript). The frontend in this directory (`car-front-end/`) is deprecated and not in use.
+
+For the main project documentation, see `../README.md`.
+
 ## Project Structure
 
 ```

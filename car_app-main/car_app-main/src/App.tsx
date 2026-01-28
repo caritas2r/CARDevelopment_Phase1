@@ -11,6 +11,7 @@ import { NewBuildOrder } from './pages/build/NewOrder';
 import { NewSourcingRequest } from './pages/sourcing/NewRequest';
 import { SourcingCandidates } from './pages/sourcing/Candidates';
 import { SourcingPayment } from './pages/sourcing/Payment';
+import { VehicleDetail } from './pages/sourcing/VehicleDetail';
 import { BillingPortal } from './pages/billing/Portal';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { Toast } from './components/Toast';
@@ -35,6 +36,7 @@ function App() {
                       <Route path="/sourcing" element={<NewSourcingRequest />} />
                       <Route path="/sourcing/candidates" element={<SourcingCandidates />} />
                       <Route path="/sourcing/payment" element={<SourcingPayment />} />
+                      <Route path="/sourcing/vehicle/:index" element={<VehicleDetail />} />
                       <Route path="/billing" element={<BillingPortal />} />
                       <Route
                         path="/admin/*"
