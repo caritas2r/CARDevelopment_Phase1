@@ -67,16 +67,26 @@ class InferenceService:
         if not self.adapter_path:
             raise RuntimeError(
                 "LORA_ADAPTER_PATH environment variable not set. "
-                "Set it to the path of your LoRA adapter directory"
+                "Set it to either:\n"
+                "  - HuggingFace Hub model ID (e.g., 'username/adapter-name')\n"
+                "  - Local path to adapter directory"
             )
         
-        if not os.path.exists(self.adapter_path):
+        # Check if adapter_path is a HuggingFace Hub ID (contains "/" and doesn't exist as local path)
+        # or a local path
+        is_hf_hub_id = "/" in self.adapter_path and not os.path.exists(self.adapter_path)
+        
+        if not is_hf_hub_id and not os.path.exists(self.adapter_path):
             raise RuntimeError(
-                f"LoRA adapter path does not exist: {self.adapter_path}"
+                f"LoRA adapter path does not exist: {self.adapter_path}\n"
+                "If this is a HuggingFace Hub model ID, make sure it's in the format 'username/model-name'"
             )
         
         print(f"[{self.name}] Loading base model: {self.base_model_id}")
-        print(f"[{self.name}] Loading LoRA adapter from: {self.adapter_path}")
+        if is_hf_hub_id:
+            print(f"[{self.name}] Loading LoRA adapter from HuggingFace Hub: {self.adapter_path}")
+        else:
+            print(f"[{self.name}] Loading LoRA adapter from local path: {self.adapter_path}")
         
         try:
             # Determine device
@@ -107,7 +117,12 @@ class InferenceService:
             
             # Load LoRA adapter
             print(f"[{self.name}] Loading LoRA adapter...")
-            self.model = PeftModel.from_pretrained(self.model, self.adapter_path)
+            # PeftModel.from_pretrained can load from HuggingFace Hub or local path
+            # Pass token if it's a HuggingFace Hub ID
+            adapter_kwargs = {}
+            if is_hf_hub_id and hf_token:
+                adapter_kwargs['token'] = hf_token
+            self.model = PeftModel.from_pretrained(self.model, self.adapter_path, **adapter_kwargs)
             
             # Set to evaluation mode
             self.model.eval()
