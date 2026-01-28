@@ -118,7 +118,9 @@ def main():
     
     app = create_app(use_mock_query_service=use_mock)
     print(f"\n[APP] Starting Flask server on port {port}\n")
-    app.run(debug=True, host='0.0.0.0', port=port)
+    # Disable debug mode in production (use FLASK_ENV=production)
+    debug_mode = os.getenv('FLASK_ENV') != 'production'
+    app.run(debug=debug_mode, host='0.0.0.0', port=port)
 
 
 if __name__ == '__main__':
