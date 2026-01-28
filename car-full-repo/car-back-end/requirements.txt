@@ -1,5 +1,25 @@
+# Production Requirements - Full Inference Support
+# This file includes all dependencies needed for production deployment with AI inference
+
+# Web Framework
 Flask==3.0.0
 flask-cors==4.0.0
+
+# Configuration
 python-dotenv==1.0.0
+
+# Schema Validation
 jsonschema==4.20.0
+
+# Payment Processing
 stripe==14.1.0
+
+# AI/ML Dependencies - Core Model Runtime
+torch>=2.0.0
+transformers==4.55.2
+peft==0.17.0
+accelerate==1.10.0
+safetensors==0.7.0
+
+# Utilities
+orjson
