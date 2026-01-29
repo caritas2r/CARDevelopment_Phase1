@@ -66,9 +66,12 @@ class QueryService:
             Returns:
                 JSON response with query results or error
             """
+            print(f"[{self.name}] POST /api/query/v1 received")
+            print(f"[{self.name}] Request headers: {dict(request.headers)}")
             try:
                 # Get request data
                 data = request.get_json()
+                print(f"[{self.name}] Request body: {data}")
                 
                 if not data or 'query' not in data:
                     return jsonify({
