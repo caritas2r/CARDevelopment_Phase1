@@ -379,7 +379,7 @@ class JsonInputConverterService:
             transformed_value = self._apply_enum_transform(value, mapping.get('transform'))
             if transformed_value is None:
                 return None, []
-            condition = f"{mapping['sql_field']} {mapping['operator']} ?"
+            condition = f"{mapping['sql_field']} {mapping['operator']} %s"
             return condition, [transformed_value]
         
         # Standard mappings
@@ -387,12 +387,12 @@ class JsonInputConverterService:
         operator = mapping['operator']
         
         if mapping_type == 'array' and operator in ['IN', 'NOT IN']:
-            placeholders = ','.join(['?'] * len(value))
+            placeholders = ','.join(['%s'] * len(value))
             condition = f"{sql_field} {operator} ({placeholders})"
             return condition, value
         
         elif mapping_type in ['number', 'enum', 'string']:
-            condition = f"{sql_field} {operator} ?"
+            condition = f"{sql_field} {operator} %s"
             return condition, [value]
         
         return None, []
@@ -500,7 +500,7 @@ class JsonInputConverterService:
         junction_table = mapping['junction_table']
         junction_field = mapping['junction_field']
         
-        placeholders = ','.join(['?'] * len(value))
+        placeholders = ','.join(['%s'] * len(value))
         
         if include:
             # Inclusion: EXISTS (SELECT 1 FROM junction_table WHERE vehicle_id = vehicles.vehicle_id AND field IN (...))
@@ -585,11 +585,11 @@ class JsonInputConverterService:
         strict_max_normalized = str(strict_max).lower() if strict_max is not None else "false"
         if strict_max_normalized == "true":
             # Strict: price <= budget.max
-            return "price <= ?", [budget_max]
+            return "price <= %s", [budget_max]
         else:
             # Flexible: price <= (budget.max * 1.1)
             flexible_max = int(budget_max * 1.1)
-            return "price <= ?", [flexible_max]
+            return "price <= %s", [flexible_max]
     
     def validate_json_structure(self, json_structure):
         """
