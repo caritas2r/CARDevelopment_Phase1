@@ -2,7 +2,7 @@
 Service Controller - Manages and orchestrates all microservices
 """
 import os
-from flask import Flask, request
+from flask import Flask, request, Response
 from flask_cors import CORS
 
 
@@ -39,34 +39,65 @@ class ServiceController:
                 }
             }, supports_credentials=False)
         
-        # Add after_request handler to ensure CORS headers on all responses (including errors)
-        @self.app.after_request
-        def after_request(response):
-            # Ensure CORS headers are always present
+        # Add explicit OPTIONS route handler for /api/* routes
+        # This will catch OPTIONS requests before Flask-CORS processes them
+        @self.app.route('/api/<path:path>', methods=['OPTIONS'])
+        def handle_options(path):
+            """Explicitly handle OPTIONS preflight requests for all /api/* routes"""
             origin = request.headers.get('Origin')
-            if origin:
-                # Check if origin is allowed
-                if self.allowed_origins is None or origin in self.allowed_origins:
-                    response.headers['Access-Control-Allow-Origin'] = '*' if self.allowed_origins is None else origin
-                    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
-                    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
-                    response.headers['Access-Control-Max-Age'] = '3600'
-            return response
+            print(f"[CORS] OPTIONS request to /api/{path} from origin: {origin}")
+            
+            if origin and (self.allowed_origins is None or origin in self.allowed_origins):
+                # Create response with CORS headers
+                response = Response()
+                response.headers['Access-Control-Allow-Origin'] = '*' if self.allowed_origins is None else origin
+                response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+                response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+                response.headers['Access-Control-Max-Age'] = '3600'
+                response.status_code = 200
+                print(f"[CORS] Returning OPTIONS response with CORS headers")
+                return response
+            else:
+                print(f"[CORS] OPTIONS request from disallowed origin: {origin}")
+                return Response(status=403)
         
-        # Explicitly handle OPTIONS requests for all /api/* routes
+        # Also handle in before_request as backup
         @self.app.before_request
         def handle_preflight():
             if request.method == 'OPTIONS' and request.path.startswith('/api/'):
                 origin = request.headers.get('Origin')
-                if origin:
-                    # Check if origin is allowed
-                    if self.allowed_origins is None or origin in self.allowed_origins:
-                        response = self.app.make_default_options_response()
+                # Always allow if origin is present (or if we allow all)
+                if origin and (self.allowed_origins is None or origin in self.allowed_origins):
+                    # Create a simple response with CORS headers
+                    response = Response()
+                    response.headers['Access-Control-Allow-Origin'] = '*' if self.allowed_origins is None else origin
+                    response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+                    response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+                    response.headers['Access-Control-Max-Age'] = '3600'
+                    response.status_code = 200
+                    print(f"[CORS] Handling OPTIONS preflight for {request.path} from origin {origin}")
+                    return response
+                elif origin:
+                    print(f"[CORS] OPTIONS request from disallowed origin: {origin}")
+        
+        # Add after_request handler to ensure CORS headers on all responses (including errors)
+        @self.app.after_request
+        def after_request(response):
+            # Ensure CORS headers are always present on all responses
+            origin = request.headers.get('Origin')
+            if origin and request.path.startswith('/api/'):
+                # Check if origin is allowed
+                if self.allowed_origins is None or origin in self.allowed_origins:
+                    # Only add if not already present (to avoid duplicates)
+                    if 'Access-Control-Allow-Origin' not in response.headers:
                         response.headers['Access-Control-Allow-Origin'] = '*' if self.allowed_origins is None else origin
+                    if 'Access-Control-Allow-Methods' not in response.headers:
                         response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
+                    if 'Access-Control-Allow-Headers' not in response.headers:
                         response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
+                    if 'Access-Control-Max-Age' not in response.headers:
                         response.headers['Access-Control-Max-Age'] = '3600'
-                        return response
+            return response
         
         self.services = []
     
