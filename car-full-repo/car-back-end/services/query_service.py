@@ -306,11 +306,12 @@ class QueryService:
                 cursor = conn.cursor()
                 cursor.execute("""
                     INSERT INTO flagged_prompts (prompt_text, flagged_annotation, flagged_query, flag_reason, query_status)
-                    VALUES (?, ?, ?, ?, ?)
+                    VALUES (%s, %s, %s, %s, %s)
+                    RETURNING id
                 """, (prompt_text, flagged_annotation, flagged_query, flag_reason, query_status))
                 
-                # Get the inserted ID
-                flagged_id = cursor.lastrowid
+                # Get the inserted ID (PostgreSQL uses RETURNING clause)
+                flagged_id = cursor.fetchone()[0]
                 
                 # Commit the transaction
                 conn.commit()

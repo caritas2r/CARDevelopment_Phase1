@@ -1,6 +1,7 @@
 """
 Service Controller - Manages and orchestrates all microservices
 """
+import os
 from flask import Flask
 from flask_cors import CORS
 
@@ -10,7 +11,29 @@ class ServiceController:
     
     def __init__(self):
         self.app = Flask(__name__)
-        CORS(self.app)  # Enable CORS for frontend requests
+        
+        # Configure CORS to properly handle preflight OPTIONS requests
+        cors_origins = os.getenv('CORS_ORIGINS', '*')
+        if cors_origins == '*':
+            # Allow all origins (development mode)
+            CORS(self.app, resources={
+                r"/api/*": {
+                    "origins": "*",
+                    "methods": ["GET", "POST", "OPTIONS"],
+                    "allow_headers": ["Content-Type"]
+                }
+            })
+        else:
+            # Allow specific origins (production mode)
+            origins = [origin.strip() for origin in cors_origins.split(',')]
+            CORS(self.app, resources={
+                r"/api/*": {
+                    "origins": origins,
+                    "methods": ["GET", "POST", "OPTIONS"],
+                    "allow_headers": ["Content-Type"]
+                }
+            })
+        
         self.services = []
     
     def register_service(self, service):

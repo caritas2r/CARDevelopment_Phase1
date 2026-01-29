@@ -53,7 +53,7 @@ class DatabaseQueryService:
         Get database connection from connection service
         
         Returns:
-            sqlite3.Connection: Database connection object
+            psycopg2.connection: Database connection object
         """
         return self.connection_service.get_connection()
     
@@ -84,7 +84,7 @@ class DatabaseQueryService:
         
         try:
             # Execute the query with parameters
-            # SQLite accepts both list and tuple for params, but we'll use tuple for consistency
+            # PostgreSQL uses %s placeholders and accepts tuple for params
             params_tuple = tuple(params) if params else ()
             cursor.execute(sql_query, params_tuple)
             rows = cursor.fetchall()
@@ -94,7 +94,20 @@ class DatabaseQueryService:
                 # Get column names from cursor description
                 columns = [description[0] for description in cursor.description]
                 # Convert each row tuple to a dictionary
-                results = [dict(zip(columns, row)) for row in rows]
+                # Handle PostgreSQL-specific types (Decimal, date, etc.) for JSON serialization
+                results = []
+                for row in rows:
+                    row_dict = {}
+                    for i, col_name in enumerate(columns):
+                        value = row[i]
+                        # Convert Decimal to int/float for JSON serialization
+                        if hasattr(value, '__class__') and value.__class__.__name__ == 'Decimal':
+                            value = int(value) if value % 1 == 0 else float(value)
+                        # Convert date/datetime to string for JSON serialization
+                        elif hasattr(value, 'isoformat'):
+                            value = value.isoformat()
+                        row_dict[col_name] = value
+                    results.append(row_dict)
                 
                 # Enrich results with junction table data (features, use_case_tags, powertrain_types)
                 enriched_results = self._enrich_with_junction_data(conn, results)
@@ -132,7 +145,7 @@ class DatabaseQueryService:
                 return vehicles
             
             # Query features for all vehicles
-            placeholders = ','.join(['?'] * len(vehicle_ids))
+            placeholders = ','.join(['%s'] * len(vehicle_ids))
             cursor.execute(
                 f"SELECT vehicle_id, feature_tag FROM vehicle_features WHERE vehicle_id IN ({placeholders})",
                 vehicle_ids
